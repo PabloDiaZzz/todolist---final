@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Administración - ToDo List</title>
+    <link rel="stylesheet" th:href="@{/css/tailwind.css}">
+</head>
+
+<body class="bg-gray-100 dark:bg-slate-900 text-slate-900 dark:text-white min-h-screen p-6 font-sans">
+
+    <header
+        class="max-w-6xl mx-auto flex justify-between items-center mb-8 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm">
+        <h1 class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">Panel de Control (ADMIN)</h1>
+        <div class="flex gap-4">
+            <a th:href="@{/home}"
+                class="px-4 py-2 bg-gray-200 dark:bg-slate-700 rounded-lg hover:bg-gray-300 dark:hover:bg-slate-600 transition">Volver
+                a mis tareas</a>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <section class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm">
+            <h2 class="text-xl font-bold border-b border-gray-200 dark:border-slate-700 pb-2 mb-4">Gestión de Usuarios
+            </h2>
+            <ul class="flex flex-col gap-3">
+                <li th:each="u : ${users}"
+                    class="flex justify-between items-center bg-gray-50 dark:bg-slate-900 p-3 rounded-lg border border-gray-200 dark:border-slate-700">
+                    <div>
+                        <p class="font-bold text-sm" th:text="${u.username}"></p>
+                        <p class="text-xs text-gray-500" th:text="${u.role.name()}"></p>
+                    </div>
+                    <form th:if="${u.role.name() == 'ROLE_USER'}" th:action="@{/admin/user/{id}/promote(id=${u.id})}"
+                        method="post">
+                        <button type="submit"
+                            class="text-xs bg-indigo-100 text-indigo-700 hover:bg-indigo-200 dark:bg-indigo-900/50 dark:text-indigo-300 dark:hover:bg-indigo-800 px-3 py-1.5 rounded-md font-semibold transition">Hacer
+                            Admin</button>
+                    </form>
+                </li>
+            </ul>
+        </section>
+
+        <section class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm">
+            <h2 class="text-xl font-bold border-b border-gray-200 dark:border-slate-700 pb-2 mb-4">Gestión de Categorías
+            </h2>
+
+            <form th:action="@{/admin/cat/create}" method="post" class="flex gap-2 mb-4">
+                <input type="text" name="title" placeholder="Nueva categoría..." required
+                    class="w-full border border-gray-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-gray-50 dark:bg-slate-900 text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+                <button type="submit"
+                    class="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700 transition">Crear</button>
+            </form>
+
+            <ul class="flex flex-col gap-2">
+                <li th:each="cat : ${cats}"
+                    class="flex justify-between items-center bg-gray-50 dark:bg-slate-900 p-2.5 rounded-lg border border-gray-200 dark:border-slate-700">
+                    <span class="text-sm font-medium" th:text="${cat.title}"></span>
+                    <form th:action="@{/admin/cat/{id}/delete(id=${cat.id})}" method="post">
+                        <button type="submit"
+                            class="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 px-2 py-1 rounded text-xs transition">Borrar</button>
+                    </form>
+                </li>
+            </ul>
+        </section>
+
+        <section class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm">
+            <h2 class="text-xl font-bold border-b border-gray-200 dark:border-slate-700 pb-2 mb-4">Todas las Tareas</h2>
+            <ul class="flex flex-col gap-3 max-h-[600px] overflow-y-auto pr-2">
+                <li th:each="t : ${tasks}"
+                    class="flex flex-col gap-2 bg-gray-50 dark:bg-slate-900 p-3 rounded-lg border border-gray-200 dark:border-slate-700">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <p class="font-bold text-sm leading-tight" th:text="${t.title}"></p>
+                            <p class="text-xs text-gray-500 mt-0.5">Autor: <span
+                                    class="font-medium text-gray-700 dark:text-gray-300"
+                                    th:text="${t.author.username}"></span></p>
+                        </div>
+                        <form th:action="@{/admin/task/{id}/delete(id=${t.id})}" method="post">
+                            <button type="submit"
+                                class="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 px-2 py-1 rounded text-xs transition">Borrar</button>
+                        </form>
+                    </div>
+                </li>
+            </ul>
+        </section>
+
+    </main>
+</body>
+
+</html>

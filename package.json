@@ -1,0 +1,31 @@
+{
+  "name": "todolist",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "generate-types": "npm --prefix frontend run generate-types",
+
+    "frontend:install": "npm --prefix frontend install",
+    "frontend:build": "npm --prefix frontend run build",
+
+    "backend:run": "mvnw.cmd spring-boot:run -Dspring-boot.run.jvmArguments=\"-Dserver.port=8080\" -Dfrontend.build.skip=true",
+
+    "dev": "concurrently --kill-others \"npm run backend:run\" \"npm --prefix frontend run dev\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "browser-sync": "^3.0.4",
+    "concurrently": "^9.2.1",
+    "tailwindcss": "^4.2.2",
+    "wait-on": "^9.0.5"
+  },
+  "dependencies": {
+    "@midudev/tailwind-animations": "^1.0.1",
+    "@tailwindcss/cli": "^4.2.2",
+    "tailwind-scrollbar": "^4.0.2"
+  }
+}

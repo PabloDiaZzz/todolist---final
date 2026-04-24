@@ -1,0 +1,7 @@
+@import "tailwindcss";
+@import "@midudev/tailwind-animations";
+
+@source "../../templates/**/*.html";
+@source "../js/**/*.js";
+
+@plugin "tailwind-scrollbar";

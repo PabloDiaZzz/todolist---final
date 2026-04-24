@@ -1,0 +1,132 @@
+<div
+    class="font-sans antialiased h-dvh flex items-center justify-center text-slate-900 dark:text-white relative overflow-hidden">
+    <img src="/wall-login.webp" class="w-full h-dvh absolute top-0 left-0 -z-10" alt="">
+    <div
+        class="w-full h-dvh absolute top-0 left-0 -z-10 backdrop-blur-sm dark:backdrop-brightness-50 dark:backdrop-contrast-150">
+    </div>
+    <section
+        class="container m-auto w-[min(450px,90vw)] shadow-2xl h-auto rounded-2xl bg-white dark:bg-slate-800 flex flex-col items-center justify-center overflow-hidden">
+
+        <div class="flex flex-col items-center justify-center w-full h-full">
+            <div class="mt-8 bg-blue-100 dark:bg-slate-700 p-3.5 rounded-full">
+                <svg class="size-10 fill-blue-600 dark:fill-indigo-400">
+                    <use href="/login.svg#login"></use>
+                </svg>
+            </div>
+
+            <div class="px-6 py-4 text-center">
+                <div
+                    class="group flex flex-col relative h-12 mb-2 items-center justify-center *:transition-all *:duration-500 cursor-pointer">
+                    <h1
+                        class="text-2xl font-bold text-blue-600 dark:text-indigo-400 absolute group-hover:opacity-0 group-hover:-translate-x-10">
+                        REGISTRO
+                    </h1>
+                    <button type="button" onclick="navigate('/login')"
+                        class="text-gray-600 dark:text-gray-400 text-lg flex gap-2 items-center cursor-pointer rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 px-3
+                py-2 whitespace-nowrap opacity-0 translate-x-10 group-hover:opacity-100 group-hover:translate-x-0 absolute">
+                        Login
+                    </button>
+                </div>
+                <p class="font-medium">Aplicación ToDo List</p>
+            </div>
+
+            <div id="register-alert"
+                class="hidden mx-8 mb-4 p-3 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 rounded-xl text-sm text-center font-medium transition-all">
+            </div>
+
+            <form id="register-form" class="flex flex-col items-stretch w-full px-8 pb-8 gap-4 caret-blue-600 dark:caret-indigo-600">
+
+                <div class="flex flex-col gap-1">
+
+                    <div class="flex flex-col gap-1 mb-4">
+                        <label for="fullName" class="text-sm font-medium ml-1">Nombre completo</label>
+                        <input
+                            class="w-full border border-gray-300 dark:border-slate-600 rounded-xl px-3 py-3 
+                              bg-gray-50 dark:bg-slate-900 dark:text-white
+                              focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 focus:border-transparent transition-all"
+                            type="text" autocomplete="name" name="fullName" id="fullName">
+                    </div>
+
+                    <div class="flex flex-col gap-1">
+                        <label for="username" class="text-sm font-medium ml-1">Nombre de Usuario</label>
+                        <input
+                            class="w-full border border-gray-300 dark:border-slate-600 rounded-xl px-3 py-3 
+                              bg-gray-50 dark:bg-slate-900 dark:text-white
+                              focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 focus:border-transparent transition-all"
+                            type="text" autocomplete="username" name="username" id="username"
+                            placeholder="Ej: USUario09">
+                        <p id="username-feedback" class="min-h-4 px-1 text-xs text-gray-500 dark:text-gray-400"></p>
+                    </div>
+
+                    <div class="flex flex-col gap-1">
+                        <label for="email" class="text-sm font-medium ml-1">Correo Electrónico</label>
+                        <input
+                            class="w-full border border-gray-300 dark:border-slate-600 rounded-xl px-3 py-3 
+                              bg-gray-50 dark:bg-slate-900 dark:text-white
+                              focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 focus:border-transparent transition-all"
+                            type="email" autocomplete="email" name="email" id="email"
+                            placeholder="Ej: email@ejemplo.com">
+                        <p id="email-feedback" class="min-h-4 px-1 text-xs text-gray-500 dark:text-gray-400"></p>
+                    </div>
+
+                    <div class="flex flex-col gap-1">
+                        <label for="password" class="text-sm font-medium ml-1">Contraseña</label>
+                        <div class="relative group/pass">
+                            <input class="pass-input w-full border border-gray-300 dark:border-slate-600 rounded-xl px-3 pr-12 py-3 
+                   bg-gray-50 dark:bg-slate-900 dark:text-white
+                   focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 focus:border-transparent transition-all"
+                                type="password" autocomplete="new-password" name="password" id="password"
+                                placeholder="••••••••">
+
+                            <button type="button"
+                                class="toggle-password absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-blue-600 dark:hover:text-indigo-400 transition-colors cursor-pointer">
+                                <svg class="eye-show size-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+                                    <path
+                                        d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                    <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <svg class="eye-hide size-5 fill-none stroke-current stroke-2 hidden"
+                                    viewBox="0 0 24 24">
+                                    <path
+                                        d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                                </svg>
+                            </button>
+                        </div>
+                        <p id="pass-complexity-feedback" class="min-h-4 px-1 text-xs text-gray-500 dark:text-gray-400"></p>
+                    </div>
+
+                    <div class="flex flex-col gap-1">
+                        <label for="confirmPassword" class="text-sm font-medium ml-1">Confirmar Contraseña</label>
+                        <div class="relative group/pass">
+                            <input class="pass-input w-full border border-gray-300 dark:border-slate-600 rounded-xl px-3 pr-12 py-3 
+                   bg-gray-50 dark:bg-slate-900 dark:text-white
+                   focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 focus:border-transparent transition-all"
+                                type="password" autocomplete="new-password" name="confirmPassword" id="confirmPassword"
+                                placeholder="••••••••">
+
+                            <button type="button"
+                                class="toggle-password absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-blue-600 dark:hover:text-indigo-400 transition-colors cursor-pointer">
+                                <svg class="eye-show size-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+                                    <path
+                                        d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                    <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                <svg class="eye-hide size-5 fill-none stroke-current stroke-2 hidden"
+                                    viewBox="0 0 24 24">
+                                    <path
+                                        d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                                </svg>
+                            </button>
+                        </div>
+                        <p id="pass-match-feedback" class="min-h-4 px-1 text-xs text-gray-500 dark:text-gray-400"></p>
+                    </div>
+
+                    <button class="dark:bg-indigo-600 bg-blue-600 text-white font-bold py-3 rounded-xl cursor-pointer 
+                           dark:hover:bg-indigo-700 hover:bg-blue-700 active:scale-95 transition-all mt-2" type="submit">
+                        Registrarse
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+</div>

@@ -1,0 +1,151 @@
+<div
+    class="w-full font-sans antialiased bg-gray-200 dark:bg-slate-900 m-0 flex flex-col items-center overflow-x-hidden min-h-screen ">
+    <header class="bg-white dark:bg-slate-800 w-full py-4 shadow-md dark:shadow-lg md:fixed md:top-0 z-10">
+        <div class="flex items-center justify-between gap-2 md:max-w-327.5 max-w-250 w-full mx-auto px-3">
+            <div class="flex flex-col gap-2">
+                <h1 class="text-blue-600 dark:text-indigo-400 font-semibold text-2xl">Aplicación ToDo List</h1>
+                <p id="user-name" class="text-gray-600 dark:text-gray-400 font-semibold"></p>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button id="admin-button" type="button" onclick="navigate('/admin')"
+                    class="hidden bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-indigo-900/50 dark:text-indigo-300 dark:hover:bg-indigo-800 font-bold py-2 px-4 rounded-xl transition-colors cursor-pointer text-sm">
+                    Panel Admin
+                </button>
+
+                <form id="logout-form">
+                    <button
+                        class="text-gray-600 dark:text-gray-400 text-sm sm:text-lg flex gap-2 items-center hover:bg-gray-200 dark:hover:bg-slate-700 px-3 py-2 rounded-xl transition-colors cursor-pointer"
+                        type="submit">
+                        <svg class="size-5 fill-gray-600 dark:fill-gray-400 rotate-180">
+                            <use href="/login.svg#login"></use>
+                        </svg>
+                        Cerrar sesión
+                    </button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <main class="w-full max-w-2xl mx-auto mt-8 px-4 flex flex-col gap-4 pb-10 md:pt-20">
+
+        <div class="flex flex-col relative pb-19">
+            <section
+                class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-md border border-gray-200 dark:border-slate-700">
+                <h2 class="text-xl font-bold text-blue-600 dark:text-indigo-400 mb-4">Nueva Tarea</h2>
+                <form id="task-form" class="flex flex-col gap-3">
+                    <input type="text" name="title" placeholder="¿Qué necesitas hacer?" required
+                        class="w-full border border-gray-300 dark:border-slate-600 rounded-xl px-4 py-3 bg-gray-50 dark:bg-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 outline-none">
+                    <textarea name="description" placeholder="Detalles (opcional)..."
+                        class="w-full border border-gray-300 dark:border-slate-600 rounded-xl px-4 py-3 bg-gray-50 dark:bg-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 outline-none resize-none h-20"></textarea>
+
+                    <div class="flex flex-col md:flex-row gap-4 max-md:*:w-full">
+                        <select id="category-select" name="categoryId"
+                            class="border border-gray-300 dark:border-slate-600 rounded-xl px-4 py-2 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none w-1/3 focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500">
+                            <option value="">- Sin Categoría -</option>
+                        </select>
+
+                        <input type="text" name="tagsInput" autocomplete="off" placeholder="Tags (ej: urgente, compras)"
+                            class="w-2/3 border border-gray-300 dark:border-slate-600 rounded-xl px-4 py-2 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500">
+                    </div>
+
+                    <button type="submit"
+                        class="dark:bg-indigo-600 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-xl dark:hover:bg-indigo-700 w-full md:w-fit md:self-end transition-colors cursor-pointer mt-2">
+                        Añadir Tarea
+                    </button>
+                </form>
+            </section>
+            <section id="task-options" data-active="false"
+                class="group/taskopts bg-white dark:bg-slate-800 rounded-2xl shadow-md border border-gray-200 dark:border-slate-700 size-4 p-4 cursor-pointer data-[active=false]:hover:rounded-xl transition-all duration-500 data-[active=true]:w-max data-[active=true]:h-15 absolute bottom-0 right-0 data-[active=true]:px-2 data-[active=true]:delay-0 delay-200 max-w-full">
+                <svg class="size-6 text-blue-800 dark:text-indigo-300 group-hover/taskopts:text-blue-500 dark:group-hover/taskopts:dark:text-indigo-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none group-data-[active=true]/taskopts:opacity-0 opacity-100 transition-all group-data-[active=true]/taskopts:duration-50 group-data-[active=true]/taskopts:delay-0 delay-500 duration-500">
+                    <use href="/main.svg#filter"></use>
+                </svg>
+                <div class="group-data-[active=true]/taskopts:visible invisible flex opacity-0 group-data-[active=true]/taskopts:opacity-100 dark:text-white transition-all duration-300 group-data-[active=true]/taskopts:delay-500 group-data-[active=true]/taskopts:duration-500 group-data-[active=true]/taskopts:*:duration-500 flex-row justify-between group-data-[active=true]/taskopts:*:scale-100 *:scale-0 group-data-[active=true]/taskopts:*:delay-0 *:delay-500 *:transition-all items-center h-full gap-3">
+                    <select name="category-options-filter" id="category-options-filter" class="bg-blue-600 dark:bg-indigo-600 px-5 py-2 rounded-lg text-white">
+                        <option value="">- Categoria -</option>
+                    </select>
+                    <select name="" id="" class="bg-blue-600 dark:bg-indigo-600 px-5 py-2 rounded-lg text-white">
+                        <option value="">- Completado -</option>
+                        <option value="true">Completadas</option>
+                        <option value="false">Incompletas</option>
+                    </select>
+                    <select name="" id="" class="bg-blue-600 dark:bg-indigo-600 px-5 py-2 rounded-lg text-white">
+                        <option value="">- Ordenar por -</option>
+                        <option value="title">Titulo</option>
+                        <option value="description">Descripción</option>
+                        <option value="category">Categoria</option>
+                        <option value="complete">Completado</option>
+                    </select>
+                </div>
+            </section>
+        </div>
+
+        <section class="flex flex-col gap-4 relative">
+            <div id="no-tasks"
+                class="hidden text-center text-gray-500 dark:text-gray-400 py-8 items-center justify-center w-full gap-4">
+                <svg class="size-5 fill-gray-600 dark:fill-gray-400 text-gray-600 dark:text-gray-400"
+                    viewBox="0 0 1024 1024">
+                    <path
+                        d="M832 512a32 32 0 1 1 64 0v352a32 32 0 0 1-32 32H160a32 32 0 0 1-32-32V160a32 32 0 0 1 32-32h352a32 32 0 0 1 0 64H192v640h640z" />
+                    <path
+                        d="m469.952 554.24 52.8-7.552L847.104 222.4a32 32 0 1 0-45.248-45.248L477.44 501.44l-7.552 52.8zm422.4-422.4a96 96 0 0 1 0 135.808l-331.84 331.84a32 32 0 0 1-18.112 9.088L436.8 623.68a32 32 0 0 1-36.224-36.224l15.104-105.6a32 32 0 0 1 9.024-18.112l331.904-331.84a96 96 0 0 1 135.744 0z" />
+                </svg>
+                No tienes tareas. ¡Añade una para empezar!
+            </div>
+
+            <div id="tasks-container" class="flex flex-col gap-4"></div>
+
+        </section>
+    </main>
+    <dialog id="edit-modal"
+        class="p-6 bg-white dark:bg-slate-800 rounded-2xl shadow-xl backdrop:bg-black/50 backdrop:backdrop-blur-sm m-auto w-[90%] max-w-lg border-none text-slate-900 dark:text-white open:flex flex-col gap-4">
+        <h2 class="text-xl font-bold text-indigo-600 dark:text-indigo-400">Editar Tarea</h2>
+
+        <form id="edit-form" method="post" class="flex flex-col gap-3">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+            <input type="text" name="title" id="edit-title" required
+                class="w-full border border-gray-300 dark:border-slate-600 rounded-xl px-4 py-2 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
+            <textarea name="description" id="edit-desc"
+                class="w-full border border-gray-300 dark:border-slate-600 rounded-xl px-4 py-2 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500 resize-none h-20"></textarea>
+
+            <div class="flex gap-4">
+                <select name="categoryId" id="edit-category"
+                    class="w-1/2 border border-gray-300 dark:border-slate-600 rounded-xl px-4 py-2 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none">
+                    <option value="">- Sin Categoría -</option>
+                    <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.title}"></option>
+                </select>
+                <input type="text" autocomplete="off" name="tagsInput" id="edit-tags"
+                    placeholder="Tags (ej: urgente, compras)"
+                    class="w-2/3 border border-gray-300 dark:border-slate-600 rounded-xl px-4 py-2 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div class="flex gap-3 justify-end mt-4">
+                <button type="button" onclick="document.getElementById('edit-modal').close()"
+                    class="px-5 py-2 bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 rounded-xl cursor-pointer transition">Cancelar</button>
+                <button type="submit"
+                    class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl cursor-pointer transition">Guardar</button>
+            </div>
+        </form>
+    </dialog>
+
+    <script>
+        function abrirEditModal(btn) {
+            const article = btn.closest('.task-item');
+            const modal = document.getElementById('edit-modal');
+
+            document.getElementById('edit-form').action = `/tasks/${article.dataset.id}/edit`;
+
+            document.getElementById('edit-title').value = article.dataset.title;
+            document.getElementById('edit-desc').value = article.dataset.description || '';
+            document.getElementById('edit-category').value = article.dataset.category || '';
+            document.getElementById('edit-tags').value = article.dataset.tags || '';
+
+            const tagIds = article.dataset.tags ? article.dataset.tags.split(',') : [];
+            document.querySelectorAll('.edit-tag-checkbox').forEach(cb => {
+                cb.checked = tagIds.includes(cb.value);
+            });
+
+            modal.showModal();
+        }
+    </script>
+</div>
