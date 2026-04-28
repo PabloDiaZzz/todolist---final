@@ -12,7 +12,7 @@ import java.util.List;
 public interface TaskRepository extends JpaRepository<Task, Long> {
 	List<Task> findByAuthor(Usuario author);
 
-	List<Task> findByCategoryId(Long categoryId);
+	List<Task> findByCategories_Id(Long categoryId);
 
 	boolean existsByTags(Tag tag);
 }

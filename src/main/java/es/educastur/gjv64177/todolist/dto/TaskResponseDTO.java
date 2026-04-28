@@ -9,6 +9,7 @@ public record TaskResponseDTO(
 		String description,
 		boolean completed,
 		LocalDateTime createdAt,
-		CategoryDTO category,
+		LocalDateTime deadline,
+		Set<CategoryDTO> categories,
 		Set<TagDTO> tags
 ) {}

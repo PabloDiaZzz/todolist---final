@@ -8,8 +8,11 @@ import es.educastur.gjv64177.todolist.repository.TagRepository;
 import es.educastur.gjv64177.todolist.repository.TaskRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -41,34 +44,39 @@ public class TaskService {
 		return tags;
 	}
 
-	public void save(Task task, Usuario autor, Long categoryId, String tagsInput) {
+	public void save(Task task, Usuario autor, Set<Long> categoryIds, String tagsInput, LocalDateTime deadline) {
 		task.setAuthor(autor);
-		if (categoryId != null) {
-			task.setCategory(categoryRepository.findById(categoryId).orElse(null));
+		if (categoryIds != null && !categoryIds.isEmpty()) {
+			task.setCategories(new HashSet<>(categoryRepository.findAllById(categoryIds)));
+		} else {
+			task.setCategories(new HashSet<>());
 		}
 		task.setTags(procesarTags(tagsInput));
+		if (deadline != null) task.setDeadline(deadline);
 		taskRepository.save(task);
 	}
 
-	public Task editTask(Long id, Usuario autor, String title, String description, Long categoryId, String tagsInput) {
+	public Task editTask(Long id, Usuario autor, String title, String description, Set<Long> categoryIds, String tagsInput, LocalDateTime deadline) {
 		Task task = findByIdAndAuthor(id, autor);
 		task.setTitle(title);
 		task.setDescription(description);
 
-		if (categoryId != null) {
-			task.setCategory(categoryRepository.findById(categoryId).orElse(null));
+		if (categoryIds != null && !categoryIds.isEmpty()) {
+			task.setCategories(new HashSet<>(categoryRepository.findAllById(categoryIds)));
 		} else {
-			task.setCategory(null);
+			task.setCategories(new HashSet<>());
 		}
 
 		task.setTags(procesarTags(tagsInput));
+		if (deadline != null) task.setDeadline(deadline);
+		task.setLastEdit(LocalDateTime.now());
 		return taskRepository.save(task);
 	}
 
 	public Task findByIdAndAuthor(Long id, Usuario author) {
 		return taskRepository.findById(id)
 				.filter(task -> task.getAuthor().getId().equals(author.getId()))
-				.orElseThrow(() -> new IllegalArgumentException("Tarea no encontrada o sin permiso"));
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarea no encontrada o sin permiso"));
 	}
 
 	@Transactional

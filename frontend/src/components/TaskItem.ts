@@ -14,11 +14,30 @@ export class TaskItem extends HTMLElement {
         const task = this._task;
         const categoryTemplate = this.querySelector('#category-template') as HTMLTemplateElement;
         const tagTemplate = this.querySelector('#tag-template') as HTMLTemplateElement;
-        const titleEl = this.querySelector('h3');
+        const titleEl = this.querySelector('.tittle-text');
         const descEl = this.querySelector('.description-text');
+        const dateEl = this.querySelector('.date-text');
+
+        const deadline = task.deadline ? new Date(task.deadline) : null;
 
         titleEl!.textContent = task.title!;
         descEl!.textContent = task.description ?? '';
+        if (!deadline) dateEl?.remove();
+        else dateEl!.textContent = deadline.toLocaleString('es-ES', {
+            year: 'numeric',
+            month: 'short',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        if (deadline && Date.now() > deadline.getTime()) {
+            dateEl?.classList.add('text-red-600', 'dark:text-red-400', 'bg-red-200', 'dark:bg-red-800/50');
+            dateEl?.classList.remove('text-yellow-600', 'dark:text-yellow-400', 'bg-yellow-200', 'dark:bg-yellow-800/50');
+        } else if (deadline) {
+            dateEl?.classList.add('text-yellow-600', 'dark:text-yellow-400', 'bg-yellow-200', 'dark:bg-yellow-800/50');
+            dateEl?.classList.remove('text-red-600', 'dark:text-red-400', 'bg-red-200', 'dark:bg-red-800/50');
+        }
 
         const wrapper = this.querySelector('.task-wrapper');
         const statusIcon = this.querySelector('.status-icon');
@@ -58,6 +77,11 @@ export class TaskItem extends HTMLElement {
             editBtn.disabled = true;
             editBtn.classList.add('opacity-50', 'cursor-not-allowed');
             editBtn.classList.remove('hover:bg-blue-200', 'dark:hover:bg-blue-900/30');
+            editBtn.classList.remove('text-blue-600', 'dark:text-indigo-400');
+            editBtn.classList.add('text-gray-300', 'dark:text-gray-600');
+            dateEl?.classList.remove('text-red-600', 'dark:text-red-400', 'bg-red-200', 'dark:bg-red-800/50');
+            dateEl?.classList.remove('text-yellow-600', 'dark:text-yellow-400', 'bg-yellow-200', 'dark:bg-yellow-800/50');
+            dateEl?.classList.add('text-green-600', 'dark:text-green-400', 'bg-green-200', 'dark:bg-green-800/50');
         } else {
             editBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             editBtn.classList.add('hover:bg-blue-200', 'dark:hover:bg-blue-900/30');
@@ -68,11 +92,13 @@ export class TaskItem extends HTMLElement {
             this.dispatchEvent(new CustomEvent('task-edit', { bubbles: true, composed: true, detail: task }));
         })
 
-        if (task.category && categoryTemplate && categoryContainer) {
-            const clone = categoryTemplate.content.cloneNode(true) as DocumentFragment;
-            const span = clone.querySelector('span');
-            span!.textContent = task.category.title ?? '';
-            categoryContainer.appendChild(clone);
+        if (task.categories && categoryTemplate && categoryContainer) {
+            task.categories.forEach(cat => {
+                const clone = categoryTemplate.content.cloneNode(true) as DocumentFragment;
+                const span = clone.querySelector('span');
+                if (span) span.textContent = cat.title ?? '';
+                categoryContainer.appendChild(clone);
+            });
         }
 
         if (task.tags && tagTemplate && tagsContainer) {

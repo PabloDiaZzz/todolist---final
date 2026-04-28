@@ -20,6 +20,10 @@ public class Task {
 
 	private LocalDateTime createdAt;
 
+	private LocalDateTime deadline;
+
+	private LocalDateTime lastEdit;
+
 	@Column(nullable = false)
 	private String title;
 
@@ -33,9 +37,13 @@ public class Task {
 	@JoinColumn(name = "author_id", nullable = false)
 	private Usuario author;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "category_id")
-	private Category category;
+	@ManyToMany
+	@JoinTable(
+			name = "tarea_cats",
+			joinColumns = @JoinColumn(name = "tarea_id"),
+			inverseJoinColumns = @JoinColumn(name = "cat_id")
+	)
+	private Set<Category> categories = new HashSet<>();
 	@ManyToMany
 	@JoinTable(
 			name = "tarea_tags",

@@ -38,14 +38,14 @@ public class TaskController {
 		Task task = new Task();
 		task.setTitle(dto.title());
 		task.setDescription(dto.description());
-		taskService.save(task, user, dto.categoryId(), dto.tagsInput());
+		taskService.save(task, user, dto.categoryIds(), dto.tagsInput(), dto.deadline());
 		return ResponseEntity.status(HttpStatus.CREATED).body(taskMapper.toDTO(task));
 	}
 
 	@PutMapping("/{id}")
 	public ResponseEntity<TaskResponseDTO> editTask(@PathVariable Long id, @RequestBody TaskRequestDTO dto, Authentication authentication) {
 		Usuario user = usuarioService.findByUsername(authentication.getName());
-		Task finalTask = taskService.editTask(id, user, dto.title(), dto.description(), dto.categoryId(), dto.tagsInput());
+		Task finalTask = taskService.editTask(id, user, dto.title(), dto.description(), dto.categoryIds(), dto.tagsInput(), dto.deadline());
 		return ResponseEntity.ok(taskMapper.toDTO(finalTask));
 	}
 

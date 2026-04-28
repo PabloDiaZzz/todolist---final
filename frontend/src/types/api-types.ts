@@ -13,8 +13,10 @@
 export interface TaskRequestDTO {
   title?: string;
   description?: string;
-  /** @format int64 */
-  categoryId?: number;
+  /** @format date-time */
+  deadline?: string;
+  /** @uniqueItems true */
+  categoryIds?: number[];
   tagsInput?: string;
 }
 
@@ -37,7 +39,10 @@ export interface TaskResponseDTO {
   completed?: boolean;
   /** @format date-time */
   createdAt?: string;
-  category?: CategoryDTO;
+  /** @format date-time */
+  deadline?: string;
+  /** @uniqueItems true */
+  categories?: CategoryDTO[];
   /** @uniqueItems true */
   tags?: TagDTO[];
 }
@@ -86,10 +91,13 @@ export interface Task {
   id?: number;
   /** @format date-time */
   createdAt?: string;
+  /** @format date-time */
+  deadline?: string;
   title?: string;
   description?: string;
   completed?: boolean;
-  category?: Category;
+  /** @uniqueItems true */
+  categories?: Category[];
   /** @uniqueItems true */
   tags?: Tag[];
 }

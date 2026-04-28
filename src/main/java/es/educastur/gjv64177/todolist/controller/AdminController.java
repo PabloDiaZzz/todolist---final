@@ -50,9 +50,9 @@ public class AdminController {
 
 	@DeleteMapping("/categories/{id}")
 	public ResponseEntity<Void> borrarCategoria(@PathVariable Long id) {
-		List<Task> tareasAfectadas = taskRepository.findByCategoryId(id);
+		List<Task> tareasAfectadas = taskRepository.findByCategories_Id(id);
 		for (Task t : tareasAfectadas) {
-			t.setCategory(null);
+			t.setCategories(null);
 			taskRepository.save(t);
 		}
 		categoryService.deleteById(id);
