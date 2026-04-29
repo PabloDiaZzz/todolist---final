@@ -5,6 +5,13 @@ import type { Category } from '../types/api-types';
 import type { TaskRequestDTO } from '../types/api-types';
 import type { TaskResponseDTO } from '../types/api-types';
 import '../components/TaskItem';
+import { Datepicker } from 'flowbite';
+
+declare module 'flowbite' {
+    interface DatepickerOptions {
+        container?: HTMLElement | string;
+    }
+}
 
 export class HomeView extends HTMLElement {
     constructor() {
@@ -18,6 +25,25 @@ export class HomeView extends HTMLElement {
         this.shadowRoot!.adoptedStyleSheets = [sheet];
 
         this.shadowRoot!.innerHTML = html;
+        
+        const themeWrapper = this.shadowRoot!.getElementById('theme-wrapper');
+        
+        const syncTheme = () => {
+            const isDark = document.documentElement.classList.contains('dark');
+            if (isDark) {
+                themeWrapper?.classList.add('dark');
+            } else {
+                themeWrapper?.classList.remove('dark');
+            }
+        };
+
+        syncTheme();
+
+        const observer = new MutationObserver(() => syncTheme());
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['class']
+        });
 
         this.setupEvents();
     }
@@ -32,9 +58,21 @@ export class HomeView extends HTMLElement {
         const searchInput = root.getElementById('category-search') as HTMLInputElement;
         const categoryList = root.getElementById('category-list')!;
         const dropdownIcon = dropdownBtn.querySelector('svg')!;
-
-        const dateTimeInput = root.getElementById('date-time-input') as HTMLInputElement;
+        const dateInput = root.getElementById('date-input') as HTMLInputElement;
+        const timeInput = root.getElementById('time-input') as HTMLInputElement;
         
+
+        const dp = new Datepicker(dateInput, {
+            autohide: true,
+            format: 'dd/mm/yyyy',
+            orientation: 'bottom',
+            language: 'es',
+            minDate: Date.now().toString(),
+            buttons: true,
+            autoSelectToday: 1,
+            container: root.getElementById('theme-wrapper') as HTMLElement
+        });
+
         let allCategories: Category[] = [];
         let selectedCategories: Category[] = [];
 
@@ -53,10 +91,6 @@ export class HomeView extends HTMLElement {
         } else {
             adminButton.classList.remove('hidden');
         }
-
-        dateTimeInput.addEventListener('focus', () => {
-            dateTimeInput.type = 'datetime-local';
-        }, { once: true });
 
         allCategories = await fetch('/api/cats').then(res => res.json());
         const renderCategoryList = (searchTerm = '') => {
@@ -123,13 +157,19 @@ export class HomeView extends HTMLElement {
         });
 
         root.addEventListener('click', (e) => {
-            if (e.target !== taskOptions && !taskOptions.contains(e.target as Node) && taskOptions.dataset.active === 'true') {
+            const target = e.target as Node;
+            const pickerEl = document.querySelector('.datepicker-picker');
+            if (target !== taskOptions && !taskOptions.contains(target) && taskOptions.dataset.active === 'true') {
                 taskOptions.setAttribute('data-active', 'false');
             }
 
-            if (!dropdownBtn.contains(e.target as Node) && !dropdownMenu.contains(e.target as Node)) {
+            if (target !== dateInput && pickerEl && !pickerEl.contains(target)) {
+                dp.hide();
+            }
+
+            if (!dropdownBtn.contains(target) && !dropdownMenu.contains(target)) {
                 dropdownMenu.classList.add('hidden');
-                dropdownIcon.classList.remove('rotate-180'); // Devolvemos la flecha a su sitio
+                dropdownIcon.classList.remove('rotate-180');
             }
         });
 
@@ -153,14 +193,22 @@ export class HomeView extends HTMLElement {
         taskForm?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData: FormData = new FormData(taskForm);
-            formData.forEach((value, key) => console.log(key, value))
+            const dateStr = formData.get('date') as string;
+            const timeStr = formData.get('time') as string;
+
+            let finalDeadline: string | undefined = undefined;
+
+            if (dateStr && timeStr) {
+                const [day, month, year] = dateStr.split('/');
+                finalDeadline = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${timeStr}:00`;
+            }
 
             const task: TaskRequestDTO = {
                 title: formData.get('title') as string,
                 description: formData.get('description') as string,
                 categoryIds: selectedCategories.map(c => c.id!),
                 tagsInput: formData.get('tagsInput') as string,
-                deadline: formData.get('datetime') as string
+                deadline: finalDeadline,
             };
 
             await fetch('/api/tasks', {
@@ -174,6 +222,7 @@ export class HomeView extends HTMLElement {
             this.loadTasks();
             taskForm.reset();
             resetUI();
+            timeInput.value = '23:59';
         });
     }
 

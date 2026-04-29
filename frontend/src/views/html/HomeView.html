@@ -1,5 +1,4 @@
-<div
-    class="w-full font-sans antialiased bg-gray-200 dark:bg-slate-900 m-0 flex flex-col items-center overflow-x-hidden min-h-screen ">
+<div id="theme-wrapper" class="w-full font-sans antialiased bg-gray-200 dark:bg-slate-900 m-0 flex flex-col items-center overflow-x-hidden min-h-screen ">
     <header class="bg-white dark:bg-slate-800 w-full py-4 shadow-md dark:shadow-lg md:fixed md:top-0 z-10">
         <div class="flex items-center justify-between gap-2 md:max-w-327.5 max-w-250 w-full mx-auto px-3">
             <div class="flex flex-col gap-2">
@@ -41,8 +40,33 @@
 
                     <div class="flex flex-col md:flex-row gap-4 max-md:*:w-full">
                         <!-- <select id="category-select" name="categoryId"
+                        <!-- <select id="category-select" name="categoryId"
                             class="border border-gray-300 dark:border-slate-600 rounded-xl px-4 py-2 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none w-1/3 focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500">
                             <option value="">- Sin Categoría -</option>
+                        </select> -->
+                        <div class="flex flex-col flex-1 gap-2 relative" id="category-dropdown-container">
+                            <button type="button" id="category-dropdown-btn"
+                                class="inline-flex justify-between items-center w-full bg-gray-50 dark:bg-slate-900 rounded-xl px-1 py-3 text-sm border border-gray-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-gray-700 dark:text-gray-200 cursor-pointer hover:border-indigo-400 group">
+                                <span id="category-dropdown-label" class="truncate px-2">Categorías: 0</span>
+                                <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-500 dark:group-hover:text-indigo-400 transition-transform duration-300"
+                                    viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd"
+                                        d="M6.293 9.293a1 1 0 011.414 0L10 11.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </button>
+
+                            <div id="category-dropdown-menu"
+                                class="hidden absolute top-12 left-0 z-50 w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-xl overflow-hidden">
+                                <div class="p-2 border-b border-gray-200 dark:border-slate-700 relative">
+                                    <input type="text" id="category-search" placeholder="Buscar categoría..."
+                                        class="w-full px-3 py-2 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-800 dark:text-gray-200">
+                                </div>
+                                <div id="category-list"
+                                    class="max-h-52 overflow-y-auto p-1 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-slate-700 dark:[&::-webkit-scrollbar-thumb]:bg-slate-500">
+                                </div>
+                            </div>
+                        </div>
                         </select> -->
                         <div class="flex flex-col flex-1 gap-2 relative" id="category-dropdown-container">
                             <button type="button" id="category-dropdown-btn"
@@ -71,8 +95,30 @@
                         <input type="text" name="tagsInput" autocomplete="off" placeholder="Tags (ej: urgente, compras)"
                             class="w-2/3 border border-gray-300 dark:border-slate-600 rounded-xl px-4 py-2 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500">
                     </div>
-                    <div class="flex flex-col gap-4 max-md:*:w-full">
-                        <input class="w-2/3 border border-gray-300 dark:border-slate-600 rounded-xl px-4 py-2 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500" type="text" id="date-time-input" placeholder="Fecha límite..." name="datetime">
+                    <div class="flex flex-col sm:flex-row gap-4 w-full">
+                        <div class="relative flex-1 group">
+                            <div class="absolute inset-y-0 inset-s-0 flex items-center ps-3 pointer-events-none z-10">
+                                <svg class="w-5 h-5 text-gray-500 dark:text-gray-400 group-hover:text-blue-500 dark:group-hover:text-indigo-400 transition-colors duration-300"
+                                    fill="currentColor" viewBox="0 0 20 20">
+                                    <path
+                                        d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                </svg>
+                            </div>
+                            <input type="text" id="date-input" name="date" placeholder="Seleccionar fecha limite"
+                                autocomplete="off"
+                                class="block w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-900 dark:border-slate-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-indigo-500 dark:focus:border-indigo-500 transition-all">
+                        </div>
+                        <div class="relative flex-1 group">
+                            <div class="absolute inset-y-0 inset-e-0 flex items-center pe-3 pointer-events-none z-10">
+                                <svg class="w-5 h-5 text-gray-500 dark:text-gray-400 group-hover:text-blue-500 dark:group-hover:text-indigo-400 transition-colors duration-300"
+                                    fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                </svg>
+                            </div>
+                            <input type="time" id="time-input" name="time" value="23:59"
+                                class="block w-full pr-10 pl-4 py-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-900 dark:border-slate-600 dark:text-white dark:focus:ring-indigo-500 dark:focus:border-indigo-500 transition-all">
+                        </div>
                     </div>
 
                     <button type="submit"
@@ -82,6 +128,9 @@
                 </form>
             </section>
             <section id="task-options" data-active="false"
+                class="hidden group/taskopts bg-white dark:bg-slate-800 rounded-2xl shadow-md border border-gray-200 dark:border-slate-700 size-4 p-4 cursor-pointer data-[active=false]:hover:rounded-xl transition-all duration-500 data-[active=true]:w-max data-[active=true]:h-15 absolute bottom-0 right-0 data-[active=true]:px-2 data-[active=true]:delay-0 delay-200 max-w-full">
+                <svg
+                    class="size-6 text-blue-800 dark:text-indigo-300 group-hover/taskopts:text-blue-500 dark:group-hover/taskopts:dark:text-indigo-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none group-data-[active=true]/taskopts:opacity-0 opacity-100 transition-all group-data-[active=true]/taskopts:duration-50 group-data-[active=true]/taskopts:delay-0 delay-500 duration-500">
                 class="hidden group/taskopts bg-white dark:bg-slate-800 rounded-2xl shadow-md border border-gray-200 dark:border-slate-700 size-4 p-4 cursor-pointer data-[active=false]:hover:rounded-xl transition-all duration-500 data-[active=true]:w-max data-[active=true]:h-15 absolute bottom-0 right-0 data-[active=true]:px-2 data-[active=true]:delay-0 delay-200 max-w-full">
                 <svg
                     class="size-6 text-blue-800 dark:text-indigo-300 group-hover/taskopts:text-blue-500 dark:group-hover/taskopts:dark:text-indigo-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none group-data-[active=true]/taskopts:opacity-0 opacity-100 transition-all group-data-[active=true]/taskopts:duration-50 group-data-[active=true]/taskopts:delay-0 delay-500 duration-500">

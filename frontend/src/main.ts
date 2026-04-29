@@ -1,4 +1,5 @@
 import './style.css';
+import 'flowbite';
 import './views/LoginView';
 import './views/HomeView';
 import './views/RegisterView';
@@ -49,4 +50,23 @@ window.addEventListener('popstate', router);
   router();
 };
 
+function initDarkMode() {
+  const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+  const applyTheme = (isDark: boolean) => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  };
+
+  applyTheme(darkModeMediaQuery.matches);
+
+  darkModeMediaQuery.addEventListener('change', (e) => {
+    applyTheme(e.matches);
+  });
+}
+
 router();
+initDarkMode();

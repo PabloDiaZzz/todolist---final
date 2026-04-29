@@ -46,6 +46,7 @@ export class TaskItem extends HTMLElement {
         const categoryContainer = this.querySelector('.category-container');
         const deleteBtn = this.querySelector('.delete-btn') as HTMLButtonElement;
         const editBtn = this.querySelector('.edit-btn') as HTMLButtonElement;
+        const infoBtn = this.querySelector('.info-btn');
 
         const toggleBtn = this.querySelector('.toggle-btn');
         toggleBtn?.addEventListener('click', async () => {
@@ -82,10 +83,12 @@ export class TaskItem extends HTMLElement {
             dateEl?.classList.remove('text-red-600', 'dark:text-red-400', 'bg-red-200', 'dark:bg-red-800/50');
             dateEl?.classList.remove('text-yellow-600', 'dark:text-yellow-400', 'bg-yellow-200', 'dark:bg-yellow-800/50');
             dateEl?.classList.add('text-green-600', 'dark:text-green-400', 'bg-green-200', 'dark:bg-green-800/50');
+            infoBtn?.classList.add('invisible');
         } else {
             editBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             editBtn.classList.add('hover:bg-blue-200', 'dark:hover:bg-blue-900/30');
             editBtn.disabled = false;
+            infoBtn?.classList.remove('invisible');
         }
 
         editBtn.addEventListener('click', () => {
