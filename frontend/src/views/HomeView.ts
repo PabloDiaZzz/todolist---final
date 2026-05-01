@@ -6,6 +6,8 @@ import type { TaskRequestDTO } from '../types/api-types';
 import type { TaskResponseDTO } from '../types/api-types';
 import '../components/TaskItem';
 import { Datepicker } from 'flowbite';
+import { setupPrefetch } from '../utils/prefetch';
+import taskItemHtml from '../components/html/TaskItem.html?raw';
 
 declare module 'flowbite' {
     interface DatepickerOptions {
@@ -25,9 +27,9 @@ export class HomeView extends HTMLElement {
         this.shadowRoot!.adoptedStyleSheets = [sheet];
 
         this.shadowRoot!.innerHTML = html;
-        
+
         const themeWrapper = this.shadowRoot!.getElementById('theme-wrapper');
-        
+
         const syncTheme = () => {
             const isDark = document.documentElement.classList.contains('dark');
             if (isDark) {
@@ -52,6 +54,9 @@ export class HomeView extends HTMLElement {
         const root = this.shadowRoot!;
         const userName = root.getElementById('user-name')!;
 
+        const closeInfoTask = root.getElementById('close-task-info') as HTMLButtonElement;
+        
+        const adminBtn = root.getElementById('admin-button')!;
         const dropdownBtn = root.getElementById('category-dropdown-btn')!;
         const dropdownMenu = root.getElementById('category-dropdown-menu')!;
         const dropdownLabel = root.getElementById('category-dropdown-label')!;
@@ -60,7 +65,7 @@ export class HomeView extends HTMLElement {
         const dropdownIcon = dropdownBtn.querySelector('svg')!;
         const dateInput = root.getElementById('date-input') as HTMLInputElement;
         const timeInput = root.getElementById('time-input') as HTMLInputElement;
-        
+
 
         const dp = new Datepicker(dateInput, {
             autohide: true,
@@ -85,11 +90,25 @@ export class HomeView extends HTMLElement {
             (window as any).navigate('/login?logout');
         });
 
-        const adminButton = root.getElementById('admin-button')!;
         if (user.role !== 'ROLE_ADMIN') {
-            adminButton.classList.add('hidden');
+            adminBtn.classList.add('hidden');
         } else {
-            adminButton.classList.remove('hidden');
+            adminBtn.classList.remove('hidden');
+        }
+
+        root.addEventListener('task-info', (e: CustomEvent<TaskResponseDTO>) => {
+            this.showInfoTask(e.detail);
+        });
+
+        closeInfoTask.addEventListener('click', () => (root.getElementById('task-info') as HTMLDialogElement).close());
+
+        const adminButton = root.getElementById('admin-button')!;
+        if (adminBtn) {
+            setupPrefetch(adminButton, '/admin', {
+                timeout: 150,
+                once: true,
+                checkNetwork: true,
+            });
         }
 
         allCategories = await fetch('/api/cats').then(res => res.json());
@@ -116,7 +135,6 @@ export class HomeView extends HTMLElement {
                 div.appendChild(checkbox);
                 div.appendChild(span);
 
-                // Al hacer clic en la fila, alternamos la selección
                 div.addEventListener('click', (e) => {
                     e.stopPropagation();
                     if (e.target !== checkbox) checkbox.checked = !checkbox.checked;
@@ -262,6 +280,36 @@ export class HomeView extends HTMLElement {
         } catch (err) {
             console.error("Error cargando tareas:", err);
         }
+    }
+
+    private async showInfoTask(task: TaskResponseDTO) {
+        const taskElement = document.createElement('task-item') as any;
+        taskElement.task = task;
+        const dialog = this.shadowRoot!.getElementById('task-info') as HTMLDialogElement;
+        const taskInfo = this.shadowRoot!.getElementById('task-info-content') as HTMLElement;
+        const title = this.shadowRoot!.getElementById('task-info-title') as HTMLHeadingElement;
+        const desc = this.shadowRoot!.getElementById('task-info-desc') as HTMLParagraphElement;
+        const deadline = this.shadowRoot!.getElementById('task-info-deadline') as HTMLParagraphElement;
+        const categories = this.shadowRoot!.getElementById('task-info-categories') as HTMLDivElement;
+        const tags = this.shadowRoot!.getElementById('task-info-tags') as HTMLDivElement;
+        const completed = this.shadowRoot!.getElementById('task-info-completed') as HTMLParagraphElement;
+        const createdAt = this.shadowRoot!.getElementById('task-info-created-at') as HTMLParagraphElement;
+        const updatedAt = this.shadowRoot!.getElementById('task-info-updated-at') as HTMLParagraphElement;
+        const dateConfig: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+        
+        title.textContent = task.title;
+        desc.textContent = task.description;
+        deadline.textContent = task.deadline ? new Date(task.deadline).toLocaleString('es-ES', dateConfig) : 'No establecida';
+        categories.innerHTML = taskElement.querySelector('.category-container')?.innerHTML ?? '';
+        tags.innerHTML = taskElement.querySelector('.tags-container')?.innerHTML ?? '';
+        completed.textContent = task.completed ? 'Completada' : 'Pendiente';
+        completed.classList.add(task.completed ? 'bg-green-200' : 'bg-yellow-200');
+        completed.classList.add(task.completed ? 'dark:bg-green-800/50' : 'dark:bg-yellow-800/50');
+        completed.classList.add(task.completed ? 'text-green-600' : 'text-yellow-600');
+        completed.classList.add(task.completed ? 'dark:text-green-400' : 'dark:text-yellow-400');
+        createdAt.textContent = new Date(task.createdAt).toLocaleString('es-ES', dateConfig);
+        updatedAt.textContent = new Date(task.lastEdit)?.toLocaleString('es-ES', dateConfig);
+        dialog.showModal();
     }
 }
 customElements.define('home-view', HomeView);

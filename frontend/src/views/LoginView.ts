@@ -14,6 +14,25 @@ export class LoginView extends HTMLElement {
 
         this.shadowRoot!.innerHTML = html;
 
+        const themeWrapper = this.shadowRoot!.getElementById('theme-wrapper');
+        
+        const syncTheme = () => {
+            const isDark = document.documentElement.classList.contains('dark');
+            if (isDark) {
+                themeWrapper?.classList.add('dark');
+            } else {
+                themeWrapper?.classList.remove('dark');
+            }
+        };
+
+        syncTheme();
+
+        const observer = new MutationObserver(() => syncTheme());
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['class']
+        });
+
         this.setupEvents();
     }
 

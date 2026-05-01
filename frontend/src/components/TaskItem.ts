@@ -95,6 +95,10 @@ export class TaskItem extends HTMLElement {
             this.dispatchEvent(new CustomEvent('task-edit', { bubbles: true, composed: true, detail: task }));
         })
 
+        infoBtn?.addEventListener('click', () => {
+            this.dispatchEvent(new CustomEvent('task-info', { bubbles: true, composed: true, detail: task }));
+        })
+
         if (task.categories && categoryTemplate && categoryContainer) {
             task.categories.forEach(cat => {
                 const clone = categoryTemplate.content.cloneNode(true) as DocumentFragment;

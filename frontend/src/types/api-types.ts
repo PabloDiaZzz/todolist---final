@@ -41,6 +41,8 @@ export interface TaskResponseDTO {
   createdAt?: string;
   /** @format date-time */
   deadline?: string;
+  /** @format date-time */
+  lastEdit?: string;
   /** @uniqueItems true */
   categories?: CategoryDTO[];
   /** @uniqueItems true */
@@ -93,6 +95,8 @@ export interface Task {
   createdAt?: string;
   /** @format date-time */
   deadline?: string;
+  /** @format date-time */
+  lastEdit?: string;
   title?: string;
   description?: string;
   completed?: boolean;

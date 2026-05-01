@@ -55,5 +55,11 @@ public class Task {
 	@PrePersist
 	protected void onCreate() {
 		this.createdAt = LocalDateTime.now();
+		this.lastEdit = LocalDateTime.now();
+	}
+
+	@PreUpdate
+	protected void onUpdate() {
+		this.lastEdit = LocalDateTime.now();
 	}
 }

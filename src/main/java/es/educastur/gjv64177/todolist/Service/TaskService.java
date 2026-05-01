@@ -69,7 +69,6 @@ public class TaskService {
 
 		task.setTags(procesarTags(tagsInput));
 		if (deadline != null) task.setDeadline(deadline);
-		task.setLastEdit(LocalDateTime.now());
 		return taskRepository.save(task);
 	}
 

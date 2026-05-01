@@ -13,10 +13,29 @@ export class ForgotPasswordView extends HTMLElement {
         this.shadowRoot!.adoptedStyleSheets = [sheet];
 
         this.shadowRoot!.innerHTML = `
-            <div class="font-sans antialiased h-dvh flex items-center justify-center text-slate-900 dark:text-white relative overflow-hidden">
+            <div id="theme-wrapper" class="font-sans antialiased h-dvh flex items-center justify-center text-slate-900 dark:text-white relative overflow-hidden">
                 ${html}
             </div>
         `;
+
+        const themeWrapper = this.shadowRoot!.getElementById('theme-wrapper');
+        
+        const syncTheme = () => {
+            const isDark = document.documentElement.classList.contains('dark');
+            if (isDark) {
+                themeWrapper?.classList.add('dark');
+            } else {
+                themeWrapper?.classList.remove('dark');
+            }
+        };
+
+        syncTheme();
+
+        const observer = new MutationObserver(() => syncTheme());
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['class']
+        });
 
         this.setupEvents();
     }
