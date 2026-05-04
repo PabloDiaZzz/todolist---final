@@ -1,13 +1,13 @@
 <article
-    class="task-wrapper group bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 flex justify-between gap-4 items-stretch transition-all hover:shadow-md">
-    <div class="flex gap-4 items-start w-full">
-        <div class="flex flex-col gap-4 items-center justify-between h-full">
-            <button type="button" class="toggle-btn mt-1 cursor-pointer">
+    class="group flex justify-between items-stretch gap-4 bg-white dark:bg-slate-800 shadow-sm hover:shadow-md p-5 border border-gray-200 dark:border-slate-700 rounded-2xl transition-all task-wrapper">
+    <div class="flex items-start gap-4 w-full">
+        <div class="flex flex-col justify-between items-center gap-4 h-full">
+            <button type="button" class="mt-1 cursor-pointer toggle-btn">
                 <div
-                    class="status-icon size-6 rounded-full border-2 border-gray-400 dark:border-gray-500 dark:hover:border-indigo-500 hover:border-blue-500 flex items-center justify-center">
+                    class="flex justify-center items-center border-2 border-gray-400 hover:border-blue-500 dark:border-gray-500 dark:hover:border-indigo-500 rounded-full size-6 status-icon">
                 </div>
             </button>
-            <svg class="info-btn bottom-5 left-5 size-5 text-gray-400 hover:text-blue-500 dark:hover:text-indigo-400 transition-all cursor-pointer opacity-0 group-hover:opacity-100"
+            <svg class="bottom-5 left-5 opacity-0 group-hover:opacity-100 size-5 text-gray-400 hover:text-blue-500 dark:hover:text-indigo-400 transition-all cursor-pointer info-btn"
                 fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
                 viewBox="0 0 24 24" id="info-icon">
                 <circle cx="12" cy="12" r="10"></circle>
@@ -16,31 +16,31 @@
             </svg>
         </div>
 
-        <div class="task-content flex flex-col flex-1 text-gray-800 dark:text-gray-200">
-            <div class="flex gap-2 items-center">
-                <h3 class="tittle-text font-bold text-lg leading-tight">{{title}}</h3>
-                <span class="date-text text-yellow-600 dark:text-yellow-400 bg-yellow-200 dark:bg-yellow-800/50 px-2 py-0.5 rounded-2xl text-xs">{{date}}</span>
+        <div class="flex flex-col flex-1 text-gray-800 dark:text-gray-200 task-content">
+            <div class="flex items-center gap-2 task-info-text">
+                <h3 class="font-bold text-lg leading-tight tittle-text">{{title}}</h3>
+                <status-info class="date-text" type="custom" color="yellow" text="{{date}}"></status-info>
             </div>
-            <pre class="description-text text-sm mt-1">{{description}}</pre>
+            <pre class="mt-1 font-sans text-sm description-text">{{description}}</pre>
 
-            <div class="category-container flex gap-2 mt-2 flex-wrap">
+            <div class="flex flex-wrap gap-2 mt-2 category-container">
             </div>
-            <div class="tags-container flex gap-2 mt-2 flex-wrap">
+            <div class="flex flex-wrap gap-2 mt-2 tags-container">
             </div>
         </div>
     </div>
 
-    <div class="flex flex-col items-end justify-between h-full self-center">
+    <div class="flex flex-col justify-between items-end self-center h-full">
         <button type="button"
-            class="edit-btn text-blue-500 hover:bg-blue-200 dark:hover:bg-blue-900/30 px-3 py-1.5 rounded-lg transition-colors cursor-pointer text-sm font-medium w-full text-center">Editar</button>
+            class="hover:bg-blue-200 dark:hover:bg-blue-900/30 px-3 py-1.5 rounded-lg w-full font-medium text-blue-500 text-sm text-center transition-colors cursor-pointer edit-btn">Editar</button>
         <button type="button" data-state="initial"
-            class="delete-btn text-red-500 hover:bg-red-200 dark:hover:bg-red-900/30 px-3 py-1.5 rounded-lg transition-colors cursor-pointer text-sm font-medium w-full text-center">Borrar</button>
+            class="hover:bg-red-200 dark:hover:bg-red-900/30 px-3 py-1.5 rounded-lg w-full font-medium text-red-500 text-sm text-center transition-colors cursor-pointer delete-btn">Borrar</button>
     </div>
 </article>
 <template id="tag-template">
-    <span class="text-xs bg-gray-300 text-gray-600 dark:bg-slate-700 dark:text-gray-300 px-2.5 py-1 rounded-md"></span>
+    <span class="bg-gray-300 dark:bg-slate-700 px-2.5 py-1 rounded-md text-gray-600 dark:text-gray-300 text-xs"></span>
 </template>
 <template id="category-template">
     <span
-        class="text-xs font-semibold bg-blue-200 text-blue-800 dark:bg-indigo-900/50 dark:text-indigo-300 px-2.5 py-1 rounded-md"></span>
+        class="bg-blue-200 dark:bg-indigo-900/50 px-2.5 py-1 rounded-md font-semibold text-blue-800 dark:text-indigo-300 text-xs"></span>
 </template>

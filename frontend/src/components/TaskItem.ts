@@ -23,20 +23,25 @@ export class TaskItem extends HTMLElement {
         titleEl!.textContent = task.title!;
         descEl!.textContent = task.description ?? '';
         if (!deadline) dateEl?.remove();
-        else dateEl!.textContent = deadline.toLocaleString('es-ES', {
-            year: 'numeric',
-            month: 'short',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
 
         if (deadline && Date.now() > deadline.getTime()) {
-            dateEl?.classList.add('text-red-600', 'dark:text-red-400', 'bg-red-200', 'dark:bg-red-800/50');
-            dateEl?.classList.remove('text-yellow-600', 'dark:text-yellow-400', 'bg-yellow-200', 'dark:bg-yellow-800/50');
+            dateEl?.setAttribute('color', 'red');
+            dateEl?.setAttribute('text', deadline.toLocaleString('es-ES', {
+                year: 'numeric',
+                month: 'short',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            }));
         } else if (deadline) {
-            dateEl?.classList.add('text-yellow-600', 'dark:text-yellow-400', 'bg-yellow-200', 'dark:bg-yellow-800/50');
-            dateEl?.classList.remove('text-red-600', 'dark:text-red-400', 'bg-red-200', 'dark:bg-red-800/50');
+            dateEl?.setAttribute('color', 'yellow');
+            dateEl?.setAttribute('text', deadline.toLocaleString('es-ES', {
+                year: 'numeric',
+                month: 'short',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            }));
         }
 
         const wrapper = this.querySelector('.task-wrapper');
@@ -80,9 +85,7 @@ export class TaskItem extends HTMLElement {
             editBtn.classList.remove('hover:bg-blue-200', 'dark:hover:bg-blue-900/30');
             editBtn.classList.remove('text-blue-600', 'dark:text-indigo-400');
             editBtn.classList.add('text-gray-300', 'dark:text-gray-600');
-            dateEl?.classList.remove('text-red-600', 'dark:text-red-400', 'bg-red-200', 'dark:bg-red-800/50');
-            dateEl?.classList.remove('text-yellow-600', 'dark:text-yellow-400', 'bg-yellow-200', 'dark:bg-yellow-800/50');
-            dateEl?.classList.add('text-green-600', 'dark:text-green-400', 'bg-green-200', 'dark:bg-green-800/50');
+            dateEl?.setAttribute('color', 'green');
             infoBtn?.classList.add('invisible');
         } else {
             editBtn.classList.remove('opacity-50', 'cursor-not-allowed');

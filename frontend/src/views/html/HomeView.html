@@ -1,23 +1,23 @@
 <div id="theme-wrapper"
-    class="w-full font-sans antialiased bg-gray-200 dark:bg-slate-900 m-0 flex flex-col items-center overflow-x-hidden min-h-screen ">
-    <header class="bg-white dark:bg-slate-800 w-full py-4 shadow-md dark:shadow-lg md:fixed md:top-0 z-10">
-        <div class="flex items-center justify-between gap-2 md:max-w-327.5 max-w-250 w-full mx-auto px-3">
+    class="flex flex-col items-center bg-gray-200 dark:bg-slate-900 m-0 w-full min-h-screen overflow-x-hidden font-sans antialiased">
+    <header class="md:top-0 z-10 md:fixed bg-white dark:bg-slate-800 shadow-md dark:shadow-lg py-4 w-full">
+        <div class="flex justify-between items-center gap-2 mx-auto px-3 w-full max-w-250 md:max-w-327.5">
             <div class="flex flex-col gap-2">
-                <h1 class="text-blue-600 dark:text-indigo-400 font-semibold text-2xl">Aplicación ToDo List</h1>
-                <p id="user-name" class="text-gray-600 dark:text-gray-400 font-semibold"></p>
+                <h1 class="font-semibold text-blue-600 dark:text-indigo-400 text-2xl">Aplicación ToDo List</h1>
+                <p id="user-name" class="font-semibold text-gray-600 dark:text-gray-400"></p>
             </div>
 
             <div class="flex items-center gap-3">
                 <button id="admin-button" type="button" onclick="navigate('/admin')"
-                    class="hidden bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-indigo-900/50 dark:text-indigo-300 dark:hover:bg-indigo-800 font-bold py-2 px-4 rounded-xl transition-colors cursor-pointer text-sm">
+                    class="hidden bg-blue-100 hover:bg-blue-200 dark:bg-indigo-900/50 dark:hover:bg-indigo-800 px-4 py-2 rounded-xl font-bold text-blue-700 dark:text-indigo-300 text-sm transition-colors cursor-pointer">
                     Panel Admin
                 </button>
 
                 <form id="logout-form">
                     <button
-                        class="text-gray-600 dark:text-gray-400 text-sm sm:text-lg flex gap-2 items-center hover:bg-gray-200 dark:hover:bg-slate-700 px-3 py-2 rounded-xl transition-colors cursor-pointer"
+                        class="flex items-center gap-2 hover:bg-gray-200 dark:hover:bg-slate-700 px-3 py-2 rounded-xl text-gray-600 dark:text-gray-400 text-sm sm:text-lg transition-colors cursor-pointer"
                         type="submit">
-                        <svg class="size-5 fill-gray-600 dark:fill-gray-400 rotate-180">
+                        <svg class="fill-gray-600 dark:fill-gray-400 size-5 rotate-180">
                             <use href="/login.svg#login"></use>
                         </svg>
                         Cerrar sesión
@@ -27,24 +27,24 @@
         </div>
     </header>
 
-    <main class="w-full max-w-2xl mx-auto mt-8 px-4 flex flex-col gap-4 pb-10 md:pt-20">
+    <main class="flex flex-col gap-4 mx-auto mt-8 px-4 md:pt-20 pb-10 w-full max-w-2xl">
 
-        <div class="flex flex-col relative pb-19">
+        <div class="relative flex flex-col pb-19">
             <section
-                class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-md border border-gray-200 dark:border-slate-700">
-                <h2 class="text-xl font-bold text-blue-600 dark:text-indigo-400 mb-4">Nueva Tarea</h2>
+                class="bg-white dark:bg-slate-800 shadow-md p-6 border border-gray-200 dark:border-slate-700 rounded-2xl">
+                <h2 class="mb-4 font-bold text-blue-600 dark:text-indigo-400 text-xl">Nueva Tarea</h2>
                 <form id="task-form" class="flex flex-col gap-3">
                     <input type="text" name="title" placeholder="¿Qué necesitas hacer?" required
-                        class="w-full border border-gray-300 dark:border-slate-600 rounded-xl px-4 py-3 bg-gray-50 dark:bg-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 outline-none">
+                        class="bg-gray-50 dark:bg-slate-900 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 w-full dark:text-white">
                     <textarea name="description" placeholder="Detalles (opcional)..."
-                        class="w-full border border-gray-300 dark:border-slate-600 rounded-xl px-4 py-3 bg-gray-50 dark:bg-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 outline-none resize-none h-20"></textarea>
+                        class="bg-gray-50 dark:bg-slate-900 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 w-full h-20 dark:text-white resize-none"></textarea>
 
-                    <div class="flex flex-col md:flex-row gap-4 max-md:*:w-full">
-                        <div class="flex flex-col flex-1 gap-2 relative" id="category-dropdown-container">
+                    <div class="flex md:flex-row flex-col gap-4 max-md:*:w-full">
+                        <div class="relative flex flex-col flex-1 gap-2" id="category-dropdown-container">
                             <button type="button" id="category-dropdown-btn"
-                                class="inline-flex justify-between items-center w-full bg-gray-50 dark:bg-slate-900 rounded-xl px-1 py-3 text-sm border border-gray-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-gray-700 dark:text-gray-200 cursor-pointer hover:border-indigo-400 group">
-                                <span id="category-dropdown-label" class="truncate px-2">Categorías: 0</span>
-                                <svg class="w-5 h-5 text-gray-500 group-hover:text-blue-500 dark:group-hover:text-indigo-400 transition-transform duration-300"
+                                class="group inline-flex justify-between items-center bg-gray-50 dark:bg-slate-900 px-1 py-3 border border-gray-300 hover:border-indigo-400 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full text-gray-700 dark:text-gray-200 text-sm transition-all cursor-pointer">
+                                <span id="category-dropdown-label" class="px-2 truncate">Categorías: 0</span>
+                                <svg class="w-5 h-5 text-gray-500 dark:group-hover:text-indigo-400 group-hover:text-blue-500 transition-transform duration-300"
                                     viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd"
                                         d="M6.293 9.293a1 1 0 011.414 0L10 11.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
@@ -53,24 +53,24 @@
                             </button>
 
                             <div id="category-dropdown-menu"
-                                class="hidden absolute top-12 left-0 z-50 w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-xl overflow-hidden">
-                                <div class="p-2 border-b border-gray-200 dark:border-slate-700 relative">
+                                class="hidden top-12 left-0 z-50 absolute bg-white dark:bg-slate-800 shadow-xl border border-gray-200 dark:border-slate-700 rounded-xl w-full overflow-hidden">
+                                <div class="relative p-2 border-gray-200 dark:border-slate-700 border-b">
                                     <input type="text" id="category-search" placeholder="Buscar categoría..."
-                                        class="w-full px-3 py-2 bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-800 dark:text-gray-200">
+                                        class="bg-gray-50 dark:bg-slate-900 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full text-gray-800 dark:text-gray-200 text-sm">
                                 </div>
                                 <div id="category-list"
-                                    class="max-h-52 overflow-y-auto p-1 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-slate-700 dark:[&::-webkit-scrollbar-thumb]:bg-slate-500">
+                                    class="[&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-thumb]:bg-slate-500 dark:[&::-webkit-scrollbar-track]:bg-slate-700 p-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar]:w-2 max-h-52 overflow-y-auto">
                                 </div>
                             </div>
                         </div>
 
                         <input type="text" name="tagsInput" autocomplete="off" placeholder="Tags (ej: urgente, compras)"
-                            class="w-2/3 border border-gray-300 dark:border-slate-600 rounded-xl px-4 py-2 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500">
+                            class="bg-gray-50 dark:bg-slate-900 px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 w-2/3 dark:text-white">
                     </div>
-                    <div class="flex flex-col sm:flex-row gap-4 w-full">
-                        <div class="relative flex-1 group">
-                            <div class="absolute inset-y-0 inset-s-0 flex items-center ps-3 pointer-events-none z-10">
-                                <svg class="w-5 h-5 text-gray-500 dark:text-gray-400 group-hover:text-blue-500 dark:group-hover:text-indigo-400 transition-colors duration-300"
+                    <div class="flex sm:flex-row flex-col gap-4 w-full">
+                        <div class="group relative flex-1">
+                            <div class="z-10 absolute inset-s-0 inset-y-0 flex items-center ps-3 pointer-events-none">
+                                <svg class="w-5 h-5 text-gray-500 dark:group-hover:text-indigo-400 dark:text-gray-400 group-hover:text-blue-500 transition-colors duration-300"
                                     fill="currentColor" viewBox="0 0 20 20">
                                     <path
                                         d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
@@ -78,59 +78,59 @@
                             </div>
                             <input type="text" id="date-input" name="date" placeholder="Seleccionar fecha limite"
                                 autocomplete="off"
-                                class="block w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-900 dark:border-slate-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-indigo-500 dark:focus:border-indigo-500 transition-all">
+                                class="block bg-gray-50 dark:bg-slate-900 py-3 pr-4 pl-10 border border-gray-300 focus:border-blue-500 dark:border-slate-600 dark:focus:border-indigo-500 rounded-xl focus:ring-blue-500 dark:focus:ring-indigo-500 w-full text-gray-900 dark:text-white text-sm transition-all dark:placeholder-gray-400">
                         </div>
-                        <div class="relative flex-1 group">
-                            <div class="absolute inset-y-0 inset-e-0 flex items-center pe-3 pointer-events-none z-10">
-                                <svg class="w-5 h-5 text-gray-500 dark:text-gray-400 group-hover:text-blue-500 dark:group-hover:text-indigo-400 transition-colors duration-300"
+                        <div class="group relative flex-1">
+                            <div class="z-10 absolute inset-e-0 inset-y-0 flex items-center pe-3 pointer-events-none">
+                                <svg class="w-5 h-5 text-gray-500 dark:group-hover:text-indigo-400 dark:text-gray-400 group-hover:text-blue-500 transition-colors duration-300"
                                     fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                 </svg>
                             </div>
                             <input type="time" id="time-input" name="time" value="23:59"
-                                class="block w-full pr-10 pl-4 py-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-900 dark:border-slate-600 dark:text-white dark:focus:ring-indigo-500 dark:focus:border-indigo-500 transition-all">
+                                class="block bg-gray-50 dark:bg-slate-900 py-3 pr-10 pl-4 border border-gray-300 focus:border-blue-500 dark:border-slate-600 dark:focus:border-indigo-500 rounded-xl focus:ring-blue-500 dark:focus:ring-indigo-500 w-full text-gray-900 dark:text-white text-sm transition-all">
                         </div>
                     </div>
 
                     <button type="submit"
-                        class="dark:bg-indigo-600 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-xl dark:hover:bg-indigo-700 w-full md:w-fit md:self-end transition-colors cursor-pointer mt-2">
+                        class="md:self-end bg-blue-600 hover:bg-blue-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 mt-2 px-6 py-2.5 rounded-xl w-full md:w-fit font-bold text-white transition-colors cursor-pointer">
                         Añadir Tarea
                     </button>
                 </form>
             </section>
             <section id="task-options" data-active="false"
-                class="hidden group/taskopts bg-white dark:bg-slate-800 rounded-2xl shadow-md border border-gray-200 dark:border-slate-700 size-4 p-4 cursor-pointer data-[active=false]:hover:rounded-xl transition-all duration-500 data-[active=true]:w-max data-[active=true]:h-15 absolute bottom-0 right-0 data-[active=true]:px-2 data-[active=true]:delay-0 delay-200 max-w-full">
+                class="group/taskopts right-0 bottom-0 absolute bg-white dark:bg-slate-800 shadow-md p-4 data-[active=true]:px-2 border border-gray-200 dark:border-slate-700 rounded-2xl data-[active=false]:hover:rounded-xl data-[active=true]:w-max max-w-full data-[active=true]:h-15 size-4 transition-all duration-500 delay-200 data-[active=true]:delay-0 cursor-pointer">
                 <svg
-                    class="size-6 text-blue-800 dark:text-indigo-300 group-hover/taskopts:text-blue-500 dark:group-hover/taskopts:dark:text-indigo-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none group-data-[active=true]/taskopts:opacity-0 opacity-100 transition-all group-data-[active=true]/taskopts:duration-50 group-data-[active=true]/taskopts:delay-0 delay-500 duration-500">
-                        <use href="/main.svg#filter"></use>
-                    </svg>
-                    <div
-                        class="group-data-[active=true]/taskopts:visible invisible flex opacity-0 group-data-[active=true]/taskopts:opacity-100 dark:text-white transition-all duration-300 group-data-[active=true]/taskopts:delay-500 group-data-[active=true]/taskopts:duration-500 group-data-[active=true]/taskopts:*:duration-500 flex-row justify-between group-data-[active=true]/taskopts:*:scale-100 *:scale-0 group-data-[active=true]/taskopts:*:delay-0 *:delay-500 *:transition-all items-center h-full gap-3">
-                        <select name="category-options-filter" id="category-options-filter"
-                            class="bg-blue-600 dark:bg-indigo-600 px-5 py-2 rounded-lg text-white">
-                            <option value="">- Categoria -</option>
-                        </select>
-                        <select name="" id="" class="bg-blue-600 dark:bg-indigo-600 px-5 py-2 rounded-lg text-white">
-                            <option value="">- Completado -</option>
-                            <option value="true">Completadas</option>
-                            <option value="false">Incompletas</option>
-                        </select>
-                        <select name="" id="" class="bg-blue-600 dark:bg-indigo-600 px-5 py-2 rounded-lg text-white">
-                            <option value="">- Ordenar por -</option>
-                            <option value="title">Titulo</option>
-                            <option value="description">Descripción</option>
-                            <option value="category">Categoria</option>
-                            <option value="complete">Completado</option>
-                        </select>
-                    </div>
+                    class="top-1/2 left-1/2 absolute opacity-100 group-data-[active=true]/taskopts:opacity-0 size-6 text-blue-800 dark:group-hover/taskopts:dark:text-indigo-400 dark:text-indigo-300 group-hover/taskopts:text-blue-500 transition-all -translate-x-1/2 -translate-y-1/2 duration-500 group-data-[active=true]/taskopts:duration-50 delay-500 group-data-[active=true]/taskopts:delay-0 pointer-events-none">
+                    <use href="/main.svg#filter"></use>
+                </svg>
+                <div
+                    class="invisible group-data-[active=true]/taskopts:visible flex flex-row justify-between items-center gap-3 opacity-0 group-data-[active=true]/taskopts:opacity-100 h-full dark:text-white group-data-[active=true]/taskopts:*:scale-100 *:scale-0 transition-all *:transition-all duration-300 group-data-[active=true]/taskopts:*:duration-500 group-data-[active=true]/taskopts:duration-500 group-data-[active=true]/taskopts:*:delay-0 group-data-[active=true]/taskopts:delay-500 *:delay-500">
+                    <select name="category-options-filter" id="category-options-filter"
+                        class="bg-blue-600 dark:bg-indigo-600 px-5 py-2 rounded-lg text-white">
+                        <option value="">- Categoria -</option>
+                    </select>
+                    <select name="" id="" class="bg-blue-600 dark:bg-indigo-600 px-5 py-2 rounded-lg text-white">
+                        <option value="">- Completado -</option>
+                        <option value="true">Completadas</option>
+                        <option value="false">Incompletas</option>
+                    </select>
+                    <select name="" id="" class="bg-blue-600 dark:bg-indigo-600 px-5 py-2 rounded-lg text-white">
+                        <option value="">- Ordenar por -</option>
+                        <option value="title">Titulo</option>
+                        <option value="description">Descripción</option>
+                        <option value="category">Categoria</option>
+                        <option value="complete">Completado</option>
+                    </select>
+                </div>
             </section>
         </div>
 
-        <section class="flex flex-col gap-4 relative">
+        <section class="relative flex flex-col gap-4">
             <div id="no-tasks"
-                class="hidden text-center text-gray-500 dark:text-gray-400 py-8 items-center justify-center w-full gap-4">
-                <svg class="size-5 fill-gray-600 dark:fill-gray-400 text-gray-600 dark:text-gray-400"
+                class="hidden justify-center items-center gap-4 py-8 w-full text-gray-500 dark:text-gray-400 text-center">
+                <svg class="fill-gray-600 dark:fill-gray-400 size-5 text-gray-600 dark:text-gray-400"
                     viewBox="0 0 1024 1024">
                     <path
                         d="M832 512a32 32 0 1 1 64 0v352a32 32 0 0 1-32 32H160a32 32 0 0 1-32-32V160a32 32 0 0 1 32-32h352a32 32 0 0 1 0 64H192v640h640z" />
@@ -145,68 +145,71 @@
         </section>
     </main>
     <dialog id="edit-modal"
-        class="p-6 bg-white dark:bg-slate-800 rounded-2xl shadow-xl backdrop:bg-black/50 backdrop:backdrop-blur-sm m-auto w-[90%] max-w-lg border-none text-slate-900 dark:text-white open:flex flex-col gap-4">
-        <h2 class="text-xl font-bold text-indigo-600 dark:text-indigo-400">Editar Tarea</h2>
+        class="open:flex flex-col gap-4 bg-white dark:bg-slate-800 backdrop:bg-black/50 shadow-xl backdrop:backdrop-blur-sm m-auto p-6 border-none rounded-2xl w-[90%] max-w-lg text-slate-900 dark:text-white">
+        <h2 class="font-bold text-indigo-600 dark:text-indigo-400 text-xl">Editar Tarea</h2>
 
         <form id="edit-form" method="post" class="flex flex-col gap-3">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
             <input type="text" name="title" id="edit-title" required
-                class="w-full border border-gray-300 dark:border-slate-600 rounded-xl px-4 py-2 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
+                class="bg-gray-50 dark:bg-slate-900 px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 w-full dark:text-white">
             <textarea name="description" id="edit-desc"
-                class="w-full border border-gray-300 dark:border-slate-600 rounded-xl px-4 py-2 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500 resize-none h-20"></textarea>
+                class="bg-gray-50 dark:bg-slate-900 px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 w-full h-20 dark:text-white resize-none"></textarea>
 
             <div class="flex gap-4">
                 <select name="categoryId" id="edit-category"
-                    class="w-1/2 border border-gray-300 dark:border-slate-600 rounded-xl px-4 py-2 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none">
+                    class="bg-gray-50 dark:bg-slate-900 px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-xl outline-none w-1/2 dark:text-white">
                     <option value="">- Sin Categoría -</option>
                     <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.title}"></option>
                 </select>
                 <input type="text" autocomplete="off" name="tagsInput" id="edit-tags"
                     placeholder="Tags (ej: urgente, compras)"
-                    class="w-2/3 border border-gray-300 dark:border-slate-600 rounded-xl px-4 py-2 bg-gray-50 dark:bg-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
+                    class="bg-gray-50 dark:bg-slate-900 px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 w-2/3 dark:text-white">
             </div>
-            <div class="flex gap-3 justify-end mt-4">
+            <div class="flex justify-end gap-3 mt-4">
                 <button type="button" onclick="document.getElementById('edit-modal').close()"
-                    class="px-5 py-2 bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 rounded-xl cursor-pointer transition">Cancelar</button>
+                    class="bg-gray-200 hover:bg-gray-300 dark:bg-slate-700 dark:hover:bg-slate-600 px-5 py-2 rounded-xl transition cursor-pointer">Cancelar</button>
                 <button type="submit"
-                    class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl cursor-pointer transition">Guardar</button>
+                    class="bg-indigo-600 hover:bg-indigo-700 px-5 py-2 rounded-xl text-white transition cursor-pointer">Guardar</button>
             </div>
         </form>
     </dialog>
 
-    <dialog id="task-info" class="p-6 rounded-2xl bg-white dark:bg-slate-800 m-auto border-none shadow-xl outline-none">
-        <div id="task-info-content" class="flex flex-col gap-4 items-stretch">
-            <svg
-                class="size-12 fill-blue-500 dark:fill-indigo-500 self-center bg-blue-200 dark:bg-indigo-900 rounded-full p-2 -my-2">
-                <use href="/main.svg#info"></use>
-            </svg>
-            <h2 id="task-info-title"
-                class="text-xl font-bold text-center self-center text-blue-500 dark:text-indigo-500"></h2>
+    <dialog id="task-info" class="bg-white dark:bg-slate-800 shadow-xl m-auto p-6 border-none rounded-2xl outline-none">
+        <div id="task-info-content" class="flex flex-col items-stretch gap-4">
+            <div class="flex justify-between items-center">
+                <h2 id="task-info-title"
+                    class="self-center font-bold text-blue-500 dark:text-indigo-500 text-xl text-center whitespace-break-spaces">
+                </h2>
+                <svg
+                    class="self-center bg-blue-200 dark:bg-indigo-900 fill-blue-500 dark:fill-indigo-500 -my-2 p-2 rounded-full size-12">
+                    <use href="/main.svg#info"></use>
+                </svg>
+
+            </div>
             <pre id="task-info-desc"
-                class=" p-2 bg-gray-100 dark:bg-slate-900 dark:text-white border-gray-300 dark:border-slate-600 border rounded-xl"></pre>
-            <div>
-                <p class="info text-sm">Fecha limite:</p>
+                class="bg-gray-100 dark:bg-slate-900 p-2 border border-gray-300 dark:border-slate-600 rounded-xl max-w-[500px] font-sans dark:text-white whitespace-pre-wrap"></pre>
+            <div class="info-field-['Fecha_limite:']">
                 <p id="task-info-deadline"
-                class="p-2 bg-gray-100 dark:bg-slate-900 dark:text-white border-gray-300 dark:border-slate-600 border rounded-xl">
+                    class="bg-gray-100 dark:bg-slate-900 p-2 border border-gray-300 dark:border-slate-600 rounded-xl dark:text-white">
                 </p>
             </div>
-            <div class="flex flex-col gap-3 justify-between">
+            <div class="flex flex-col justify-between gap-3">
                 <div id="task-info-categories"></div>
                 <div id="task-info-tags"></div>
             </div>
-            <p id="task-info-completed" class="px-2 py-1 rounded-lg self-start"></p>
-            <div>
-                <p class="info text-sm">Creado:</p>
+            <status-info id="task-info-status" type="pendiente"></status-info>
+            <div class="info-field-['Fecha_de_creación:']">
                 <p id="task-info-created-at"
-                class="p-2 bg-gray-100 dark:bg-slate-900 dark:text-white border-gray-300 dark:border-slate-600 border rounded-xl">
-            </p>
+                    class="bg-gray-100 dark:bg-slate-900 p-2 border border-gray-300 dark:border-slate-600 rounded-xl dark:text-white">
+                </p>
             </div>
-            <div class="info-field-wrapper bg-gray-100 dark:bg-slate-900 dark:text-white border-gray-300 dark:border-slate-600 border rounded-xl" style="--label: 'Última modificación: ';">
+            <div
+                class="bg-gray-100 dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-xl dark:text-white info-field-['Última_modificación:']">
                 <p id="task-info-updated-at" class="p-2"></p>
             </div>
             <button id="close-task-info"
-                class="item-stretch rounded-xl bg-red-500 text-white p-2 cursor-pointer outline-none self-stretch hover:scale-101 transition-all">Cerrar</button>
+                class="self-stretch bg-red-500 p-2 rounded-xl outline-none text-white hover:scale-101 transition-all cursor-pointer item-stretch">Cerrar</button>
         </div>
     </dialog>
 

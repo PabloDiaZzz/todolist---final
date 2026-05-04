@@ -38,6 +38,9 @@ async function router() {
     case '/forgot-password':
       app.innerHTML = '<forgot-password-view></forgot-password-view>';
       break;
+    case '/admin':
+      app.innerHTML = '<admin-view></admin-view>';
+      break;
     default:
       app.innerHTML = isLoggedIn ? '<home-view></home-view>' : '<login-view></login-view>';
   }

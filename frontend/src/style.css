@@ -1,60 +1,67 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @plugin "tailwindcss-view-transitions";
 @plugin "flowbite/plugin";
 
-@source "./views/**/*.html";
-@source "./components/**/*.html";
+@source "./views/**/*.{html,ts}";
+@source "./components/**/*.{html,ts}";
 @source "./main.ts";
+@source "./**/*.html";
+
 @source "../node_modules/flowbite";
 @source "../node_modules/flowbite-datepicker";
 
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
-@import "flowbite/src/themes/default";
+@import 'flowbite/src/themes/default';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
 @view-transition {
-    navigation: auto;
+  navigation: auto;
 }
 
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-    transition: background-color 9999s ease-in-out 0s, color 9999s ease-in-out 0s;
+  transition: background-color 9999s ease-in-out 0s, color 9999s ease-in-out 0s;
 }
 
 @layer base {
-    :root {
-        interpolate-size: allow-keywords;
-    }
+  :root {
+    interpolate-size: allow-keywords;
+  }
 
-    * {
-        transition-behavior: allow-discrete;
-    }
+  * {
+    transition-behavior: allow-discrete;
+  }
 }
 
 @layer utilities {
-    .bg-brand {
-        @apply bg-blue-500 dark:bg-indigo-600 hover:bg-blue-600 dark:hover:bg-indigo-700;
-    }
-
+  .bg-brand {
+    @apply bg-blue-500 dark:bg-indigo-600 hover:bg-blue-600 dark:hover:bg-indigo-700;
+  }
 }
 
-.info-field-wrapper {
-    @apply @container overflow-hidden relative group border border-gray-300 dark:border-slate-600 rounded-xl bg-gray-100 dark:bg-slate-900;
+@utility info-field-* {
+  --label: --value([ * ]);
+  @apply relative cursor-default;
 
-    & p {
-        @apply p-2 relative transition-all duration-300 group-hover:text-transparent;
+  & > *,
+  &:not(:has(*)) {
+    @apply relative transition-all duration-300 overflow-hidden text-black dark:text-white;
 
-        &::before {
-            /* Aquí recibimos el texto desde el HTML */
-            content: var(--label);
-            @apply absolute left-2 top-2 opacity-0 translate-x-[50cqw] transition-all duration-300 whitespace-nowrap text-gray-500 dark:text-gray-400 font-medium;
-        }
+    &::before {
+      content: var(--label);
+      @apply absolute left-2 top-1/2 -translate-y-1/2 translate-x-1/2 transition-all duration-300 whitespace-nowrap text-transparent;
+      text-indent: 0;
     }
+  }
 
-    &:hover p::before {
-        @apply opacity-100 translate-x-0;
+  &:hover > *,
+  &:hover:not(:has(*)) {
+    @apply text-transparent indent-[-50%] cursor-copy select-none;
+
+    &::before {
+      @apply text-gray-400 dark:text-gray-400 translate-x-0;
     }
+  }
 }
