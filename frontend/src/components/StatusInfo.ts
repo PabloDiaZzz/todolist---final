@@ -15,7 +15,7 @@ export class StatusInfo extends HTMLElement {
         this.render();
     }
 
-    attributeChangedCallback(name: string, oldValue: string, newValue: string) {
+    attributeChangedCallback(_name: string, oldValue: string, newValue: string) {
         if (oldValue !== newValue) {
             this.render();
         }
@@ -45,7 +45,6 @@ export class StatusInfo extends HTMLElement {
 
         const baseClasses = 'px-2 py-0.5 rounded-2xl text-sm font-semibold inline-block transition-colors';
 
-        // 1. Dividimos el mapa en 'light' y 'dark' para poder combinarlos dinámicamente
         const colorMap: Record<string, { light: string, dark: string }> = {
             green: { light: 'bg-green-200 text-green-600', dark: 'dark:bg-green-800/50 dark:text-green-400' },
             yellow: { light: 'bg-yellow-200 text-yellow-600', dark: 'dark:bg-yellow-800/50 dark:text-yellow-400' },
@@ -67,17 +66,13 @@ export class StatusInfo extends HTMLElement {
 
         let appliedColor = '';
         
-        // 2. Separamos el string de color por espacios
         const colorParts = color.trim().split(/\s+/);
 
         if (colorParts.length === 1 && colorMap[colorParts[0]]) {
-            // Caso A: Un solo color válido (ej: "green") -> Usamos su light y su dark
             appliedColor = `${colorMap[colorParts[0]].light} ${colorMap[colorParts[0]].dark}`;
         } else if (colorParts.length === 2 && colorMap[colorParts[0]] && colorMap[colorParts[1]]) {
-            // Caso B: Dos colores válidos (ej: "gray blue") -> Light del primero, Dark del segundo
             appliedColor = `${colorMap[colorParts[0]].light} ${colorMap[colorParts[1]].dark}`;
         } else {
-            // Caso C: No coincide con el diccionario, se asume que son clases de Tailwind puras
             appliedColor = color;
         }
 

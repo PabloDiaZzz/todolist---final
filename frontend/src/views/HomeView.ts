@@ -99,9 +99,9 @@ export class HomeView extends HTMLElement {
       adminBtn.classList.remove('hidden')
     }
 
-    root.addEventListener('task-info', (e: CustomEvent<TaskResponseDTO>) => {
+    root.addEventListener('task-info', ((e: CustomEvent<TaskResponseDTO>) => {
       this.showInfoTask(e.detail)
-    })
+    }) as EventListener)
 
     closeInfoTask.addEventListener('click', () =>
       (root.getElementById('task-info') as HTMLDialogElement).close()
@@ -120,7 +120,7 @@ export class HomeView extends HTMLElement {
     const renderCategoryList = (searchTerm = '') => {
       categoryList.innerHTML = ''
       const filtered = allCategories.filter(c =>
-        c.title.toLowerCase().includes(searchTerm.toLowerCase())
+        (c.title ?? '').toLowerCase().includes(searchTerm.toLowerCase())
       )
 
       filtered.forEach(cat => {
@@ -141,7 +141,7 @@ export class HomeView extends HTMLElement {
 
         const span = document.createElement('span')
         span.className = 'text-sm font-medium text-gray-700 dark:text-gray-200'
-        span.textContent = cat.title
+        span.textContent = cat.title ?? ''
 
         div.appendChild(checkbox)
         div.appendChild(span)
@@ -377,8 +377,8 @@ export class HomeView extends HTMLElement {
       }
     })
 
-    title.textContent = task.title
-    desc.textContent = task.description
+    title.textContent = task.title ?? ''
+    desc.textContent = task.description ?? ''
     deadline.textContent = task.deadline
       ? new Date(task.deadline).toLocaleString('es-ES', dateConfig)
       : 'No establecida'
@@ -393,14 +393,12 @@ export class HomeView extends HTMLElement {
       statusType = 'vencida'
     }
     completed.setAttribute('type', statusType)
-    createdAt.textContent = new Date(task.createdAt).toLocaleString(
-      'es-ES',
-      dateConfig
-    )
-    updatedAt.textContent = new Date(task.lastEdit)?.toLocaleString(
-      'es-ES',
-      dateConfig
-    )
+    createdAt.textContent = task.createdAt
+      ? new Date(task.createdAt).toLocaleString('es-ES', dateConfig)
+      : ''
+    updatedAt.textContent = task.lastEdit
+      ? new Date(task.lastEdit).toLocaleString('es-ES', dateConfig)
+      : ''
     dialog.showModal()
   }
 }
