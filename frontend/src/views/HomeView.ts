@@ -84,10 +84,10 @@ export class HomeView extends HTMLElement {
     let allCategories: Category[] = []
     let selectedCategories: Category[] = []
 
-    const [user, categoriesRes] = await Promise.all([
+    const [user, categoriesRes]: [UsuarioDTO, Category[], void] = await Promise.all([
       fetch('/api/user/me').then(res => res.json()),
       fetch('/api/cats').then(res => res.json()),
-      this.loadTasks() // Modificamos loadTasks para que devuelva una promesa (ver abajo)
+      this.loadTasks()
     ]);
 
     const logoutForm = root.getElementById('logout-form')!
