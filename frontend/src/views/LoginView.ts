@@ -78,15 +78,37 @@ export class LoginView extends HTMLElement {
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const formData = new FormData(form);
-            const res = await fetch('/api/login', { method: 'POST', body: formData });
+
+            const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+            const originalText = submitBtn.textContent || 'Iniciar sesión';
+
+            submitBtn.textContent = 'Iniciando sesión...';
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
+
             alerts.forEach(el => el.classList.add('hidden'));
 
-            if (res.ok) (window as any).navigate('/home');
-            else if (res.status === 401) root.querySelector('#login-error')?.classList.remove('hidden');
-            else if (res.status === 404) root.querySelector('#login-required')?.classList.remove('hidden');
-            else if (res.status === 403) root.querySelector('#login-required')?.classList.remove('hidden');
-            else root.querySelector('#login-error')?.classList.remove('hidden');
+            try {
+                const formData = new FormData(form);
+                const res = await fetch('/api/login', { method: 'POST', body: formData });
+
+                if (res.ok) {
+                    (window as any).navigate('/home');
+                } else {
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+
+                    if (res.status === 401) root.querySelector('#login-error')?.classList.remove('hidden');
+                    else if (res.status === 404 || res.status === 403) root.querySelector('#login-required')?.classList.remove('hidden');
+                    else root.querySelector('#login-error')?.classList.remove('hidden');
+                }
+            } catch (error) {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+                root.querySelector('#login-error')?.classList.remove('hidden');
+            }
         });
 
         this.checkUrlParams(root);

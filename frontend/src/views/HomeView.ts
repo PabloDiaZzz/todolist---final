@@ -84,7 +84,11 @@ export class HomeView extends HTMLElement {
     let allCategories: Category[] = []
     let selectedCategories: Category[] = []
 
-    const user: UsuarioDTO = await fetch('/api/user/me').then(res => res.json())
+    const [user, categoriesRes] = await Promise.all([
+      fetch('/api/user/me').then(res => res.json()),
+      fetch('/api/cats').then(res => res.json()),
+      this.loadTasks() // Modificamos loadTasks para que devuelva una promesa (ver abajo)
+    ]);
 
     const logoutForm = root.getElementById('logout-form')!
     logoutForm.addEventListener('submit', async e => {
@@ -109,14 +113,14 @@ export class HomeView extends HTMLElement {
 
     const adminButton = root.getElementById('admin-button')!
     if (adminBtn) {
-      setupPrefetch(adminButton, '/admin', {
+      setupPrefetch(adminButton, '/api/admin/tasks', {
         timeout: 150,
         once: true,
         checkNetwork: true
       })
     }
 
-    allCategories = await fetch('/api/cats').then(res => res.json())
+    allCategories = categoriesRes
     const renderCategoryList = (searchTerm = '') => {
       categoryList.innerHTML = ''
       const filtered = allCategories.filter(c =>
