@@ -1,5 +1,6 @@
 import html from './html/LoginView.html?raw';
 import styles from '../style.css?inline';
+import { setupPrefetch } from '../utils/prefetch';
 
 export class LoginView extends HTMLElement {
     constructor() {
@@ -15,7 +16,7 @@ export class LoginView extends HTMLElement {
         this.shadowRoot!.innerHTML = html;
 
         const themeWrapper = this.shadowRoot!.getElementById('theme-wrapper');
-        
+
         const syncTheme = () => {
             const isDark = document.documentElement.classList.contains('dark');
             if (isDark) {
@@ -48,16 +49,17 @@ export class LoginView extends HTMLElement {
         }
 
         if (params.has('logout') || params.has('required') || params.has('error')) {
-            window.history.replaceState({}, document.title, window.location.pathname);  
+            window.history.replaceState({}, document.title, window.location.pathname);
         }
     }
 
     private setupEvents() {
         const root = this.shadowRoot!;
         const alerts = root.querySelectorAll('.alert');
-        const form = root.querySelector('#login-form') as HTMLFormElement;
-        const toggleBtn = root.querySelector('#toggle-password');
-        const passInput = root.querySelector('#password') as HTMLInputElement;
+        const form = root.getElementById('login-form') as HTMLFormElement;
+        const loginBtn = root.getElementById('login-btn') as HTMLButtonElement;
+        const toggleBtn = root.getElementById('toggle-password') as HTMLButtonElement;
+        const passInput = root.getElementById('password') as HTMLInputElement;
 
         toggleBtn?.addEventListener('click', () => {
             const isPassword = passInput.type === 'password';
@@ -66,12 +68,20 @@ export class LoginView extends HTMLElement {
             root.querySelector('.eye-hide')?.classList.toggle('hidden');
         });
 
+        if (loginBtn) {
+            setupPrefetch(loginBtn, '/home', {
+                timeout: 150,
+                once: true,
+                checkNetwork: true
+            });
+        }
+
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(form);
             const res = await fetch('/api/login', { method: 'POST', body: formData });
             alerts.forEach(el => el.classList.add('hidden'));
-            
+
             if (res.ok) (window as any).navigate('/home');
             else if (res.status === 401) root.querySelector('#login-error')?.classList.remove('hidden');
             else if (res.status === 404) root.querySelector('#login-required')?.classList.remove('hidden');
