@@ -8,6 +8,7 @@ import '../components/TaskItem'
 import '../components/StatusInfo'
 import { Datepicker } from 'flowbite'
 import { setupPrefetch } from '../utils/prefetch'
+import type { TaskItem } from '../components/TaskItem'
 
 declare module 'flowbite' {
   interface DatepickerOptions {
@@ -16,6 +17,9 @@ declare module 'flowbite' {
 }
 
 export class HomeView extends HTMLElement {
+  private cats: Category[] = [];
+
+
   constructor() {
     super()
     this.attachShadow({ mode: 'open' })
@@ -58,15 +62,8 @@ export class HomeView extends HTMLElement {
       'close-task-info'
     ) as HTMLButtonElement
 
-    const adminBtn = root.getElementById('admin-button')!
-    const dropdownBtn = root.getElementById('category-dropdown-btn')!
-    const dropdownMenu = root.getElementById('category-dropdown-menu')!
-    const dropdownLabel = root.getElementById('category-dropdown-label')!
-    const searchInput = root.getElementById(
-      'category-search'
-    ) as HTMLInputElement
-    const categoryList = root.getElementById('category-list')!
-    const dropdownIcon = dropdownBtn.querySelector('svg')!
+    const adminBtn = root.getElementById('admin-button')! as HTMLButtonElement;
+    const catDropdownContainer = root.getElementById('category-dropdown-container')! as HTMLDivElement;
     const dateInput = root.getElementById('date-input') as HTMLInputElement
     const timeInput = root.getElementById('time-input') as HTMLInputElement
 
@@ -81,14 +78,13 @@ export class HomeView extends HTMLElement {
       container: root.getElementById('theme-wrapper') as HTMLElement
     })
 
-    let allCategories: Category[] = []
-    let selectedCategories: Category[] = []
-
     const [user, categoriesRes]: [UsuarioDTO, Category[], void] = await Promise.all([
       fetch('/api/user/me').then(res => res.json()),
       fetch('/api/cats').then(res => res.json()),
       this.loadTasks()
     ]);
+
+    this.cats = categoriesRes
 
     const logoutForm = root.getElementById('logout-form')!
     logoutForm.addEventListener('submit', async e => {
@@ -107,6 +103,10 @@ export class HomeView extends HTMLElement {
       this.showInfoTask(e.detail)
     }) as EventListener)
 
+    root.addEventListener('task-edit', ((e: CustomEvent<{ taskElement: TaskItem, task: TaskResponseDTO }>) => {
+      this.showEditTask(e.detail.taskElement, e.detail.task)
+    }) as EventListener)
+
     closeInfoTask.addEventListener('click', () =>
       (root.getElementById('task-info') as HTMLDialogElement).close()
     )
@@ -120,70 +120,9 @@ export class HomeView extends HTMLElement {
       })
     }
 
-    allCategories = categoriesRes
-    const renderCategoryList = (searchTerm = '') => {
-      categoryList.innerHTML = ''
-      const filtered = allCategories.filter(c =>
-        (c.title ?? '').toLowerCase().includes(searchTerm.toLowerCase())
-      )
-
-      filtered.forEach(cat => {
-        if (cat.id === undefined) return
-        const isSelected = selectedCategories.some(sc => sc.id === cat.id)
-
-        const div = document.createElement('div')
-        div.className = `flex items-center gap-3 px-4 py-2.5 cursor-pointer rounded-lg transition-colors ${isSelected
-          ? 'bg-indigo-50 dark:bg-indigo-900/30'
-          : 'hover:bg-gray-100 dark:hover:bg-slate-700'
-          }`
-
-        const checkbox = document.createElement('input')
-        checkbox.type = 'checkbox'
-        checkbox.className =
-          'w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 cursor-pointer'
-        checkbox.checked = isSelected
-
-        const span = document.createElement('span')
-        span.className = 'text-sm font-medium text-gray-700 dark:text-gray-200'
-        span.textContent = cat.title ?? ''
-
-        div.appendChild(checkbox)
-        div.appendChild(span)
-
-        div.addEventListener('click', e => {
-          e.stopPropagation()
-          if (e.target !== checkbox) checkbox.checked = !checkbox.checked
-
-          if (checkbox.checked) {
-            selectedCategories.push(cat)
-          } else {
-            selectedCategories = selectedCategories.filter(
-              sc => sc.id !== cat.id
-            )
-          }
-          updateUI()
-        })
-
-        categoryList.appendChild(div)
-      })
-    }
-
-    const updateUI = () => {
-      dropdownLabel.textContent = `Categorías: ${selectedCategories.length}`
-
-      renderList(searchInput.value)
-    }
-
-    const resetUI = () => {
-      selectedCategories = []
-      updateUI()
-    }
-
-    const renderList = renderCategoryList
-    renderList()
-
     userName.textContent = user.fullName ?? ''
     this.loadTasks()
+    this.loadCatsDropdown('category-dropdown-container');
     root.addEventListener('task-updated', () => this.loadTasks())
 
     const taskOptions = root.getElementById('task-options')!
@@ -205,30 +144,20 @@ export class HomeView extends HTMLElement {
       if (target !== dateInput && pickerEl && !pickerEl.contains(target)) {
         dp.hide()
       }
-
-      if (!dropdownBtn.contains(target) && !dropdownMenu.contains(target)) {
-        dropdownMenu.classList.add('hidden')
-        dropdownIcon.classList.remove('rotate-180')
-      }
-    })
-
-    dropdownBtn.addEventListener('click', () => {
-      dropdownMenu.classList.toggle('hidden')
-      dropdownIcon.classList.toggle('rotate-180')
-      if (!dropdownMenu.classList.contains('hidden')) searchInput.focus()
-    })
-
-    searchInput.addEventListener('input', e => {
-      renderList((e.target as HTMLInputElement).value)
     })
 
     root.addEventListener('click', e => {
-      if (
-        !dropdownBtn.contains(e.target as Node) &&
-        !dropdownMenu.contains(e.target as Node)
-      ) {
-        dropdownMenu.classList.add('hidden')
-      }
+      const allCategoryMenus = root.querySelectorAll('.category-dropdown-menu:not(.hidden)');
+      allCategoryMenus.forEach(menu => {
+        const container = menu.parentElement!;
+        const btn = container.querySelector('.category-dropdown-btn')!;
+        const icon = btn.querySelector('svg')!;
+
+        if (!btn.contains(e.target as Node) && !menu.contains(e.target as Node)) {
+          menu.classList.add('hidden');
+          if (icon) icon.classList.remove('rotate-180');
+        }
+      });
     })
 
     const taskForm = root.getElementById('task-form') as HTMLFormElement
@@ -248,10 +177,13 @@ export class HomeView extends HTMLElement {
         )}T${timeStr}:00`
       }
 
+      const checkedBoxes = catDropdownContainer.querySelectorAll('.category-list input[type="checkbox"]:checked') as NodeListOf<HTMLInputElement>;
+      const categoryIds = Array.from(checkedBoxes).map(cb => Number(cb.value));
+
       const task: TaskRequestDTO = {
         title: formData.get('title') as string,
         description: formData.get('description') as string,
-        categoryIds: selectedCategories.map(c => c.id!),
+        categoryIds: categoryIds,
         tagsInput: formData.get('tagsInput') as string,
         deadline: finalDeadline
       }
@@ -266,8 +198,8 @@ export class HomeView extends HTMLElement {
 
       this.loadTasks()
       taskForm.reset()
-      resetUI()
-      timeInput.value = '23:59'
+      this.loadCatsDropdown('category-dropdown-container', []);
+      timeInput.value = '00:00'
     })
   }
 
@@ -404,6 +336,179 @@ export class HomeView extends HTMLElement {
       ? new Date(task.lastEdit).toLocaleString('es-ES', dateConfig)
       : ''
     dialog.showModal()
+  }
+
+  private showEditTask(_taskElement: TaskItem, task: TaskResponseDTO) {
+    const dialog = this.shadowRoot!.getElementById('task-edit') as HTMLDialogElement
+    const modalBox = this.shadowRoot!.getElementById('edit-modal-box') as HTMLElement;
+    const form = this.shadowRoot!.getElementById('edit-form') as HTMLFormElement;
+    const title = this.shadowRoot!.getElementById('edit-title') as HTMLInputElement
+    const desc = this.shadowRoot!.getElementById('edit-desc') as HTMLTextAreaElement
+    const dateDeadline = this.shadowRoot!.getElementById('date-deadline-edit') as HTMLInputElement
+    const timeDeadline = this.shadowRoot!.getElementById('time-deadline-edit') as HTMLInputElement
+    const tags = this.shadowRoot!.getElementById('edit-tags') as HTMLInputElement
+    const cancel = this.shadowRoot!.getElementById('cancel-edit-task') as HTMLButtonElement
+    const dateConfig: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }
+    const dp = new Datepicker(dateDeadline, {
+      autohide: true,
+      format: 'dd/mm/yyyy',
+      orientation: 'top',
+      language: 'es',
+      minDate: Date.now().toString(),
+      buttons: true,
+      autoSelectToday: 1,
+      container: modalBox
+    })
+
+    title.value = task.title ?? ''
+    desc.value = task.description ?? ''
+    if (task.deadline) {
+      const d = new Date(task.deadline);
+      dateDeadline.value = d.toLocaleDateString('es-ES', dateConfig);
+      dp.setDate(d);
+      timeDeadline.value = d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    } else {
+      dateDeadline.value = '';
+      timeDeadline.value = '00:00';
+    }
+    this.loadCatsDropdown('category-edit-dropdown-container', task.categories ?? []);
+    tags.value = task.tags?.map(t => t.name).join(', ') || '';
+    cancel.onclick = () => {
+      dp.destroy()
+      dialog.close()
+    }
+    modalBox.onclick = (e) => {
+      if (dateDeadline.contains(e.target as Node)) return;
+      dp.hide()
+    }
+    dialog.onclick = (e) => {
+      if (e.target === dialog) {
+        dp.destroy()
+        dialog.close()
+        document.body.classList.remove('overflow-hidden');
+      }
+    };
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      let finalDeadline: string | undefined = undefined;
+      
+      if (dateDeadline.value && timeDeadline.value) {
+        const [day, month, year] = dateDeadline.value.split('/');
+        finalDeadline = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${timeDeadline.value}:00`;
+      }
+      const checkedBoxes = modalBox.querySelectorAll('.category-list input[type="checkbox"]:checked') as NodeListOf<HTMLInputElement>;
+      const categoryIds = Array.from(checkedBoxes).map(cb => Number(cb.value));
+      const taskSubmit: TaskRequestDTO = {
+        title: formData.get('title') as string,
+        description: formData.get('description') as string,
+        deadline: finalDeadline,
+        categoryIds: categoryIds,
+        tagsInput: formData.get('tagsInput') as string
+      };
+      try {
+        const response = await fetch('/api/tasks/' + task.id, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(taskSubmit)
+        });
+        if (!response.ok) {
+          throw new Error('Error al editar la tarea');
+        }
+        await this.loadTasks();
+        dialog.close();
+        document.body.classList.remove('overflow-hidden');
+      } catch (err) {
+        console.error('Error al editar la tarea:', err);
+      }
+    }
+    dialog.show();
+  }
+
+  private loadCatsDropdown(id: string, selectedCategories: Category[] = []) {
+    const root = this.shadowRoot!
+    const container = root.getElementById(id)! as HTMLDivElement
+    const dropdownBtn = container.querySelector('.category-dropdown-btn') as HTMLButtonElement
+    const dropdownMenu = container.querySelector('.category-dropdown-menu') as HTMLDivElement
+    const dropdownLabel = container.querySelector('.category-dropdown-label') as HTMLSpanElement
+    const searchInput = container.querySelector('.category-search') as HTMLInputElement
+    const categoryList = container.querySelector('.category-list')! as HTMLDivElement
+    const dropdownIcon = dropdownBtn.querySelector('svg')! as SVGElement
+
+    const renderCategoryList = (searchTerm = '') => {
+      categoryList.innerHTML = ''
+      const filtered = this.cats.filter(c =>
+        (c.title ?? '').toLowerCase().includes(searchTerm.toLowerCase())
+      )
+
+      filtered.forEach(cat => {
+        if (cat.id === undefined) return
+        const isSelected = selectedCategories.some(sc => sc.id === cat.id)
+
+        const div = document.createElement('div')
+        div.className = `flex items-center gap-3 px-4 py-2.5 cursor-pointer rounded-lg transition-colors ${isSelected
+          ? 'bg-indigo-50 dark:bg-indigo-900/30'
+          : 'hover:bg-gray-100 dark:hover:bg-slate-700'
+          }`
+
+        const checkbox = document.createElement('input')
+        checkbox.type = 'checkbox'
+        checkbox.value = String(cat.id);
+        checkbox.className =
+          'w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 cursor-pointer'
+        checkbox.checked = isSelected
+
+        const span = document.createElement('span')
+        span.className = 'text-sm font-medium text-gray-700 dark:text-gray-200'
+        span.textContent = cat.title ?? ''
+
+        div.appendChild(checkbox)
+        div.appendChild(span)
+
+        div.onclick = e => {
+          e.stopPropagation()
+          if (e.target !== checkbox) checkbox.checked = !checkbox.checked
+
+          if (checkbox.checked) {
+            selectedCategories.push(cat)
+          } else {
+            selectedCategories = selectedCategories.filter(
+              sc => sc.id !== cat.id
+            )
+          }
+          updateUI()
+        }
+
+        categoryList.appendChild(div)
+      })
+    }
+
+    dropdownBtn.onclick = (e) => {
+      e.preventDefault();
+      dropdownMenu.classList.toggle('hidden')
+      dropdownIcon.classList.toggle('rotate-180')
+      if (!dropdownMenu.classList.contains('hidden')) searchInput.focus()
+    }
+
+    searchInput.oninput = (e) => {
+      renderCategoryList((e.target as HTMLInputElement).value)
+    }
+
+    const updateUI = () => {
+      dropdownLabel.textContent = `Categorías: ${selectedCategories.length}`
+
+      renderList(searchInput.value)
+    }
+
+    const renderList = renderCategoryList
+    renderList();
+    updateUI();
   }
 }
 customElements.define('home-view', HomeView)

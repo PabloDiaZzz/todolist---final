@@ -95,8 +95,8 @@ export class TaskItem extends HTMLElement {
         }
 
         editBtn.addEventListener('click', () => {
-            this.dispatchEvent(new CustomEvent('task-edit', { bubbles: true, composed: true, detail: task }));
-        })
+            this.dispatchEvent(new CustomEvent('task-edit', { bubbles: true, composed: true, detail: { taskElement: this, task: task } }));
+        });
 
         infoBtn?.addEventListener('click', () => {
             this.dispatchEvent(new CustomEvent('task-info', { bubbles: true, composed: true, detail: task }));

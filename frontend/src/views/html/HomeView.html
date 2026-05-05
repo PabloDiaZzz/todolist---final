@@ -41,9 +41,9 @@
 
                     <div class="flex md:flex-row flex-col gap-4 max-md:*:w-full">
                         <div class="relative flex flex-col flex-1 gap-2" id="category-dropdown-container">
-                            <button type="button" id="category-dropdown-btn"
-                                class="group inline-flex justify-between items-center bg-gray-50 dark:bg-slate-900 px-1 py-3 border border-gray-300 hover:border-indigo-400 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full text-gray-700 dark:text-gray-200 text-sm transition-all cursor-pointer">
-                                <span id="category-dropdown-label" class="px-2 truncate">Categorías: 0</span>
+                            <button type="button"
+                                class="category-dropdown-btn group inline-flex justify-between items-center bg-gray-50 dark:bg-slate-900 px-1 py-3 border border-gray-300 hover:border-indigo-400 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full text-gray-700 dark:text-gray-200 text-sm transition-all cursor-pointer">
+                                <span class="category-dropdown-label px-2 truncate">Categorías: 0</span>
                                 <svg class="w-5 h-5 text-gray-500 dark:group-hover:text-indigo-400 group-hover:text-blue-500 transition-transform duration-300"
                                     viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd"
@@ -52,14 +52,14 @@
                                 </svg>
                             </button>
 
-                            <div id="category-dropdown-menu"
-                                class="hidden top-12 left-0 z-50 absolute bg-white dark:bg-slate-800 shadow-xl border border-gray-200 dark:border-slate-700 rounded-xl w-full overflow-hidden">
+                            <div
+                                class="category-dropdown-menu hidden top-12 left-0 z-50 absolute bg-white dark:bg-slate-800 shadow-xl border border-gray-200 dark:border-slate-700 rounded-xl w-full overflow-hidden">
                                 <div class="relative p-2 border-gray-200 dark:border-slate-700 border-b">
-                                    <input type="text" id="category-search" placeholder="Buscar categoría..."
-                                        class="bg-gray-50 dark:bg-slate-900 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full text-gray-800 dark:text-gray-200 text-sm">
+                                    <input type="text" placeholder="Buscar categoría..."
+                                        class="category-search bg-gray-50 dark:bg-slate-900 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full text-gray-800 dark:text-gray-200 text-sm">
                                 </div>
-                                <div id="category-list"
-                                    class="[&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-thumb]:bg-slate-500 dark:[&::-webkit-scrollbar-track]:bg-slate-700 p-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar]:w-2 max-h-52 overflow-y-auto">
+                                <div
+                                    class="category-list [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-thumb]:bg-slate-500 dark:[&::-webkit-scrollbar-track]:bg-slate-700 p-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar]:w-2 max-h-52 overflow-y-auto">
                                 </div>
                             </div>
                         </div>
@@ -144,38 +144,83 @@
 
         </section>
     </main>
-    <dialog id="edit-modal"
-        class="open:flex flex-col gap-4 bg-white dark:bg-slate-800 backdrop:bg-black/50 shadow-xl backdrop:backdrop-blur-sm m-auto p-6 border-none rounded-2xl w-[90%] max-w-lg text-slate-900 dark:text-white">
-        <h2 class="font-bold text-indigo-600 dark:text-indigo-400 text-xl">Editar Tarea</h2>
+    <dialog id="task-edit"
+        class="fixed inset-0 z-50 justify-center items-center w-full h-full max-w-none max-h-none m-0 bg-black/50 backdrop-blur-sm border-none open:flex">
+        <div id="edit-modal-box"
+            class="relative flex flex-col gap-4 bg-white dark:bg-slate-800 shadow-xl m-auto p-6 rounded-2xl w-[90%] max-w-xl text-slate-900 dark:text-white">
+            <h2 class="font-bold text-blue dark:text-indigo-400 text-xl">Editar Tarea</h2>
 
-        <form id="edit-form" method="post" class="flex flex-col gap-3">
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <form id="edit-form" class="flex flex-col gap-3">
+                <input type="text" name="title" id="edit-title" placeholder="Titulo" required
+                    class="bg-gray-50 dark:bg-slate-900 px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 w-full dark:text-white">
+                <textarea name="description" id="edit-desc" placeholder="Descripción"
+                    class="bg-gray-50 dark:bg-slate-900 px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 w-full h-20 dark:text-white resize-none min-h-35"></textarea>
 
-            <input type="text" name="title" id="edit-title" required
-                class="bg-gray-50 dark:bg-slate-900 px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 w-full dark:text-white">
-            <textarea name="description" id="edit-desc"
-                class="bg-gray-50 dark:bg-slate-900 px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 w-full h-20 dark:text-white resize-none"></textarea>
+                <div class="flex md:flex-row flex-col gap-4 max-md:*:w-full">
+                    <div class="relative flex flex-col flex-1 gap-2" id="category-edit-dropdown-container">
+                        <button type="button"
+                            class="category-dropdown-btn group inline-flex justify-between items-center bg-gray-50 dark:bg-slate-900 px-1 py-3 border border-gray-300 hover:border-indigo-400 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full text-gray-700 dark:text-gray-200 text-sm transition-all cursor-pointer">
+                            <span class="category-dropdown-label px-2 truncate">Categorías: 0</span>
+                            <svg class="w-5 h-5 text-gray-500 dark:group-hover:text-indigo-400 group-hover:text-blue-500 transition-transform duration-300"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M6.293 9.293a1 1 0 011.414 0L10 11.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </button>
 
-            <div class="flex gap-4">
-                <select name="categoryId" id="edit-category"
-                    class="bg-gray-50 dark:bg-slate-900 px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-xl outline-none w-1/2 dark:text-white">
-                    <option value="">- Sin Categoría -</option>
-                    <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.title}"></option>
-                </select>
-                <input type="text" autocomplete="off" name="tagsInput" id="edit-tags"
-                    placeholder="Tags (ej: urgente, compras)"
-                    class="bg-gray-50 dark:bg-slate-900 px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 w-2/3 dark:text-white">
-            </div>
-            <div class="flex justify-end gap-3 mt-4">
-                <button type="button" onclick="document.getElementById('edit-modal').close()"
-                    class="bg-gray-200 hover:bg-gray-300 dark:bg-slate-700 dark:hover:bg-slate-600 px-5 py-2 rounded-xl transition cursor-pointer">Cancelar</button>
-                <button type="submit"
-                    class="bg-indigo-600 hover:bg-indigo-700 px-5 py-2 rounded-xl text-white transition cursor-pointer">Guardar</button>
-            </div>
-        </form>
+                        <div
+                            class="category-dropdown-menu hidden top-12 left-0 z-50 absolute bg-white dark:bg-slate-800 shadow-xl border border-gray-200 dark:border-slate-700 rounded-xl w-full overflow-hidden">
+                            <div class="relative p-2 border-gray-200 dark:border-slate-700 border-b">
+                                <input type="text" placeholder="Buscar categoría..."
+                                    class="category-search bg-gray-50 dark:bg-slate-900 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full text-gray-800 dark:text-gray-200 text-sm">
+                            </div>
+                            <div
+                                class="category-list [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-thumb]:bg-slate-500 dark:[&::-webkit-scrollbar-track]:bg-slate-700 p-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar]:w-2 max-h-52 overflow-y-auto">
+                            </div>
+                        </div>
+                    </div>
+
+                    <input type="text" name="tagsInput" autocomplete="off" placeholder="Tags (ej: urgente, compras)"
+                        id="edit-tags"
+                        class="bg-gray-50 dark:bg-slate-900 px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 w-2/3 dark:text-white">
+                </div>
+                <div class="flex sm:flex-row flex-col gap-4 w-full">
+                    <div class="group relative flex-1" id="edit-date-container">
+                        <div class="z-10 absolute inset-s-0 inset-y-0 flex items-center ps-3 pointer-events-none">
+                            <svg class="w-5 h-5 text-gray-500 dark:group-hover:text-indigo-400 dark:text-gray-400 group-hover:text-blue-500 transition-colors duration-300"
+                                fill="currentColor" viewBox="0 0 20 20">
+                                <path
+                                    d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                            </svg>
+                        </div>
+                        <input type="text" id="date-deadline-edit" name="date" placeholder="Seleccionar fecha limite"
+                            autocomplete="off"
+                            class="block bg-gray-50 dark:bg-slate-900 py-3 pr-4 pl-10 border border-gray-300 focus:border-blue-500 dark:border-slate-600 dark:focus:border-indigo-500 rounded-xl focus:ring-blue-500 dark:focus:ring-indigo-500 w-full text-gray-900 dark:text-white text-sm transition-all dark:placeholder-gray-400">
+                    </div>
+                    <div class="group relative flex-1">
+                        <div class="z-10 absolute inset-e-0 inset-y-0 flex items-center pe-3 pointer-events-none">
+                            <svg class="w-5 h-5 text-gray-500 dark:group-hover:text-indigo-400 dark:text-gray-400 group-hover:text-blue-500 transition-colors duration-300"
+                                fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                        </div>
+                        <input type="time" id="time-deadline-edit" name="time" value="23:59"
+                            class="block bg-gray-50 dark:bg-slate-900 py-3 pr-10 pl-4 border border-gray-300 focus:border-blue-500 dark:border-slate-600 dark:focus:border-indigo-500 rounded-xl focus:ring-blue-500 dark:focus:ring-indigo-500 w-full text-gray-900 dark:text-white text-sm transition-all">
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3 mt-4">
+                    <button id="cancel-edit-task" type="button"
+                        class="bg-gray-200 hover:bg-gray-300 dark:bg-slate-700 dark:hover:bg-slate-600 px-5 py-2 rounded-xl transition cursor-pointer">Cancelar</button>
+                    <button id="save-edit-task" type="submit"
+                        class="bg-indigo-600 hover:bg-indigo-700 px-5 py-2 rounded-xl text-white transition cursor-pointer">Guardar</button>
+                </div>
+            </form>
+        </div>
     </dialog>
 
-    <dialog id="task-info" class="bg-white dark:bg-slate-800 shadow-xl m-auto p-6 border-none rounded-2xl outline-none">
+    <dialog id="task-info" class="bg-white dark:bg-slate-800 shadow-xl m-auto p-6 border-none rounded-2xl outline-none min-w-md">
         <div id="task-info-content" class="flex flex-col items-stretch gap-4">
             <div class="flex justify-between items-center">
                 <h2 id="task-info-title"
