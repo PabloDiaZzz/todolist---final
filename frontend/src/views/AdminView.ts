@@ -11,7 +11,7 @@ export class AdminView extends HTMLElement {
 
     private me!: UsuarioDTO;
     private cats: Category[] = [];
-    private todos: TaskResponseDTO[] = [];
+    private tasks: TaskResponseDTO[] = [];
     private users: UsuarioDTO[] = [];
 
     constructor() {
@@ -61,7 +61,7 @@ export class AdminView extends HTMLElement {
             this.me = user;
             this.users = users;
             this.cats = cats;
-            this.todos = tasks;
+            this.tasks = tasks;
 
             userName.textContent = user.fullName ?? '';
         });
@@ -92,7 +92,7 @@ export class AdminView extends HTMLElement {
 
         buscarCatInput.addEventListener('input', () => {
             const searchValue = buscarCatInput.value.toLowerCase();
-            const filteredCats = this.cats.filter(cat => cat.title.toLowerCase().includes(searchValue));
+            const filteredCats = this.cats.filter(cat => cat.title!.toLowerCase().includes(searchValue));
             this.displayCats(filteredCats);
         })
 
@@ -115,7 +115,7 @@ export class AdminView extends HTMLElement {
     private displayCats(cats: Category[] = this.cats) {
         const catsContainer = this.shadowRoot!.querySelector('.cats-list') as HTMLUListElement
         catsContainer.innerHTML = '';
-        cats = [...cats].sort((a: Category, b: Category) => a.title.localeCompare(b.title))
+        cats = [...cats].sort((a: Category, b: Category) => a.title!.localeCompare(b.title!))
         const noCats = this.shadowRoot!.getElementById('no-cats') as HTMLDivElement
         if (cats.length === 0) {
             noCats.classList.add('flex')
@@ -132,7 +132,7 @@ export class AdminView extends HTMLElement {
     }
 
     private displayTasks() {
-
+        console.log(this.tasks)
     }
 
     private displayUsers() {
@@ -162,7 +162,7 @@ export class AdminView extends HTMLElement {
             this.me = user;
             this.users = users;
             this.cats = cats;
-            this.todos = tasks;
+            this.tasks = tasks;
 
             userName.textContent = user.fullName ?? '';
         });

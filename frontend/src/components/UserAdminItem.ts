@@ -1,5 +1,4 @@
 import html from './html/UserAdminItem.html?raw';
-import style from '../style.css?inline';
 import type { UsuarioDTO } from '../types/api-types';
 
 export class UserAdminItem extends HTMLElement {

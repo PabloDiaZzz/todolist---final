@@ -1,5 +1,4 @@
 import html from './html/CatAdminItem.html?raw';
-import style from '../style.css?inline';
 import type { Category } from '../types/api-types';
 
 export class CatAdminItem extends HTMLElement {
