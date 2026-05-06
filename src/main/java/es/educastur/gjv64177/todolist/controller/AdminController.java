@@ -43,7 +43,8 @@ public class AdminController {
 	@PostMapping("/categories")
 	public ResponseEntity<Category> createCat(@RequestBody Category categoryRequest) {
 		Category category = new Category();
-		category.setTitle(categoryRequest.getTitle());
+		String title = categoryRequest.getTitle().substring(0, 1).toUpperCase() + categoryRequest.getTitle().substring(1).toLowerCase();
+		category.setTitle(title);
 		Category savedCat = categoryService.save(category);
 		return ResponseEntity.status(HttpStatus.CREATED).body(savedCat);
 	}

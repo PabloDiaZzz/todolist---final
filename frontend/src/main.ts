@@ -4,6 +4,7 @@ import './views/LoginView';
 import './views/HomeView';
 import './views/RegisterView';
 import './views/ForgotPasswordView';
+import './views/AdminView';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 
