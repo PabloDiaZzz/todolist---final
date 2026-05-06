@@ -5,7 +5,7 @@ import '../components/UserAdminItem';
 import '../components/CatAdminItem';
 import type { UserAdminItem } from '../components/UserAdminItem';
 import type { CatAdminItem } from '../components/CatAdminItem';
-import isEqual from 'lodash/isEqual';
+import { isEqual } from 'lodash';
 
 export class AdminView extends HTMLElement {
 
