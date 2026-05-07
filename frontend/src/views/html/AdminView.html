@@ -58,7 +58,7 @@
                     class="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700 transition">Crear</button>
             </form>
             <div id="buscar-cat-container" data-active="false"
-                class="group/search relative flex items-center bg-blue-600 dark:bg-indigo-600 hover:bg-blue-700 dark:hover:bg-indigo-700 text-white rounded-lg text-sm font-bold transition-all duration-750 mb-3 h-10 w-24 data-[active=true]:w-64 cursor-pointer overflow-hidden data-[active=true]:bg-gray-300 dark:data-[active=true]:bg-slate-900">
+                class="group/search relative flex items-center bg-blue-600 dark:bg-indigo-600 hover:bg-blue-700 dark:hover:bg-indigo-700 text-white rounded-lg text-sm font-bold transition-all duration-750 mb-3 h-10 w-24 data-[active=true]:w-full cursor-pointer overflow-hidden data-[active=true]:bg-gray-300 dark:data-[active=true]:bg-slate-900">
                 <div
                     class="absolute inset-0 flex items-center justify-center transition-all duration-750 opacity-100 group-data-[active=true]/search:opacity-0 pointer-events-none group-data-[active=true]/search:scale-y-0 group-data-[active=true]/search:scale-x-10">
                     Buscar
@@ -86,16 +86,15 @@
         <section class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm">
             <h2 class="text-xl font-bold border-b border-gray-200 dark:border-slate-700 pb-2 mb-4">Todas las Tareas</h2>
             <ul class="flex flex-col gap-3 max-h-[600px] overflow-y-auto pr-2">
-                <li th:each="t : ${tasks}"
+                <li
                     class="flex flex-col gap-2 bg-gray-50 dark:bg-slate-900 p-3 rounded-lg border border-gray-200 dark:border-slate-700">
                     <div class="flex justify-between items-start">
                         <div class="flex-1">
-                            <p class="font-bold text-sm leading-tight" th:text="${t.title}"></p>
+                            <p class="font-bold text-sm leading-tight"></p>
                             <p class="text-xs text-gray-500 mt-0.5">Autor: <span
-                                    class="font-medium text-gray-700 dark:text-gray-300"
-                                    th:text="${t.author.username}"></span></p>
+                                    class="font-medium text-gray-700 dark:text-gray-300"></span></p>
                         </div>
-                        <form th:action="@{/admin/task/{id}/delete(id=${t.id})}" method="post">
+                        <form>
                             <button type="submit"
                                 class="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 px-2 py-1 rounded text-xs transition">Borrar</button>
                         </form>

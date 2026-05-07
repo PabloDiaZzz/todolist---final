@@ -9,6 +9,8 @@ import '../components/StatusInfo'
 import { Datepicker } from 'flowbite'
 import { setupPrefetch } from '../utils/prefetch'
 import type { TaskItem } from '../components/TaskItem'
+import { authService } from '../services/AuthService'
+import { syncThemeWithObserver } from '../utils/theme'
 
 declare module 'flowbite' {
   interface DatepickerOptions {
@@ -18,7 +20,7 @@ declare module 'flowbite' {
 
 export class HomeView extends HTMLElement {
   private cats: Category[] = [];
-
+  private themeObserver: MutationObserver | null = null;
 
   constructor() {
     super()
@@ -34,24 +36,15 @@ export class HomeView extends HTMLElement {
 
     const themeWrapper = this.shadowRoot!.getElementById('theme-wrapper')
 
-    const syncTheme = () => {
-      const isDark = document.documentElement.classList.contains('dark')
-      if (isDark) {
-        themeWrapper?.classList.add('dark')
-      } else {
-        themeWrapper?.classList.remove('dark')
-      }
-    }
-
-    syncTheme()
-
-    const observer = new MutationObserver(() => syncTheme())
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class']
-    })
+    this.themeObserver = syncThemeWithObserver(themeWrapper);
 
     this.setupEvents()
+  }
+
+  disconnectedCallback() {
+    if (this.themeObserver) {
+      this.themeObserver.disconnect();
+    }
   }
 
   private async setupEvents() {
@@ -88,9 +81,9 @@ export class HomeView extends HTMLElement {
 
     const logoutForm = root.getElementById('logout-form')!
     logoutForm.addEventListener('submit', async e => {
-      e.preventDefault()
-      await fetch('/api/logout', { method: 'POST' })
-        ; (window as any).navigate('/login?logout')
+      e.preventDefault();
+      await authService.logout();
+      (window as any).navigate('/login?logout');
     })
 
     if (user.role !== 'ROLE_ADMIN') {
@@ -396,7 +389,7 @@ export class HomeView extends HTMLElement {
       e.preventDefault();
       const formData = new FormData(form);
       let finalDeadline: string | undefined = undefined;
-      
+
       if (dateDeadline.value && timeDeadline.value) {
         const [day, month, year] = dateDeadline.value.split('/');
         finalDeadline = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${timeDeadline.value}:00`;

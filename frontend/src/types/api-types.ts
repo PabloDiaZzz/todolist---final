@@ -86,24 +86,17 @@ export interface UsuarioDTO {
   username?: string;
   role?: string;
   fullName?: string;
+  email?: string;
 }
 
-export interface Task {
-  /** @format int64 */
-  id?: number;
-  /** @format date-time */
-  createdAt?: string;
-  /** @format date-time */
-  deadline?: string;
-  /** @format date-time */
-  lastEdit?: string;
-  title?: string;
-  description?: string;
-  completed?: boolean;
-  /** @uniqueItems true */
-  categories?: Category[];
-  /** @uniqueItems true */
-  tags?: Tag[];
+export interface UserTasksDTO {
+  user?: UsuarioDTO;
+  tasks?: TaskResponseDTO[];
+}
+
+export interface TaskUserDTO {
+  task?: TaskResponseDTO;
+  author?: UsuarioDTO;
 }
 
 export type QueryParamsType = Record<string | number, any>;
@@ -710,11 +703,25 @@ export class Api<
      * No description
      *
      * @tags admin-controller
+     * @name GetFullUserProfile
+     * @request GET:/api/admin/users/{username}/full-profile
+     */
+    getFullUserProfile: (username: string, params: RequestParams = {}) =>
+      this.request<UserTasksDTO, any>({
+        path: `/api/admin/users/${username}/full-profile`,
+        method: "GET",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags admin-controller
      * @name GetAllTasks
      * @request GET:/api/admin/tasks
      */
     getAllTasks: (params: RequestParams = {}) =>
-      this.request<Task[], any>({
+      this.request<TaskUserDTO[], any>({
         path: `/api/admin/tasks`,
         method: "GET",
         ...params,

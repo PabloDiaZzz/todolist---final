@@ -1,8 +1,11 @@
 import html from './html/LoginView.html?raw';
 import styles from '../style.css?inline';
 import { setupPrefetch } from '../utils/prefetch';
+import { syncThemeWithObserver } from '../utils/theme';
 
 export class LoginView extends HTMLElement {
+    private themeObserver: MutationObserver | null = null;
+
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -17,24 +20,15 @@ export class LoginView extends HTMLElement {
 
         const themeWrapper = this.shadowRoot!.getElementById('theme-wrapper');
 
-        const syncTheme = () => {
-            const isDark = document.documentElement.classList.contains('dark');
-            if (isDark) {
-                themeWrapper?.classList.add('dark');
-            } else {
-                themeWrapper?.classList.remove('dark');
-            }
-        };
-
-        syncTheme();
-
-        const observer = new MutationObserver(() => syncTheme());
-        observer.observe(document.documentElement, {
-            attributes: true,
-            attributeFilter: ['class']
-        });
+        this.themeObserver = syncThemeWithObserver(themeWrapper);
 
         this.setupEvents();
+    }
+
+    disconnectedCallback() {
+        if (this.themeObserver) {
+            this.themeObserver.disconnect();
+        }
     }
 
     private checkUrlParams(root: ShadowRoot) {

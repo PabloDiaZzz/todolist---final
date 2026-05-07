@@ -1,7 +1,10 @@
 import html from './html/ForgotPasswordView.html?raw';
 import styles from '../style.css?inline';
+import { syncThemeWithObserver } from '../utils/theme';
 
 export class ForgotPasswordView extends HTMLElement {
+    private themeObserver: MutationObserver | null = null;
+
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -19,25 +22,16 @@ export class ForgotPasswordView extends HTMLElement {
         `;
 
         const themeWrapper = this.shadowRoot!.getElementById('theme-wrapper');
-        
-        const syncTheme = () => {
-            const isDark = document.documentElement.classList.contains('dark');
-            if (isDark) {
-                themeWrapper?.classList.add('dark');
-            } else {
-                themeWrapper?.classList.remove('dark');
-            }
-        };
 
-        syncTheme();
-
-        const observer = new MutationObserver(() => syncTheme());
-        observer.observe(document.documentElement, {
-            attributes: true,
-            attributeFilter: ['class']
-        });
+        this.themeObserver = syncThemeWithObserver(themeWrapper);
 
         this.setupEvents();
+    }
+
+    disconnectedCallback() {
+        if (this.themeObserver) {
+            this.themeObserver.disconnect();
+        }
     }
 
     private setupEvents() {
@@ -49,7 +43,7 @@ export class ForgotPasswordView extends HTMLElement {
             e.preventDefault();
             const formData = new FormData(form);
             const res = await fetch('/api/auth/forgot-password', { method: 'POST', body: formData });
-            
+
             if (res.ok) {
                 alertError.classList.remove('hidden');
                 alertError.classList.add('bg-emerald-100', 'text-emerald-700', 'dark:bg-emerald-900/30', 'dark:text-emerald-400');

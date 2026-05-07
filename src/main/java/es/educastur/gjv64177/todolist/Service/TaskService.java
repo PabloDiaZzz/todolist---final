@@ -56,6 +56,10 @@ public class TaskService {
 		taskRepository.save(task);
 	}
 
+	public void save(Task task) {
+		taskRepository.save(task);
+	}
+
 	public Task editTask(Long id, Usuario autor, String title, String description, Set<Long> categoryIds, String tagsInput, LocalDateTime deadline) {
 		Task task = findByIdAndAuthor(id, autor);
 		task.setTitle(title);

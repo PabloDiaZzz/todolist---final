@@ -1,8 +1,11 @@
 import html from './html/RegisterView.html?raw';
 import styles from '../style.css?inline';
+import { syncThemeWithObserver } from '../utils/theme';
 
 export class RegisterView extends HTMLElement {
     private root: ShadowRoot;
+    private themeObserver: MutationObserver | null = null;
+
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -17,25 +20,16 @@ export class RegisterView extends HTMLElement {
         this.root.innerHTML = html;
 
         const themeWrapper = this.shadowRoot!.getElementById('theme-wrapper');
-        
-        const syncTheme = () => {
-            const isDark = document.documentElement.classList.contains('dark');
-            if (isDark) {
-                themeWrapper?.classList.add('dark');
-            } else {
-                themeWrapper?.classList.remove('dark');
-            }
-        };
 
-        syncTheme();
-
-        const observer = new MutationObserver(() => syncTheme());
-        observer.observe(document.documentElement, {
-            attributes: true,
-            attributeFilter: ['class']
-        });
+        this.themeObserver = syncThemeWithObserver(themeWrapper);
 
         this.setupEvents();
+    }
+
+    disconnectedCallback() {
+        if (this.themeObserver) {
+            this.themeObserver.disconnect();
+        }
     }
 
     private setupValidation(input: HTMLInputElement, feedback: HTMLElement, apiUrl: string, paramName: string, label: string) {

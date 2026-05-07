@@ -1,17 +1,20 @@
 import html from './html/AdminView.html?raw';
 import style from '../style.css?inline';
-import type { Category, TaskResponseDTO, UsuarioDTO } from '../types/api-types';
+import type { Category, TaskResponseDTO, TaskUserDTO, UsuarioDTO } from '../types/api-types';
 import '../components/UserAdminItem';
 import '../components/CatAdminItem';
 import type { UserAdminItem } from '../components/UserAdminItem';
 import type { CatAdminItem } from '../components/CatAdminItem';
 import { isEqual } from 'lodash';
+import { authService } from '../services/AuthService';
+import { syncThemeWithObserver } from '../utils/theme';
 
 export class AdminView extends HTMLElement {
 
+    private themeObserver: MutationObserver | null = null;
     private me!: UsuarioDTO;
     private cats: Category[] = [];
-    private tasks: TaskResponseDTO[] = [];
+    private tasks: TaskUserDTO[] = [];
     private users: UsuarioDTO[] = [];
 
     constructor() {
@@ -26,25 +29,17 @@ export class AdminView extends HTMLElement {
         this.shadowRoot!.innerHTML = html;
         const themeWrapper = this.shadowRoot!.getElementById('theme-wrapper')
 
-        const syncTheme = () => {
-            const isDark = document.documentElement.classList.contains('dark')
-            if (isDark) {
-                themeWrapper?.classList.add('dark')
-            } else {
-                themeWrapper?.classList.remove('dark')
-            }
-        }
-
-        syncTheme()
-
-        const observer = new MutationObserver(() => syncTheme())
-        observer.observe(document.documentElement, {
-            attributes: true,
-            attributeFilter: ['class']
-        })
+        this.themeObserver = syncThemeWithObserver(themeWrapper);
 
         this.setupEvents()
     }
+
+    disconnectedCallback() {
+        if (this.themeObserver) {
+            this.themeObserver.disconnect();
+        }
+    }
+
     async setupEvents() {
         const root = this.shadowRoot!
         const userName = root.getElementById('user-name')!
@@ -73,9 +68,11 @@ export class AdminView extends HTMLElement {
         root.addEventListener('user-promoted', () => this.setupEvents());
         root.addEventListener('cat-deleted', () => this.setupEvents());
 
-        root.addEventListener('click', (e)=> {
+        root.addEventListener('click', (e) => {
             if (buscarCatContainer.contains(e.target as Node)) {
                 buscarCatContainer.dataset.active = 'true';
+            } else if (root.querySelector('.delete-cat-form')?.contains(e.target as Node)) {
+                this.loadData();
             } else {
                 buscarCatContainer.dataset.active = 'false';
             }
@@ -85,8 +82,8 @@ export class AdminView extends HTMLElement {
         if (logoutForm) {
             logoutForm.addEventListener('submit', async (e) => {
                 e.preventDefault()
-                await fetch('/api/auth/logout', { method: 'POST' })
-                window.location.href = '/login'
+                await authService.logout();
+                (window as any).navigate('/login?logout');
             })
         }
 
@@ -114,8 +111,13 @@ export class AdminView extends HTMLElement {
 
     private displayCats(cats: Category[] = this.cats) {
         const catsContainer = this.shadowRoot!.querySelector('.cats-list') as HTMLUListElement
+        const buscarCatInput = this.shadowRoot!.getElementById('buscar-cat-input') as HTMLInputElement
         catsContainer.innerHTML = '';
-        cats = [...cats].sort((a: Category, b: Category) => a.title!.localeCompare(b.title!))
+        cats = [...cats]
+            .filter(cat => cat.title!.toLowerCase()
+                .includes(buscarCatInput.value.toLowerCase()))
+            .sort((a: Category, b: Category) => a.title!.localeCompare(b.title!))
+
         const noCats = this.shadowRoot!.getElementById('no-cats') as HTMLDivElement
         if (cats.length === 0) {
             noCats.classList.add('flex')
@@ -132,17 +134,25 @@ export class AdminView extends HTMLElement {
     }
 
     private displayTasks() {
-        console.log(this.tasks)
+        const taskMap: Map<TaskResponseDTO, UsuarioDTO> = new Map()
+        this.tasks.forEach(task => {
+            if (task.task && task.author) {
+                taskMap.set(task.task, task.author)
+            }
+        })
     }
 
     private displayUsers() {
         const usersContainer = this.shadowRoot!.querySelector('.users-list') as HTMLUListElement
         usersContainer.innerHTML = '';
         const users = this.users.filter(user => !isEqual(user, this.me));
+        const noUsers = this.shadowRoot!.getElementById('no-users') as HTMLDivElement
         if (users.length === 0) {
-            const noUsers = this.shadowRoot!.getElementById('no-users') as HTMLDivElement
             noUsers.classList.add('flex')
             noUsers.classList.remove('hidden')
+        } else {
+            noUsers.classList.remove('flex')
+            noUsers.classList.add('hidden')
         }
         users.forEach(user => {
             const li = document.createElement('user-admin-item') as UserAdminItem;
@@ -150,7 +160,7 @@ export class AdminView extends HTMLElement {
             usersContainer.appendChild(li)
         })
     }
-    
+
     private async loadData() {
         const userName = this.shadowRoot!.getElementById('user-name')!
         await Promise.all([

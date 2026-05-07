@@ -1,5 +1,5 @@
 import html from './html/UserAdminItem.html?raw';
-import type { UsuarioDTO } from '../types/api-types';
+import type { UserTasksDTO, UsuarioDTO } from '../types/api-types';
 
 export class UserAdminItem extends HTMLElement {
     private _user!: UsuarioDTO & { id?: number };
@@ -38,6 +38,16 @@ export class UserAdminItem extends HTMLElement {
                 }
             });
         }
+
+        this.setupEvents();
+    }
+
+    private setupEvents() {
+        const nameBtn = this.querySelector('.user-name-btn') as HTMLButtonElement;
+        nameBtn.addEventListener('click', async () => {
+            const userTasks: UserTasksDTO = await fetch(`/api/admin/users/${this._user.username}/full-profile`).then(res => res.json())
+            window.navigate(`/userinfo`, userTasks);
+        });
     }
 }
 

@@ -5,6 +5,8 @@ import './views/HomeView';
 import './views/RegisterView';
 import './views/ForgotPasswordView';
 import './views/AdminView';
+import './views/UserInfoView';
+import { authService } from './services/AuthService';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 
@@ -26,18 +28,26 @@ async function router() {
   }
 
   try {
-    const res = await fetch('/api/user/me');
-    const isLoggedIn = res.ok;
+    const isLoggedIn = await authService.checkSession();
 
     isFirstLoad = false;
 
-    if (!isLoggedIn && path !== '/register' && path !== '/forgot-password' && path !== '/login' && path !== '/') {
+    const publicPaths = ['/login', '/register', '/forgot-password', '/'];
+    const adminPaths = ['/admin', '/userinfo'];
+
+    if (!isLoggedIn && !publicPaths.includes(path)) {
       window.history.pushState({}, '', '/login?required');
       app.innerHTML = '<login-view></login-view>';
       return;
     }
 
-    if (isLoggedIn && (path === '/login' || path === '/' || path === '/register' || path === '/forgot-password')) {
+    if (isLoggedIn && publicPaths.includes(path)) {
+      window.history.pushState({}, '', '/home');
+      app.innerHTML = '<home-view></home-view>';
+      return;
+    }
+
+    if (adminPaths.includes(path) && !authService.isAdmin()) {
       window.history.pushState({}, '', '/home');
       app.innerHTML = '<home-view></home-view>';
       return;
@@ -58,6 +68,18 @@ async function router() {
         break;
       case '/admin':
         app.innerHTML = '<admin-view></admin-view>';
+        break;
+      case '/userinfo':
+        const stateData = window.history.state;
+
+        if (stateData && stateData.user) {
+          app.innerHTML = '';
+          const userInfoElement = document.createElement('user-info-view') as any;
+          userInfoElement.data = stateData;
+          app.appendChild(userInfoElement);
+        } else {
+          window.navigate('/admin');
+        }
         break;
       default:
         app.innerHTML = isLoggedIn ? '<home-view></home-view>' : '<login-view></login-view>';
@@ -81,8 +103,8 @@ async function router() {
 
 window.addEventListener('popstate', router);
 
-(window as any).navigate = (path: string) => {
-  window.history.pushState({}, '', path);
+window.navigate = (path: string, state: any = {}) => {
+  window.history.pushState(state, '', path);
   router();
 };
 
