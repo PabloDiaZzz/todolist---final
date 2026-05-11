@@ -2,9 +2,9 @@ import html from './html/UserAdminItem.html?raw';
 import type { UserTasksDTO, UsuarioDTO } from '../types/api-types';
 
 export class UserAdminItem extends HTMLElement {
-    private _user!: UsuarioDTO & { id?: number };
+    private _user!: UsuarioDTO;
 
-    set user(data: UsuarioDTO & { id?: number }) {
+    set user(data: UsuarioDTO) {
         this._user = data;
         this.render();
     }
@@ -26,7 +26,7 @@ export class UserAdminItem extends HTMLElement {
                 e.preventDefault();
 
                 try {
-                    const response = await fetch(`/api/admin/users/${this._user.id}/promote`, {
+                    const response = await fetch(`/api/admin/users/${this._user.username}/promote`, {
                         method: 'PATCH'
                     });
 

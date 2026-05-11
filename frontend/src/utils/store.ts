@@ -1,0 +1,1 @@
+export const prefetchCache = new Map<string, any>();

@@ -51,9 +51,9 @@ public class AdminController {
 		return ResponseEntity.ok(response);
 	}
 
-	@PatchMapping("/users/{id}/promote")
-	public ResponseEntity<Void> makeAdmin(@PathVariable Long id) {
-		usuarioService.makeAdmin(id);
+	@PatchMapping("/users/{username}/promote")
+	public ResponseEntity<Void> makeAdmin(@PathVariable String username) {
+		usuarioService.makeAdmin(username);
 		return ResponseEntity.ok().build();
 	}
 

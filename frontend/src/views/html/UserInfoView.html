@@ -1,15 +1,15 @@
 <div id="theme-wrapper"
-    class="flex flex-col items-center bg-gray-200 dark:bg-slate-900 m-0 w-full min-h-screen overflow-x-hidden font-sans antialiased px-5">
+    class="flex flex-col items-center bg-gray-200 dark:bg-slate-900 m-0 px-5 w-full min-h-screen overflow-x-hidden font-sans antialiased">
     <header class="md:top-0 z-10 md:fixed bg-white dark:bg-slate-800 shadow-md dark:shadow-lg py-4 w-full">
         <div class="flex justify-between items-center gap-2 mx-auto px-3 w-full max-w-250 md:max-w-327.5">
             <div class="flex flex-col gap-2">
-                <h1 class="text-2xl font-semibold text-blue-600 dark:text-indigo-400">Panel de Control (ADMIN)</h1>
+                <h1 class="font-semibold text-blue-600 dark:text-indigo-400 text-2xl">Panel de Control (ADMIN)</h1>
                 <p id="user-name" class="font-semibold text-gray-600 dark:text-gray-400"></p>
             </div>
             <div class="flex items-center gap-3">
-                <button id="user-button" type="button" onclick="navigate('/')"
+                <button id="admin-button" type="button" onclick="navigate('/admin')"
                     class="bg-blue-100 hover:bg-blue-200 dark:bg-indigo-900/50 dark:hover:bg-indigo-800 px-4 py-2 rounded-xl font-bold text-blue-700 dark:text-indigo-300 text-sm transition-colors cursor-pointer">Panel
-                    Usuario</button>
+                    Admin</button>
 
                 <form id="logout-form">
                     <button
@@ -25,8 +25,14 @@
         </div>
     </header>
 
-    <main
-        class="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 pb-10 md:pt-20 text-black dark:text-white items-start">
+    <main class="flex flex-col gap-4 mx-auto mt-8 px-4 md:pt-20 pb-10 w-full max-w-2xl">
+        <section class="flex flex-col bg-back-secondary p-6 rounded-lg w-full">
+            <h1 id="user-info-title" class="font-semibold text-color text-2xl"></h1>
+            <p id="user-info-fullname" class="font-medium text-gray-600 dark:text-gray-400 text-sm"></p>
+        </section>
+        <section class="flex flex-col bg-back-secondary p-6 rounded-lg w-full" id="task-list">
+
+        </section>
 
     </main>
 </div>

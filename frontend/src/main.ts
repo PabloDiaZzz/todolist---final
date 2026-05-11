@@ -83,6 +83,7 @@ async function router() {
         break;
       default:
         app.innerHTML = isLoggedIn ? '<home-view></home-view>' : '<login-view></login-view>';
+        window.history.replaceState({}, document.title, isLoggedIn ? '/home' : '/login');
     }
   } catch (error) {
     app.innerHTML = `

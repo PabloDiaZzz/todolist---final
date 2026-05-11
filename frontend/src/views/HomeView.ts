@@ -1,6 +1,5 @@
 import html from './html/HomeView.html?raw'
 import styles from '../style.css?inline'
-import type { UsuarioDTO } from '../types/api-types'
 import type { Category } from '../types/api-types'
 import type { TaskRequestDTO } from '../types/api-types'
 import type { TaskResponseDTO } from '../types/api-types'
@@ -11,6 +10,8 @@ import { setupPrefetch } from '../utils/prefetch'
 import type { TaskItem } from '../components/TaskItem'
 import { authService } from '../services/AuthService'
 import { syncThemeWithObserver } from '../utils/theme'
+import { prefetchCache } from '../utils/store'
+import { isEqual } from 'lodash'
 
 declare module 'flowbite' {
   interface DatepickerOptions {
@@ -19,6 +20,7 @@ declare module 'flowbite' {
 }
 
 export class HomeView extends HTMLElement {
+  private tasks: TaskResponseDTO[] = [];
   private cats: Category[] = [];
   private themeObserver: MutationObserver | null = null;
 
@@ -71,26 +73,20 @@ export class HomeView extends HTMLElement {
       container: root.getElementById('theme-wrapper') as HTMLElement
     })
 
-    const [user, categoriesRes]: [UsuarioDTO, Category[], void] = await Promise.all([
-      fetch('/api/user/me').then(res => res.json()),
-      fetch('/api/cats').then(res => res.json()),
-      this.loadTasks()
-    ]);
-
-    this.cats = categoriesRes
-
-    const logoutForm = root.getElementById('logout-form')!
-    logoutForm.addEventListener('submit', async e => {
-      e.preventDefault();
-      await authService.logout();
-      (window as any).navigate('/login?logout');
-    })
-
+    const user = authService.getUser()!;
+    userName.textContent = user.fullName ?? '';
     if (user.role !== 'ROLE_ADMIN') {
       adminBtn.classList.add('hidden')
     } else {
       adminBtn.classList.remove('hidden')
     }
+
+    const logoutForm = root.getElementById('logout-form')!
+    logoutForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      await authService.logout();
+      window.navigate('/login?logout');
+    })
 
     root.addEventListener('task-info', ((e: CustomEvent<TaskResponseDTO>) => {
       this.showInfoTask(e.detail)
@@ -104,18 +100,19 @@ export class HomeView extends HTMLElement {
       (root.getElementById('task-info') as HTMLDialogElement).close()
     )
 
-    const adminButton = root.getElementById('admin-button')!
     if (adminBtn) {
-      setupPrefetch(adminButton, '/api/admin/tasks', {
+      const urlsPrefetch = [
+        '/api/admin/tasks',
+        '/api/admin/users',
+        '/api/cats'
+      ]
+      setupPrefetch(adminBtn, urlsPrefetch, {
         timeout: 150,
         once: true,
-        checkNetwork: true
+        checkNetwork: true,
       })
     }
 
-    userName.textContent = user.fullName ?? ''
-    this.loadTasks()
-    this.loadCatsDropdown('category-dropdown-container');
     root.addEventListener('task-updated', () => this.loadTasks())
 
     const taskOptions = root.getElementById('task-options')!
@@ -194,44 +191,85 @@ export class HomeView extends HTMLElement {
       this.loadCatsDropdown('category-dropdown-container', []);
       timeInput.value = '00:00'
     })
+    this.loadCats();
+    this.loadTasks();
+  }
+
+  private async loadCats() {
+    if (prefetchCache.has('/api/cats')) {
+      this.cats = prefetchCache.get('/api/cats');
+      this.loadCatsDropdown('category-dropdown-container');
+    }
+
+    try {
+      const response = await fetch('/api/cats');
+      if (!response.ok) throw new Error('Error al obtener categorías');
+
+      const freshCats: Category[] = await response.json();
+
+      if (!isEqual(this.cats, freshCats)) {
+        this.cats = freshCats;
+        prefetchCache.set('/api/cats', freshCats);
+        this.loadCatsDropdown('category-dropdown-container');
+      }
+    } catch (err) {
+      console.error('Error cargando categorías:', err);
+    }
   }
 
   private async loadTasks() {
-    const container = this.shadowRoot!.getElementById('tasks-container')
-    try {
-      const response = await fetch('/api/tasks')
-      const tasks: TaskResponseDTO[] = await response.json()
-
-      if (container) {
-        container.innerHTML = ''
-
-        const noTasks = this.shadowRoot!.getElementById('no-tasks')
-        const taskOptions = this.shadowRoot!.getElementById('task-options')!
-        if (tasks.length === 0) {
-          noTasks?.classList.remove('hidden')
-          noTasks?.classList.add('flex')
-        } else {
-          noTasks?.classList.add('hidden')
-          noTasks?.classList.remove('flex')
-        }
-        if (tasks.length < 2) {
-          taskOptions.classList.add('opacity-0')
-          taskOptions.classList.remove('opacity-100')
-          taskOptions.classList.add('pointer-events-none')
-        } else {
-          taskOptions.classList.remove('opacity-0')
-          taskOptions.classList.add('opacity-100')
-          taskOptions.classList.remove('pointer-events-none')
-        }
-        tasks.forEach((taskData: TaskResponseDTO) => {
-          const taskElement = document.createElement('task-item') as any
-          taskElement.task = taskData
-          container.appendChild(taskElement)
-        })
-      }
-    } catch (err) {
-      console.error('Error cargando tareas:', err)
+    if (prefetchCache.has('/api/tasks')) {
+      this.tasks = prefetchCache.get('/api/tasks');
+      this.renderTasks();
     }
+
+    try {
+      const response = await fetch('/api/tasks');
+      if (!response.ok) throw new Error('Error al obtener tareas');
+
+      const freshTasks: TaskResponseDTO[] = await response.json();
+
+      if (!isEqual(this.tasks, freshTasks)) {
+        this.tasks = freshTasks;
+        prefetchCache.set('/api/tasks', freshTasks);
+        this.renderTasks();
+      }
+
+    } catch (err) {
+      console.error('Error cargando tareas:', err);
+    }
+  }
+
+  private renderTasks() {
+    const container = this.shadowRoot!.getElementById('tasks-container');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    const noTasks = this.shadowRoot!.getElementById('no-tasks');
+    const taskOptions = this.shadowRoot!.getElementById('task-options');
+
+    if (this.tasks.length === 0) {
+      noTasks?.classList.replace('hidden', 'flex');
+    } else {
+      noTasks?.classList.replace('flex', 'hidden');
+    }
+
+    if (taskOptions) {
+      if (this.tasks.length < 2) {
+        taskOptions.classList.add('opacity-0', 'pointer-events-none');
+        taskOptions.classList.remove('opacity-100');
+      } else {
+        taskOptions.classList.remove('opacity-0', 'pointer-events-none');
+        taskOptions.classList.add('opacity-100');
+      }
+    }
+
+    this.tasks.forEach((taskData: TaskResponseDTO) => {
+      const taskElement = document.createElement('task-item') as any;
+      taskElement.task = taskData;
+      container.appendChild(taskElement);
+    });
   }
 
   private async showInfoTask(task: TaskResponseDTO) {

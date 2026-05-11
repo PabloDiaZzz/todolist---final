@@ -1,13 +1,15 @@
+import { prefetchCache } from "./store";
+
 interface PrefetchOptions {
     timeout?: number;
     once?: boolean;
     checkNetwork?: boolean;
-    onSuccess?: (data: any) => void;
+    onSuccess?: (url: string, data: any) => void;
 }
 
 export function setupPrefetch(
     element: HTMLElement,
-    url: string,
+    urls: string | string[],
     options: PrefetchOptions = {}
 ) {
     const { timeout = 150, once = true, checkNetwork = true, onSuccess } = options;
@@ -31,17 +33,21 @@ export function setupPrefetch(
         if (once && hasPrefetched) return;
         if (!canPrefetch()) return;
 
-        timer = window.setTimeout(async () => {
-            try {
-                const response = await fetch(url);
-                if (response.ok) {
-                    hasPrefetched = true;
-                    const data = await response.json().catch(() => ({}));
-                    if (onSuccess) onSuccess(data);
+        timer = window.setTimeout(() => {
+            hasPrefetched = true;
+            const urlList = Array.isArray(urls) ? urls : [urls];
+            urlList.forEach(async (url) => {
+                try {
+                    const response = await fetch(url);
+                    if (response.ok) {
+                        const data = await response.json().catch(() => ({}));
+                        prefetchCache.set(url, data);
+                        if (onSuccess) onSuccess(url, data);
+                    }
+                } catch (err) {
+                    console.error(`[Prefetch] Error en ${url}:`, err);
                 }
-            } catch (err) {
-                console.error(`[Prefetch] Error en ${url}:`, err);
-            }
+            });
         }, timeout);
     };
 

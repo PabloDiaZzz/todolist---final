@@ -5,6 +5,7 @@ import es.educastur.gjv64177.todolist.model.Role;
 import es.educastur.gjv64177.todolist.model.Usuario;
 import es.educastur.gjv64177.todolist.repository.UsuarioRepository;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -77,9 +78,6 @@ public class UsuarioService {
 				.orElseThrow(() -> new RuntimeException("Email no encontrado"));
 		String tempPassword = UUID.randomUUID().toString().substring(0, 8);
 
-		usuario.setPassword(passwordEncoder.encode(tempPassword));
-		usuarioRepository.save(usuario);
-
 		try {
 			MimeMessage message = mailSender.createMimeMessage();
 			MimeMessageHelper helper = new MimeMessageHelper(message, "UTF-8");
@@ -90,6 +88,8 @@ public class UsuarioService {
 			helper.setText("Tu nueva contraseña es: " + tempPassword);
 
 			mailSender.send(message);
+			usuario.setPassword(passwordEncoder.encode(tempPassword));
+			usuarioRepository.save(usuario);
 		} catch (Exception e) {
 			throw new RuntimeException("Error al crear el mensaje de correo", e);
 		}
@@ -99,8 +99,9 @@ public class UsuarioService {
 		return usuarioRepository.findAll();
 	}
 
-	public void makeAdmin(Long id) {
-		Usuario user = usuarioRepository.findById(id).orElseThrow();
+	@Transactional
+	public void makeAdmin(String username) {
+		Usuario user = usuarioRepository.findByUsername(username).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
 		user.setRole(Role.ROLE_ADMIN);
 		usuarioRepository.save(user);
 	}

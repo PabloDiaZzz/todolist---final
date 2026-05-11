@@ -8,6 +8,8 @@ import type { CatAdminItem } from '../components/CatAdminItem';
 import { isEqual } from 'lodash';
 import { authService } from '../services/AuthService';
 import { syncThemeWithObserver } from '../utils/theme';
+import { prefetchCache } from '../utils/store';
+import { setupPrefetch } from '../utils/prefetch';
 
 export class AdminView extends HTMLElement {
 
@@ -42,31 +44,27 @@ export class AdminView extends HTMLElement {
 
     async setupEvents() {
         const root = this.shadowRoot!
-        const userName = root.getElementById('user-name')!
+        const userBtn = root.getElementById('user-button') as HTMLButtonElement;
         const buscarCatContainer = root.getElementById('buscar-cat-container') as HTMLDivElement;
         const buscarCatInput = root.getElementById('buscar-cat-input') as HTMLInputElement
         const createCatForm = root.getElementById('create-cat-form') as HTMLFormElement
 
-        await Promise.all([
-            fetch('/api/user/me').then(res => res.json()),
-            fetch('/api/cats').then(res => res.json()),
-            fetch('/api/admin/tasks').then(res => res.json()),
-            fetch('/api/admin/users').then(res => res.json())
-        ]).then(([user, cats, tasks, users]) => {
-            this.me = user;
-            this.users = users;
-            this.cats = cats;
-            this.tasks = tasks;
-
-            userName.textContent = user.fullName ?? '';
-        });
-
-        this.displayTasks();
-        this.displayUsers();
-        this.displayCats();
+        await this.loadData();
 
         root.addEventListener('user-promoted', () => this.setupEvents());
         root.addEventListener('cat-deleted', () => this.setupEvents());
+
+        if (userBtn) {
+            const urlsPrefetch = [
+                '/api/tasks',
+                '/api/cats',
+            ]
+            setupPrefetch(userBtn, urlsPrefetch, {
+                timeout: 150,
+                once: true,
+                checkNetwork: true,
+            })
+        }
 
         root.addEventListener('click', (e) => {
             if (buscarCatContainer.contains(e.target as Node)) {
@@ -83,7 +81,7 @@ export class AdminView extends HTMLElement {
             logoutForm.addEventListener('submit', async (e) => {
                 e.preventDefault()
                 await authService.logout();
-                (window as any).navigate('/login?logout');
+                window.navigate('/login?logout');
             })
         }
 
@@ -162,24 +160,51 @@ export class AdminView extends HTMLElement {
     }
 
     private async loadData() {
-        const userName = this.shadowRoot!.getElementById('user-name')!
+        const userName = this.shadowRoot!.getElementById('user-name')!;
+
+        this.me = authService.getUser()!;
+        userName.textContent = this.me.fullName ?? '';
+
+        if (prefetchCache.has('/api/admin/tasks')) {
+            this.tasks = prefetchCache.get('/api/admin/tasks');
+            this.displayTasks();
+        }
+        if (prefetchCache.has('/api/cats')) {
+            this.cats = prefetchCache.get('/api/cats');
+            this.displayCats();
+        }
+        if (prefetchCache.has('/api/admin/users')) {
+            this.users = prefetchCache.get('/api/admin/users');
+            this.displayUsers();
+        }
+
         await Promise.all([
-            fetch('/api/user/me').then(res => res.json()),
             fetch('/api/cats').then(res => res.json()),
             fetch('/api/admin/tasks').then(res => res.json()),
             fetch('/api/admin/users').then(res => res.json())
-        ]).then(([user, cats, tasks, users]) => {
-            this.me = user;
-            this.users = users;
-            this.cats = cats;
-            this.tasks = tasks;
+        ]).then(([freshCats, freshTasks, users]) => {
+            const tasksChanged = !isEqual(this.tasks, freshTasks);
+            const catsChanged = !isEqual(this.cats, freshCats);
+            const usersChanged = !isEqual(this.users, users);
 
-            userName.textContent = user.fullName ?? '';
+            if (tasksChanged) {
+                this.tasks = freshTasks;
+                prefetchCache.set('/api/admin/tasks', freshTasks);
+                this.displayTasks();
+            }
+
+            if (catsChanged) {
+                this.cats = freshCats;
+                prefetchCache.set('/api/cats', freshCats);
+                this.displayCats();
+            }
+
+            if (usersChanged) {
+                this.users = users;
+                prefetchCache.set('/api/admin/users', users);
+                this.displayUsers();
+            }
         });
-
-        this.displayTasks();
-        this.displayUsers();
-        this.displayCats();
     }
 }
 customElements.define('admin-view', AdminView);

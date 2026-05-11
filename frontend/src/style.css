@@ -39,6 +39,30 @@ input:-webkit-autofill:active {
   .bg-brand {
     @apply bg-blue-500 dark:bg-indigo-600 hover:bg-blue-600 dark:hover:bg-indigo-700;
   }
+
+  .bg-element-primary {
+    @apply bg-blue-500 dark:bg-indigo-600;
+  }
+
+  .bg-back-primary {
+    @apply bg-gray-200 dark:bg-slate-900;
+  }
+
+  .bg-back-secondary {
+    @apply bg-white dark:bg-slate-800;
+  }
+
+  .text-color {
+    @apply text-blue-500 dark:text-indigo-400;
+  }
+
+  .text-color-hover {
+    @apply text-blue-600 dark:text-indigo-500 hover:text-blue-700 dark:hover:text-indigo-600;
+  }
+
+  .text-color-secondary {
+    @apply text-gray-400 dark:text-gray-500;
+  }
 }
 
 @utility info-field-* {

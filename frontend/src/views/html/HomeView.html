@@ -42,8 +42,8 @@
                     <div class="flex md:flex-row flex-col gap-4 max-md:*:w-full">
                         <div class="relative flex flex-col flex-1 gap-2" id="category-dropdown-container">
                             <button type="button"
-                                class="category-dropdown-btn group inline-flex justify-between items-center bg-gray-50 dark:bg-slate-900 px-1 py-3 border border-gray-300 hover:border-indigo-400 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full text-gray-700 dark:text-gray-200 text-sm transition-all cursor-pointer">
-                                <span class="category-dropdown-label px-2 truncate">Categorías: 0</span>
+                                class="group inline-flex justify-between items-center bg-gray-50 dark:bg-slate-900 px-1 py-3 border border-gray-300 hover:border-indigo-400 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full text-gray-700 dark:text-gray-200 text-sm transition-all cursor-pointer category-dropdown-btn">
+                                <span class="px-2 truncate category-dropdown-label">Categorías: 0</span>
                                 <svg class="w-5 h-5 text-gray-500 dark:group-hover:text-indigo-400 group-hover:text-blue-500 transition-transform duration-300"
                                     viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd"
@@ -53,13 +53,13 @@
                             </button>
 
                             <div
-                                class="category-dropdown-menu hidden top-12 left-0 z-50 absolute bg-white dark:bg-slate-800 shadow-xl border border-gray-200 dark:border-slate-700 rounded-xl w-full overflow-hidden">
+                                class="hidden top-12 left-0 z-50 absolute bg-white dark:bg-slate-800 shadow-xl border border-gray-200 dark:border-slate-700 rounded-xl w-full overflow-hidden category-dropdown-menu">
                                 <div class="relative p-2 border-gray-200 dark:border-slate-700 border-b">
                                     <input type="text" placeholder="Buscar categoría..."
-                                        class="category-search bg-gray-50 dark:bg-slate-900 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full text-gray-800 dark:text-gray-200 text-sm">
+                                        class="bg-gray-50 dark:bg-slate-900 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full text-gray-800 dark:text-gray-200 text-sm category-search">
                                 </div>
                                 <div
-                                    class="category-list [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-thumb]:bg-slate-500 dark:[&::-webkit-scrollbar-track]:bg-slate-700 p-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar]:w-2 max-h-52 overflow-y-auto">
+                                    class="[&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-thumb]:bg-slate-500 dark:[&::-webkit-scrollbar-track]:bg-slate-700 p-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar]:w-2 max-h-52 overflow-y-auto category-list">
                                 </div>
                             </div>
                         </div>
@@ -145,7 +145,7 @@
         </section>
     </main>
     <dialog id="task-edit"
-        class="fixed inset-0 z-50 justify-center items-center w-full h-full max-w-none max-h-none m-0 bg-black/50 backdrop-blur-sm border-none open:flex">
+        class="z-50 fixed inset-0 open:flex justify-center items-center bg-black/50 backdrop-blur-sm m-0 border-none w-full max-w-none h-full max-h-none">
         <div id="edit-modal-box"
             class="relative flex flex-col gap-4 bg-white dark:bg-slate-800 shadow-xl m-auto p-6 rounded-2xl w-[90%] max-w-xl text-slate-900 dark:text-white">
             <h2 class="font-bold text-blue dark:text-indigo-400 text-xl">Editar Tarea</h2>
@@ -154,13 +154,13 @@
                 <input type="text" name="title" id="edit-title" placeholder="Titulo" required
                     class="bg-gray-50 dark:bg-slate-900 px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 w-full dark:text-white">
                 <textarea name="description" id="edit-desc" placeholder="Descripción"
-                    class="bg-gray-50 dark:bg-slate-900 px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 w-full h-20 dark:text-white resize-none min-h-35"></textarea>
+                    class="bg-gray-50 dark:bg-slate-900 px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 w-full h-20 min-h-35 dark:text-white resize-none"></textarea>
 
                 <div class="flex md:flex-row flex-col gap-4 max-md:*:w-full">
                     <div class="relative flex flex-col flex-1 gap-2" id="category-edit-dropdown-container">
                         <button type="button"
-                            class="category-dropdown-btn group inline-flex justify-between items-center bg-gray-50 dark:bg-slate-900 px-1 py-3 border border-gray-300 hover:border-indigo-400 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full text-gray-700 dark:text-gray-200 text-sm transition-all cursor-pointer">
-                            <span class="category-dropdown-label px-2 truncate">Categorías: 0</span>
+                            class="group inline-flex justify-between items-center bg-gray-50 dark:bg-slate-900 px-1 py-3 border border-gray-300 hover:border-indigo-400 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full text-gray-700 dark:text-gray-200 text-sm transition-all cursor-pointer category-dropdown-btn">
+                            <span class="px-2 truncate category-dropdown-label">Categorías: 0</span>
                             <svg class="w-5 h-5 text-gray-500 dark:group-hover:text-indigo-400 group-hover:text-blue-500 transition-transform duration-300"
                                 viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd"
@@ -170,13 +170,13 @@
                         </button>
 
                         <div
-                            class="category-dropdown-menu hidden top-12 left-0 z-50 absolute bg-white dark:bg-slate-800 shadow-xl border border-gray-200 dark:border-slate-700 rounded-xl w-full overflow-hidden">
+                            class="hidden top-12 left-0 z-50 absolute bg-white dark:bg-slate-800 shadow-xl border border-gray-200 dark:border-slate-700 rounded-xl w-full overflow-hidden category-dropdown-menu">
                             <div class="relative p-2 border-gray-200 dark:border-slate-700 border-b">
                                 <input type="text" placeholder="Buscar categoría..."
-                                    class="category-search bg-gray-50 dark:bg-slate-900 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full text-gray-800 dark:text-gray-200 text-sm">
+                                    class="bg-gray-50 dark:bg-slate-900 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full text-gray-800 dark:text-gray-200 text-sm category-search">
                             </div>
                             <div
-                                class="category-list [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-thumb]:bg-slate-500 dark:[&::-webkit-scrollbar-track]:bg-slate-700 p-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar]:w-2 max-h-52 overflow-y-auto">
+                                class="[&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-thumb]:bg-slate-500 dark:[&::-webkit-scrollbar-track]:bg-slate-700 p-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar]:w-2 max-h-52 overflow-y-auto category-list">
                             </div>
                         </div>
                     </div>
@@ -220,7 +220,8 @@
         </div>
     </dialog>
 
-    <dialog id="task-info" class="bg-white dark:bg-slate-800 shadow-xl m-auto p-6 border-none rounded-2xl outline-none min-w-md">
+    <dialog id="task-info"
+        class="bg-white dark:bg-slate-800 shadow-xl m-auto p-6 border-none rounded-2xl outline-none min-w-md">
         <div id="task-info-content" class="flex flex-col items-stretch gap-4">
             <div class="flex justify-between items-center">
                 <h2 id="task-info-title"
