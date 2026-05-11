@@ -10,7 +10,7 @@ import { setupPrefetch } from '../utils/prefetch'
 import type { TaskItem } from '../components/TaskItem'
 import { authService } from '../services/AuthService'
 import { syncThemeWithObserver } from '../utils/theme'
-import { prefetchCache } from '../utils/store'
+import { prefetchCache, updateCachedData } from '../utils/store'
 import { isEqual } from 'lodash'
 
 declare module 'flowbite' {
@@ -153,6 +153,7 @@ export class HomeView extends HTMLElement {
     const taskForm = root.getElementById('task-form') as HTMLFormElement
     taskForm?.addEventListener('submit', async e => {
       e.preventDefault()
+      const tasksContainer = root.getElementById('tasks-container') as HTMLDivElement
       const formData: FormData = new FormData(taskForm)
       const dateStr = formData.get('date') as string
       const timeStr = formData.get('time') as string
@@ -170,7 +171,7 @@ export class HomeView extends HTMLElement {
       const checkedBoxes = catDropdownContainer.querySelectorAll('.category-list input[type="checkbox"]:checked') as NodeListOf<HTMLInputElement>;
       const categoryIds = Array.from(checkedBoxes).map(cb => Number(cb.value));
 
-      const task: TaskRequestDTO = {
+      const taskRequest: TaskRequestDTO = {
         title: formData.get('title') as string,
         description: formData.get('description') as string,
         categoryIds: categoryIds,
@@ -178,18 +179,63 @@ export class HomeView extends HTMLElement {
         deadline: finalDeadline
       }
 
-      await fetch('/api/tasks', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(task)
-      })
+      const fakeId = Date.now();
+      const localTask: TaskResponseDTO = {
+        id: fakeId,
+        title: taskRequest.title,
+        description: taskRequest.description,
+        deadline: taskRequest.deadline,
+        completed: false,
+        categories: this.cats.filter(c => taskRequest.categoryIds?.includes(c.id!)),
+        tags: taskRequest.tagsInput ? taskRequest.tagsInput.split(',').map(name => ({ name: name.trim() })) : [],
+        createdAt: new Date().toISOString(),
+        lastEdit: new Date().toISOString()
+      };
 
-      this.loadTasks()
-      taskForm.reset()
+      this.tasks = updateCachedData<TaskResponseDTO>('/api/tasks', oldTasks => {
+        return [...oldTasks, localTask];
+      });
+      this.renderTasks();
+      taskForm.reset();
       this.loadCatsDropdown('category-dropdown-container', []);
-      timeInput.value = '00:00'
+      timeInput.value = '00:00';
+
+      try {
+        const response = await fetch('/api/tasks', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(taskRequest)
+        });
+
+        if (!response.ok) throw new Error('Error en el servidor');
+
+        const realTask: TaskResponseDTO = await response.json();
+        const taskIndex = this.tasks.findIndex(t => t.id === fakeId);
+
+        if (taskIndex !== -1) {
+          this.tasks[taskIndex] = realTask;
+
+          prefetchCache.set('/api/tasks', this.tasks);
+
+          const taskElements = tasksContainer.querySelectorAll('task-item') as NodeListOf<any>;
+          taskElements.forEach(el => {
+            if (el.task?.id === fakeId) {
+              el.task = realTask;
+            }
+          });
+        }
+
+      } catch (err) {
+        console.error('Error al guardar la tarea en el servidor:', err);
+        this.tasks = updateCachedData<TaskResponseDTO>('/api/tasks', old => old.filter(t => t.id !== fakeId));
+        const taskElements = tasksContainer.querySelectorAll('task-item') as NodeListOf<any>;
+        taskElements.forEach(el => {
+          if (el.task?.id === fakeId) {
+            el.remove();
+          }
+        });
+        alert("Error de conexión: No se pudo guardar la tarea.");
+      }
     })
     this.loadCats();
     this.loadTasks();
@@ -441,6 +487,28 @@ export class HomeView extends HTMLElement {
         categoryIds: categoryIds,
         tagsInput: formData.get('tagsInput') as string
       };
+      const originalTask = { ...task };
+
+      const localTask: TaskResponseDTO = {
+          ...task,
+          title: taskSubmit.title,
+          description: taskSubmit.description,
+          deadline: taskSubmit.deadline,
+          categories: this.cats.filter(c => taskSubmit.categoryIds?.includes(c.id!)),
+          tags: taskSubmit.tagsInput ? taskSubmit.tagsInput.split(',').map(name => ({ name: name.trim() })) : [],
+          lastEdit: new Date().toISOString()
+      };
+
+      this.tasks = updateCachedData<TaskResponseDTO>('/api/tasks', oldTasks => 
+          oldTasks.map(t => t.id === task.id ? localTask : t)
+      );
+
+      _taskElement.task = localTask;
+
+      dp.destroy();
+      dialog.close();
+      document.body.classList.remove('overflow-hidden');
+
       try {
         const response = await fetch('/api/tasks/' + task.id, {
           method: 'PUT',
@@ -449,14 +517,25 @@ export class HomeView extends HTMLElement {
           },
           body: JSON.stringify(taskSubmit)
         });
-        if (!response.ok) {
-          throw new Error('Error al editar la tarea');
-        }
-        await this.loadTasks();
-        dialog.close();
-        document.body.classList.remove('overflow-hidden');
+
+        if (!response.ok) throw new Error('Error al editar la tarea');
+
+        const realTask: TaskResponseDTO = await response.json();
+        
+        this.tasks = updateCachedData<TaskResponseDTO>('/api/tasks', oldTasks => 
+            oldTasks.map(t => t.id === task.id ? realTask : t)
+        );
+        _taskElement.task = realTask;
+
       } catch (err) {
         console.error('Error al editar la tarea:', err);
+        
+        this.tasks = updateCachedData<TaskResponseDTO>('/api/tasks', oldTasks => 
+            oldTasks.map(t => t.id === task.id ? originalTask : t)
+        );
+        _taskElement.task = originalTask;
+        
+        alert("Error de conexión: No se pudieron guardar los cambios.");
       }
     }
     dialog.show();

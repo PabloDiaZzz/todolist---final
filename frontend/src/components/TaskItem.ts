@@ -1,10 +1,11 @@
 import html from './html/TaskItem.html?raw';
-import type { TaskResponseDTO as Task } from '../types/api-types';
+import type { TaskResponseDTO } from '../types/api-types';
+import { updateCachedData } from '../utils/store';
 
 export class TaskItem extends HTMLElement {
-    private _task!: Task;
+    private _task!: TaskResponseDTO;
 
-    set task(data: Task) {
+    set task(data: TaskResponseDTO) {
         this._task = data;
         this.render();
     }
@@ -55,9 +56,25 @@ export class TaskItem extends HTMLElement {
 
         const toggleBtn = this.querySelector('.toggle-btn');
         toggleBtn?.addEventListener('click', async () => {
-            await fetch(`/api/tasks/${task.id}/toggle`, { method: 'PATCH' });
-            this.dispatchEvent(new CustomEvent('task-updated', { bubbles: true, composed: true }));
+            const originalState = task.completed;
+            task.completed = !originalState;
+            this.render();
+            updateCachedData<TaskResponseDTO>('/api/tasks', oldTasks =>
+                oldTasks.map(t => t.id === task.id ? { ...t, completed: task.completed } : t)
+            );
+            
+            try {
+                const response = await fetch(`/api/tasks/${task.id}/toggle`, { method: 'PATCH' });
+                if (!response.ok) throw new Error('Error al actualizar');
+            } catch (error) {
+                task.completed = originalState;
+                updateCachedData<TaskResponseDTO>('/api/tasks', oldTasks =>
+                    oldTasks.map(t => t.id === task.id ? { ...t, completed: task.completed } : t)
+                );
+                this.render();
+            }
         });
+
         this.querySelector('.delete-btn')?.addEventListener('click', async () => {
             if (deleteBtn.dataset.state === 'initial') {
                 deleteBtn.dataset.state = 'confirm';
@@ -67,10 +84,30 @@ export class TaskItem extends HTMLElement {
                     deleteBtn.dataset.state = 'initial';
                     deleteBtn.classList.add('hover:bg-red-50', 'dark:hover:bg-red-900/30');
                     deleteBtn.classList.remove('hover:bg-red-500', 'dark:hover:bg-red-500', 'text-white', 'dark:text-white');
-                })
+                }, { once: true });
             } else if (deleteBtn.dataset.state === 'confirm') {
-                await fetch(`/api/tasks/${task.id}`, { method: 'DELETE' });
-                this.dispatchEvent(new CustomEvent('task-updated', { bubbles: true, composed: true }));
+                this.style.display = 'none';
+                updateCachedData<TaskResponseDTO>('/api/tasks', oldTasks => oldTasks.filter(t => t.id !== task.id));
+                const container = this.parentElement;
+                try {
+                    const response = await fetch(`/api/tasks/${task.id}`, { method: 'DELETE' });
+                    if (!response.ok) throw new Error('Error al borrar');
+
+                    this.remove();
+
+                    if (container && container.children.length === 0) {
+                        const noTasks = container.parentElement?.querySelector('#no-tasks');
+                        noTasks?.classList.replace('hidden', 'flex');
+                    }
+                } catch (err) {
+                    this.style.display = '';
+                    updateCachedData<TaskResponseDTO>('/api/tasks', oldTasks => [...oldTasks, task]);
+
+                    deleteBtn.dataset.state = 'initial';
+                    deleteBtn.classList.add('hover:bg-red-50', 'dark:hover:bg-red-900/30');
+                    deleteBtn.classList.remove('hover:bg-red-500', 'dark:hover:bg-red-500', 'text-white', 'dark:text-white');
+                    alert('Error de conexión al borrar la tarea.');
+                }
             }
         });
 
