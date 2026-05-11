@@ -10,6 +10,10 @@ export class CatAdminItem extends HTMLElement {
         this.render();
     }
 
+    get cat(): Category {
+        return this._cat;
+    }
+
     private render() {
         this.innerHTML = html;
 
@@ -23,6 +27,16 @@ export class CatAdminItem extends HTMLElement {
             this.style.display = 'none';
             updateCachedData<Category>('/api/cats', oldCats => oldCats.filter(c => c.id !== this._cat.id));
             this.dispatchEvent(new CustomEvent('sync-memory', { bubbles: true, composed: true }));
+
+            const container = this.parentElement;
+            const noCatsBanner = container?.parentElement?.querySelector('#no-cats');
+
+            if (container && noCatsBanner) {
+                const visibleItems = Array.from(container.children).filter(el => (el as HTMLElement).style.display !== 'none');
+                if (visibleItems.length === 0) {
+                    noCatsBanner.classList.replace('hidden', 'flex');
+                }
+            }
 
             try {
                 const response = await fetch(`/api/admin/categories/${this._cat.id}`, {

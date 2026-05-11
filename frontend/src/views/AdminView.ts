@@ -94,7 +94,7 @@ export class AdminView extends HTMLElement {
         createCatForm.onsubmit = async (e) => {
             e.preventDefault()
             const formData = new FormData(createCatForm)
-            const title = formData.get('title') as string
+            const title = (formData.get('title') as string).trim().charAt(0).toUpperCase() + (formData.get('title') as string).trim().slice(1).toLowerCase();
             const fakeId = Date.now();
             const localCat: Category = { id: fakeId, title };
             this.cats = updateCachedData<Category>('/api/cats', oldCats => [...oldCats, localCat]);

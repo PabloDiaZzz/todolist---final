@@ -14,6 +14,7 @@
     "prettier": "^3.8.3",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "swagger-typescript-api": "^13.6.10",
+    "tailwind-scrollbar": "^4.0.2",
     "tailwindcss-view-transitions": "^0.1.1",
     "typescript": "~6.0.2",
     "vite": "^8.0.9"

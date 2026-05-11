@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 @plugin "tailwindcss-view-transitions";
 @plugin "flowbite/plugin";
+@plugin 'tailwind-scrollbar';
 
 @source "./views/**/*.{html,ts}";
 @source "./components/**/*.{html,ts}";

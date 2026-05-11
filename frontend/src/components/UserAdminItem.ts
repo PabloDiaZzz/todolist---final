@@ -10,6 +10,10 @@ export class UserAdminItem extends HTMLElement {
         this.render();
     }
 
+    get user(): UsuarioDTO {
+        return this._user;
+    }
+
     private render() {
         this.innerHTML = html;
 
