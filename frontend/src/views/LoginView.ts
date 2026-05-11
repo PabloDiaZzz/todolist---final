@@ -1,7 +1,7 @@
 import html from './html/LoginView.html?raw';
 import styles from '../style.css?inline';
-import { setupPrefetch } from '../utils/prefetch';
 import { syncThemeWithObserver } from '../utils/theme';
+import { prefetchCache } from '../utils/store';
 
 export class LoginView extends HTMLElement {
     private themeObserver: MutationObserver | null = null;
@@ -51,7 +51,6 @@ export class LoginView extends HTMLElement {
         const root = this.shadowRoot!;
         const alerts = root.querySelectorAll('.alert');
         const form = root.getElementById('login-form') as HTMLFormElement;
-        const loginBtn = root.getElementById('login-btn') as HTMLButtonElement;
         const toggleBtn = root.getElementById('toggle-password') as HTMLButtonElement;
         const passInput = root.getElementById('password') as HTMLInputElement;
 
@@ -61,14 +60,6 @@ export class LoginView extends HTMLElement {
             root.querySelector('.eye-show')?.classList.toggle('hidden');
             root.querySelector('.eye-hide')?.classList.toggle('hidden');
         });
-
-        if (loginBtn) {
-            setupPrefetch(loginBtn, '/home', {
-                timeout: 150,
-                once: true,
-                checkNetwork: true
-            });
-        }
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -87,7 +78,12 @@ export class LoginView extends HTMLElement {
                 const res = await fetch('/api/login', { method: 'POST', body: formData });
 
                 if (res.ok) {
-                    (window as any).navigate('/home');
+                    const tasks = await fetch('/api/tasks').then(r => r.json()).catch(() => null);
+                    const cats = await fetch('/api/cats').then(r => r.json()).catch(() => null);
+                    if (tasks) prefetchCache.set('/api/tasks', tasks);
+                    if (cats) prefetchCache.set('/api/cats', cats);
+
+                    window.navigate('/home');
                 } else {
                     submitBtn.textContent = originalText;
                     submitBtn.disabled = false;

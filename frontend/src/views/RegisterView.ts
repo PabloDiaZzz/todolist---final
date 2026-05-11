@@ -1,6 +1,7 @@
 import html from './html/RegisterView.html?raw';
 import styles from '../style.css?inline';
 import { syncThemeWithObserver } from '../utils/theme';
+import { prefetchCache } from '../utils/store';
 
 export class RegisterView extends HTMLElement {
     private root: ShadowRoot;
@@ -166,9 +167,15 @@ export class RegisterView extends HTMLElement {
             e.preventDefault();
             errorAlert.classList.add('hidden');
 
+            const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+            const originalText = submitBtn.textContent || 'Registrarse';
             const formData = new FormData(form);
             const password = formData.get('password') as string;
             const confirmPassword = formData.get('confirmPassword') as string;
+
+            submitBtn.textContent = 'Registrándose...';
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
 
             if (password !== confirmPassword) {
                 errorAlert.textContent = "Las contraseñas no coinciden.";
@@ -184,7 +191,6 @@ export class RegisterView extends HTMLElement {
             paramsRegister.append('confirmPassword', confirmPassword);
 
             try {
-                // --- PETICIÓN 1: REGISTRO ---
                 const resRegister = await fetch('/api/auth/register', {
                     method: 'POST',
                     headers: {
@@ -194,10 +200,13 @@ export class RegisterView extends HTMLElement {
                 });
 
                 if (resRegister.ok) {
-                    // --- PETICIÓN 2: AUTO-LOGIN ---
                     const paramsLogin = new URLSearchParams();
                     paramsLogin.append('username', formData.get('username') as string);
                     paramsLogin.append('password', password);
+
+                    submitBtn.textContent = 'Iniciando sesión...';
+                    submitBtn.disabled = true;
+                    submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
 
                     const resLogin = await fetch('/api/login', {
                         method: 'POST',
@@ -208,16 +217,20 @@ export class RegisterView extends HTMLElement {
                     });
 
                     if (resLogin.ok) {
-                        // Todo perfecto, lo llevamos directo a sus tareas
-                        (window as any).navigate('/home');
+                        const tasks = await fetch('/api/tasks').then(r => r.json()).catch(() => null);
+                        const cats = await fetch('/api/cats').then(r => r.json()).catch(() => null);
+                        if (tasks) prefetchCache.set('/api/tasks', tasks);
+                        if (cats) prefetchCache.set('/api/cats', cats);
+
+                        window.navigate('/home');
                     } else {
-                        // Raro que pase, pero si falla el auto-login, lo mandamos al Login manual
-                        (window as any).navigate('/login');
+                        submitBtn.textContent = originalText;
+                        submitBtn.disabled = false;
+                        submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+                        window.navigate('/login');
                     }
 
                 } else {
-                    // --- ¡AQUÍ FALTABA TU ELSE! ---
-                    // Manejar si el registro falla (ej. Usuario ya existe en BD)
                     const errorMsg = await resRegister.text();
                     errorAlert.textContent = errorMsg || "Error al registrar. Revisa los datos o prueba otro usuario.";
                     errorAlert.classList.remove('hidden');

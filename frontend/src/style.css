@@ -64,13 +64,69 @@ input:-webkit-autofill:active {
   .text-color-secondary {
     @apply text-gray-400 dark:text-gray-500;
   }
+
+  .base-select {
+    /* 1. Forzamos base-select en el elemento y en el picker */
+    appearance: base-select;
+    background-image: none;
+    /* Quitamos la flecha de Flowbite */
+
+    &::picker(select) {
+      appearance: base-select;
+      border-radius: 12px;
+      /* ¡AQUÍ ESTÁ EL REDONDEO! */
+      padding: 0;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      background-color: transparent;
+      overflow: hidden;
+      /* Corta lo que sobresalga */
+    }
+
+    /* 2. Ocultamos la flecha rebelde del navegador */
+    &::picker-icon {
+      display: none;
+    }
+
+    /* 3. Rotamos NUESTRO svg cuando el select está abierto */
+    &:open>button svg {
+      transform: rotate(180deg);
+    }
+
+    /* Estilos para las opciones dentro del div */
+    >div option {
+      padding: 10px 15px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    >div option:hover,
+    >div option:focus {
+      background-color: #f3f4f6;
+      /* bg-gray-100 para el hover */
+    }
+
+    /* Estilo en modo oscuro para las opciones */
+    @media (prefers-color-scheme: dark) {
+      &::picker(select) {
+        border-color: #334155;
+        /* slate-700 */
+      }
+
+      >div option:hover,
+      >div option:focus {
+        background-color: #334155;
+        /* slate-700 */
+      }
+    }
+  }
 }
 
 @utility info-field-* {
-  --label: --value([ * ]);
+  --label: --value([ *]);
   @apply relative cursor-default;
 
-  & > *,
+  &>*,
   &:not(:has(*)) {
     @apply relative transition-all duration-300 overflow-hidden text-black dark:text-white;
 
@@ -81,7 +137,7 @@ input:-webkit-autofill:active {
     }
   }
 
-  &:hover > *,
+  &:hover>*,
   &:hover:not(:has(*)) {
     @apply text-transparent indent-[-50%] cursor-copy select-none;
 

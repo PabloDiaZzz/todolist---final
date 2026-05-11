@@ -120,6 +120,11 @@ export class HomeView extends HTMLElement {
       taskOptions.setAttribute('data-active', 'true')
     })
 
+    const filterSelects = taskOptions.querySelectorAll('select');
+    filterSelects.forEach(select => {
+      select.addEventListener('change', () => this.renderTasks());
+    });
+
     root.addEventListener('click', e => {
       const target = e.target as Node
       const pickerEl = document.querySelector('.datepicker-picker')
@@ -242,9 +247,17 @@ export class HomeView extends HTMLElement {
   }
 
   private async loadCats() {
+    const catsOptions = this.shadowRoot!.getElementById('category-options-filter').querySelector('div') as HTMLDivElement;
     if (prefetchCache.has('/api/cats')) {
       this.cats = prefetchCache.get('/api/cats');
       this.loadCatsDropdown('category-dropdown-container');
+      this.updateCategoryFilter();
+      this.cats.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat.id?.toString() ?? '';
+        option.textContent = cat.title ?? '';
+        catsOptions.appendChild(option);
+      });
     }
 
     try {
@@ -257,6 +270,12 @@ export class HomeView extends HTMLElement {
         this.cats = freshCats;
         prefetchCache.set('/api/cats', freshCats);
         this.loadCatsDropdown('category-dropdown-container');
+        this.cats.forEach(cat => {
+          const option = document.createElement('option');
+          option.value = cat.id?.toString() ?? '';
+          option.textContent = cat.title ?? '';
+          catsOptions.appendChild(option);
+        });
       }
     } catch (err) {
       console.error('Error cargando categorías:', err);
@@ -296,7 +315,9 @@ export class HomeView extends HTMLElement {
     const noTasks = this.shadowRoot!.getElementById('no-tasks');
     const taskOptions = this.shadowRoot!.getElementById('task-options');
 
-    if (this.tasks.length === 0) {
+    const tasksToRender = this.getProcessedTasks();
+
+    if (tasksToRender.length === 0) {
       noTasks?.classList.replace('hidden', 'flex');
     } else {
       noTasks?.classList.replace('flex', 'hidden');
@@ -312,7 +333,7 @@ export class HomeView extends HTMLElement {
       }
     }
 
-    this.tasks.forEach((taskData: TaskResponseDTO) => {
+    tasksToRender.forEach((taskData: TaskResponseDTO) => {
       const taskElement = document.createElement('task-item') as any;
       taskElement.task = taskData;
       container.appendChild(taskElement);
@@ -491,17 +512,17 @@ export class HomeView extends HTMLElement {
       const originalTask = { ...task };
 
       const localTask: TaskResponseDTO = {
-          ...task,
-          title: taskSubmit.title,
-          description: taskSubmit.description,
-          deadline: taskSubmit.deadline,
-          categories: this.cats.filter(c => taskSubmit.categoryIds?.includes(c.id!)),
-          tags: taskSubmit.tagsInput ? taskSubmit.tagsInput.split(',').map(name => ({ name: name.trim() })) : [],
-          lastEdit: new Date().toISOString()
+        ...task,
+        title: taskSubmit.title,
+        description: taskSubmit.description,
+        deadline: taskSubmit.deadline,
+        categories: this.cats.filter(c => taskSubmit.categoryIds?.includes(c.id!)),
+        tags: taskSubmit.tagsInput ? taskSubmit.tagsInput.split(',').map(name => ({ name: name.trim() })) : [],
+        lastEdit: new Date().toISOString()
       };
 
-      this.tasks = updateCachedData<TaskResponseDTO>('/api/tasks', oldTasks => 
-          oldTasks.map(t => t.id === task.id ? localTask : t)
+      this.tasks = updateCachedData<TaskResponseDTO>('/api/tasks', oldTasks =>
+        oldTasks.map(t => t.id === task.id ? localTask : t)
       );
 
       _taskElement.task = localTask;
@@ -522,20 +543,20 @@ export class HomeView extends HTMLElement {
         if (!response.ok) throw new Error('Error al editar la tarea');
 
         const realTask: TaskResponseDTO = await response.json();
-        
-        this.tasks = updateCachedData<TaskResponseDTO>('/api/tasks', oldTasks => 
-            oldTasks.map(t => t.id === task.id ? realTask : t)
+
+        this.tasks = updateCachedData<TaskResponseDTO>('/api/tasks', oldTasks =>
+          oldTasks.map(t => t.id === task.id ? realTask : t)
         );
         _taskElement.task = realTask;
 
       } catch (err) {
         console.error('Error al editar la tarea:', err);
-        
-        this.tasks = updateCachedData<TaskResponseDTO>('/api/tasks', oldTasks => 
-            oldTasks.map(t => t.id === task.id ? originalTask : t)
+
+        this.tasks = updateCachedData<TaskResponseDTO>('/api/tasks', oldTasks =>
+          oldTasks.map(t => t.id === task.id ? originalTask : t)
         );
         _taskElement.task = originalTask;
-        
+
         alert("Error de conexión: No se pudieron guardar los cambios.");
       }
     }
@@ -620,6 +641,73 @@ export class HomeView extends HTMLElement {
     const renderList = renderCategoryList
     renderList();
     updateUI();
+  }
+
+  private updateCategoryFilter() {
+    const root = this.shadowRoot!;
+    const filterSelect = root.getElementById('category-options-filter') as HTMLSelectElement;
+    if (!filterSelect) return;
+
+    filterSelect.innerHTML = '<option value="">- Categoria -</option>';
+    this.cats.forEach(cat => {
+      const option = document.createElement('option');
+      option.value = String(cat.id);
+      option.textContent = cat.title ?? '';
+      filterSelect.appendChild(option);
+    });
+  }
+
+  private getProcessedTasks(): TaskResponseDTO[] {
+    const root = this.shadowRoot!;
+    const taskOptions = root.getElementById('task-options');
+    if (!taskOptions) return this.tasks;
+
+    const selects = taskOptions.querySelectorAll('select');
+    const categoryFilter = selects[0].value;
+    const statusFilter = selects[1].value;
+    const sortFilter = selects[2].value;
+
+    let processed = [...this.tasks];
+
+    if (statusFilter !== '') {
+      const isComplete = statusFilter === 'true';
+      processed = processed.filter(t => !!t.completed === isComplete);
+    }
+
+    if (categoryFilter !== '') {
+      const catId = Number(categoryFilter);
+      processed = processed.filter(t => t.categories?.some(c => c.id === catId));
+    }
+    if (sortFilter !== '') {
+      processed.sort((a, b) => {
+        if (sortFilter === 'title') {
+          return (a.title || '').localeCompare(b.title || '');
+        }
+        if (sortFilter === 'description') {
+          return (a.description || '').localeCompare(b.description || '');
+        }
+        if (sortFilter === 'category') {
+          const catA = a.categories?.[0]?.title || 'z';
+          const catB = b.categories?.[0]?.title || 'z';
+          return catA.localeCompare(catB);
+        }
+        if (sortFilter === 'complete') {
+          return (a.completed === b.completed) ? 0 : (a.completed ? 1 : -1);
+        }
+        if (sortFilter === 'deadline') {
+          return (new Date(b.deadline || '').getTime() - new Date(a.deadline || '').getTime());
+        }
+        if (sortFilter === 'created') {
+          return (new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime());
+        }
+        if (sortFilter === 'lastEdit') {
+          return (new Date(b.lastEdit || '').getTime() - new Date(a.lastEdit || '').getTime());
+        }
+        return 0;
+      });
+    }
+
+    return processed;
   }
 }
 customElements.define('home-view', HomeView)

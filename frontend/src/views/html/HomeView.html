@@ -58,7 +58,9 @@
                                     <input type="text" placeholder="Buscar categoría..."
                                         class="bg-gray-50 dark:bg-slate-900 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full text-gray-800 dark:text-gray-200 text-sm category-search">
                                 </div>
-                                <div class="scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-slate-500 scrollbar-track-gray-100 dark:scrollbar-track-slate-700 scrollbar-thumb-rounded-full p-1 max-h-52 overflow-y-auto category-list"></div>
+                                <div
+                                    class="scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-slate-500 scrollbar-track-gray-100 dark:scrollbar-track-slate-700 scrollbar-thumb-rounded-full p-1 max-h-52 overflow-y-auto category-list">
+                                </div>
                             </div>
                         </div>
 
@@ -98,28 +100,60 @@
                 </form>
             </section>
             <section id="task-options" data-active="false"
-                class="group/taskopts right-0 bottom-0 absolute bg-white dark:bg-slate-800 shadow-md p-4 data-[active=true]:px-2 border border-gray-200 dark:border-slate-700 rounded-2xl data-[active=false]:hover:rounded-xl data-[active=true]:w-max max-w-full data-[active=true]:h-15 size-4 transition-all duration-500 delay-200 data-[active=true]:delay-0 cursor-pointer">
+                class="group/taskopts right-0 bottom-0 absolute bg-white dark:bg-slate-800 shadow-md p-4 data-[active=true]:px-2 border border-gray-200 dark:border-slate-700 rounded-2xl data-[active=false]:hover:rounded-xl data-[active=true]:w-full max-w-full data-[active=true]:h-15 size-4 transition-all duration-500 delay-200 data-[active=true]:delay-0 cursor-pointer">
                 <svg
                     class="top-1/2 left-1/2 absolute opacity-100 group-data-[active=true]/taskopts:opacity-0 size-6 text-blue-800 dark:group-hover/taskopts:dark:text-indigo-400 dark:text-indigo-300 group-hover/taskopts:text-blue-500 transition-all -translate-x-1/2 -translate-y-1/2 duration-500 group-data-[active=true]/taskopts:duration-50 delay-500 group-data-[active=true]/taskopts:delay-0 pointer-events-none">
                     <use href="/main.svg#filter"></use>
                 </svg>
                 <div
-                    class="invisible group-data-[active=true]/taskopts:visible flex flex-row justify-between items-center gap-3 opacity-0 group-data-[active=true]/taskopts:opacity-100 h-full dark:text-white group-data-[active=true]/taskopts:*:scale-100 *:scale-0 transition-all *:transition-all duration-300 group-data-[active=true]/taskopts:*:duration-500 group-data-[active=true]/taskopts:duration-500 group-data-[active=true]/taskopts:*:delay-0 group-data-[active=true]/taskopts:delay-500 *:delay-500">
+                    class="invisible group-data-[active=true]/taskopts:visible flex flex-row justify-between items-center gap-3 opacity-0 group-data-[active=true]/taskopts:opacity-100 h-full dark:text-white group-data-[active=true]/taskopts:*:scale-100 *:scale-0 transition-all *:transition-all duration-300 group-data-[active=true]/taskopts:*:duration-500 group-data-[active=true]/taskopts:duration-500 group-data-[active=true]/taskopts:*:delay-0 group-data-[active=true]/taskopts:delay-500 *:delay-500 *:flex-1">
                     <select name="category-options-filter" id="category-options-filter"
-                        class="bg-blue-600 dark:bg-indigo-600 px-5 py-2 rounded-lg text-white">
-                        <option value="">- Categoria -</option>
+                        class="bg-blue-600 dark:bg-indigo-600 px-5 py-2 rounded-lg text-white outline-none border-none base-select cursor-pointer">
+                        <button class="flex items-center justify-between gap-3 w-full outline-none">
+                            <selectedcontent></selectedcontent>
+                            <svg width="20" height="20" viewBox="0 0 24 24" class="transition-transform duration-300">
+                                <path fill="currentColor" d="m7 10l5 5l5-5z" />
+                            </svg>
+                        </button>
+                        <div class="bg-white dark:bg-slate-800 text-black dark:text-white flex flex-col">
+                            <option value="">- Categoria -</option>
+                        </div>
                     </select>
-                    <select name="" id="" class="bg-blue-600 dark:bg-indigo-600 px-5 py-2 rounded-lg text-white">
-                        <option value="">- Completado -</option>
-                        <option value="true">Completadas</option>
-                        <option value="false">Incompletas</option>
+
+                    <select name="complete-options-filter" id="complete-options-filter"
+                        class="bg-blue-600 dark:bg-indigo-600 px-5 py-2 rounded-lg text-white outline-none border-none base-select cursor-pointer">
+                        <button class="flex items-center justify-between gap-3 w-full outline-none">
+                            <selectedcontent></selectedcontent>
+                            <svg width="20" height="20" viewBox="0 0 24 24" class="transition-transform duration-300">
+                                <path fill="currentColor" d="m7 10l5 5l5-5z" />
+                            </svg>
+                        </button>
+                        <div class="bg-white dark:bg-slate-800 text-black dark:text-white flex flex-col">
+                            <option value="">- Completado -</option>
+                            <option value="true">Completadas</option>
+                            <option value="false">Incompletas</option>
+                        </div>
                     </select>
-                    <select name="" id="" class="bg-blue-600 dark:bg-indigo-600 px-5 py-2 rounded-lg text-white">
-                        <option value="">- Ordenar por -</option>
-                        <option value="title">Titulo</option>
-                        <option value="description">Descripción</option>
-                        <option value="category">Categoria</option>
-                        <option value="complete">Completado</option>
+
+                    <select name="sort-options-filter" id="sort-options-filter"
+                        class="bg-blue-600 dark:bg-indigo-600 px-5 py-2 rounded-lg text-white outline-none border-none base-select cursor-pointer">
+                        <button class="flex items-center justify-between gap-3 w-full outline-none">
+                            <selectedcontent></selectedcontent>
+                            <svg width="20" height="20" viewBox="0 0 24 24" class="transition-transform duration-300">
+                                <path fill="currentColor" d="m7 10l5 5l5-5z" />
+                            </svg>
+                        </button>
+                        <div class="bg-white dark:bg-slate-800 text-black dark:text-white flex flex-col">
+                            <option value="">- Ordenar por -</option>
+                            <option value="title">Titulo</option>
+                            <option value="description">Descripción</option>
+                            <option value="category">Categoria</option>
+                            <option value="complete">Completado</option>
+                            <option value="created">Fecha de creación</option>
+                            <option value="lastEdit">Última edición</option>
+                            <option value="deadline">Fecha limite</option>
+                            <option value="priority">Prioridad</option>
+                        </div>
                     </select>
                 </div>
             </section>
@@ -173,45 +207,46 @@
                                 <input type="text" placeholder="Buscar categoría..."
                                     class="bg-gray-50 dark:bg-slate-900 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full text-gray-800 dark:text-gray-200 text-sm category-search">
                             </div>
-                            <div class="scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-slate-500 scrollbar-track-gray-100 dark:scrollbar-track-slate-700 scrollbar-thumb-rounded-full p-1 max-h-52 overflow-y-auto category-list">
+                            <div
+                                class="scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-slate-500 scrollbar-track-gray-100 dark:scrollbar-track-slate-700 scrollbar-thumb-rounded-full p-1 max-h-52 overflow-y-auto category-list">
+                            </div>
                         </div>
-                    </div>
 
-                    <input type="text" name="tagsInput" autocomplete="off" placeholder="Tags (ej: urgente, compras)"
-                        id="edit-tags"
-                        class="bg-gray-50 dark:bg-slate-900 px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 w-2/3 dark:text-white">
-                </div>
-                <div class="flex sm:flex-row flex-col gap-4 w-full">
-                    <div class="group relative flex-1" id="edit-date-container">
-                        <div class="z-10 absolute inset-s-0 inset-y-0 flex items-center ps-3 pointer-events-none">
-                            <svg class="w-5 h-5 text-gray-500 dark:group-hover:text-indigo-400 dark:text-gray-400 group-hover:text-blue-500 transition-colors duration-300"
-                                fill="currentColor" viewBox="0 0 20 20">
-                                <path
-                                    d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-                            </svg>
-                        </div>
-                        <input type="text" id="date-deadline-edit" name="date" placeholder="Seleccionar fecha limite"
-                            autocomplete="off"
-                            class="block bg-gray-50 dark:bg-slate-900 py-3 pr-4 pl-10 border border-gray-300 focus:border-blue-500 dark:border-slate-600 dark:focus:border-indigo-500 rounded-xl focus:ring-blue-500 dark:focus:ring-indigo-500 w-full text-gray-900 dark:text-white text-sm transition-all dark:placeholder-gray-400">
+                        <input type="text" name="tagsInput" autocomplete="off" placeholder="Tags (ej: urgente, compras)"
+                            id="edit-tags"
+                            class="bg-gray-50 dark:bg-slate-900 px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 w-2/3 dark:text-white">
                     </div>
-                    <div class="group relative flex-1">
-                        <div class="z-10 absolute inset-e-0 inset-y-0 flex items-center pe-3 pointer-events-none">
-                            <svg class="w-5 h-5 text-gray-500 dark:group-hover:text-indigo-400 dark:text-gray-400 group-hover:text-blue-500 transition-colors duration-300"
-                                fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                            </svg>
+                    <div class="flex sm:flex-row flex-col gap-4 w-full">
+                        <div class="group relative flex-1" id="edit-date-container">
+                            <div class="z-10 absolute inset-s-0 inset-y-0 flex items-center ps-3 pointer-events-none">
+                                <svg class="w-5 h-5 text-gray-500 dark:group-hover:text-indigo-400 dark:text-gray-400 group-hover:text-blue-500 transition-colors duration-300"
+                                    fill="currentColor" viewBox="0 0 20 20">
+                                    <path
+                                        d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
+                                </svg>
+                            </div>
+                            <input type="text" id="date-deadline-edit" name="date"
+                                placeholder="Seleccionar fecha limite" autocomplete="off"
+                                class="block bg-gray-50 dark:bg-slate-900 py-3 pr-4 pl-10 border border-gray-300 focus:border-blue-500 dark:border-slate-600 dark:focus:border-indigo-500 rounded-xl focus:ring-blue-500 dark:focus:ring-indigo-500 w-full text-gray-900 dark:text-white text-sm transition-all dark:placeholder-gray-400">
                         </div>
-                        <input type="time" id="time-deadline-edit" name="time" value="23:59"
-                            class="block bg-gray-50 dark:bg-slate-900 py-3 pr-10 pl-4 border border-gray-300 focus:border-blue-500 dark:border-slate-600 dark:focus:border-indigo-500 rounded-xl focus:ring-blue-500 dark:focus:ring-indigo-500 w-full text-gray-900 dark:text-white text-sm transition-all">
+                        <div class="group relative flex-1">
+                            <div class="z-10 absolute inset-e-0 inset-y-0 flex items-center pe-3 pointer-events-none">
+                                <svg class="w-5 h-5 text-gray-500 dark:group-hover:text-indigo-400 dark:text-gray-400 group-hover:text-blue-500 transition-colors duration-300"
+                                    fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                </svg>
+                            </div>
+                            <input type="time" id="time-deadline-edit" name="time" value="23:59"
+                                class="block bg-gray-50 dark:bg-slate-900 py-3 pr-10 pl-4 border border-gray-300 focus:border-blue-500 dark:border-slate-600 dark:focus:border-indigo-500 rounded-xl focus:ring-blue-500 dark:focus:ring-indigo-500 w-full text-gray-900 dark:text-white text-sm transition-all">
+                        </div>
                     </div>
-                </div>
-                <div class="flex justify-end gap-3 mt-4">
-                    <button id="cancel-edit-task" type="button"
-                        class="bg-gray-200 hover:bg-gray-300 dark:bg-slate-700 dark:hover:bg-slate-600 px-5 py-2 rounded-xl transition cursor-pointer">Cancelar</button>
-                    <button id="save-edit-task" type="submit"
-                        class="bg-indigo-600 hover:bg-indigo-700 px-5 py-2 rounded-xl text-white transition cursor-pointer">Guardar</button>
-                </div>
+                    <div class="flex justify-end gap-3 mt-4">
+                        <button id="cancel-edit-task" type="button"
+                            class="bg-gray-200 hover:bg-gray-300 dark:bg-slate-700 dark:hover:bg-slate-600 px-5 py-2 rounded-xl transition cursor-pointer">Cancelar</button>
+                        <button id="save-edit-task" type="submit"
+                            class="bg-indigo-600 hover:bg-indigo-700 px-5 py-2 rounded-xl text-white transition cursor-pointer">Guardar</button>
+                    </div>
             </form>
         </div>
     </dialog>
