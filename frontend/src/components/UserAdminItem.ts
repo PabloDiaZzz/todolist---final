@@ -1,5 +1,6 @@
 import html from './html/UserAdminItem.html?raw';
 import type { UserTasksDTO, UsuarioDTO } from '../types/api-types';
+import { updateCachedData } from '../utils/store';
 
 export class UserAdminItem extends HTMLElement {
     private _user!: UsuarioDTO;
@@ -24,17 +25,34 @@ export class UserAdminItem extends HTMLElement {
         } else {
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
+                const originalRole = this._user.role;
+                this._user.role = 'ROLE_ADMIN';
+                roleEl.textContent = 'ROLE_ADMIN';
+                form.style.display = 'none';
+                updateCachedData<UsuarioDTO>('/api/admin/users', oldUsers =>
+                    oldUsers.map(u => u.username === this._user.username ? { ...u, role: 'ROLE_ADMIN' } : u)
+                );
+                this.dispatchEvent(new CustomEvent('sync-memory', { bubbles: true, composed: true }));
 
                 try {
                     const response = await fetch(`/api/admin/users/${this._user.username}/promote`, {
                         method: 'PATCH'
                     });
 
-                    if (response.ok) {
-                        this.dispatchEvent(new CustomEvent('user-promoted', { bubbles: true, composed: true }));
-                    }
+                    if (!response.ok) throw new Error('Error al promover');
+                    form.remove();
+
                 } catch (error) {
                     console.error('Error al promover al usuario:', error);
+                    this._user.role = originalRole;
+                    roleEl.textContent = originalRole ?? '';
+                    form.style.display = '';
+                    
+                    updateCachedData<UsuarioDTO>('/api/admin/users', oldUsers =>
+                        oldUsers.map(u => u.username === this._user.username ? { ...u, role: originalRole } : u)
+                    );
+                    this.dispatchEvent(new CustomEvent('sync-memory', { bubbles: true, composed: true }));
+                    alert('Error de conexión: No se pudo hacer Admin al usuario.');
                 }
             });
         }

@@ -1,5 +1,6 @@
 import html from './html/CatAdminItem.html?raw';
 import type { Category } from '../types/api-types';
+import { updateCachedData } from '../utils/store';
 
 export class CatAdminItem extends HTMLElement {
     private _cat!: Category;
@@ -19,17 +20,24 @@ export class CatAdminItem extends HTMLElement {
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
+            this.style.display = 'none';
+            updateCachedData<Category>('/api/cats', oldCats => oldCats.filter(c => c.id !== this._cat.id));
+            this.dispatchEvent(new CustomEvent('sync-memory', { bubbles: true, composed: true }));
 
             try {
                 const response = await fetch(`/api/admin/categories/${this._cat.id}`, {
                     method: 'DELETE'
                 });
 
-                if (response.ok) {
-                    this.dispatchEvent(new CustomEvent('cat-deleted', { bubbles: true, composed: true }));
-                }
+                if (!response.ok) throw new Error('Error al borrar');
+                this.remove();
+
             } catch (error) {
                 console.error('Error al borrar la categoría:', error);
+                this.style.display = '';
+                updateCachedData<Category>('/api/cats', oldCats => [...oldCats, this._cat]);
+                this.dispatchEvent(new CustomEvent('sync-memory', { bubbles: true, composed: true }));
+                alert('Error de conexión al borrar la categoría.');
             }
         });
     }

@@ -8,7 +8,7 @@ import type { CatAdminItem } from '../components/CatAdminItem';
 import { isEqual } from 'lodash';
 import { authService } from '../services/AuthService';
 import { syncThemeWithObserver } from '../utils/theme';
-import { prefetchCache } from '../utils/store';
+import { prefetchCache, updateCachedData } from '../utils/store';
 import { setupPrefetch } from '../utils/prefetch';
 
 export class AdminView extends HTMLElement {
@@ -51,8 +51,10 @@ export class AdminView extends HTMLElement {
 
         await this.loadData();
 
-        root.addEventListener('user-promoted', () => this.setupEvents());
-        root.addEventListener('cat-deleted', () => this.setupEvents());
+        root.addEventListener('sync-memory', () => {
+            this.users = prefetchCache.get('/api/admin/users') || [];
+            this.cats = prefetchCache.get('/api/cats') || [];
+        });
 
         if (userBtn) {
             const urlsPrefetch = [
@@ -95,15 +97,36 @@ export class AdminView extends HTMLElement {
             e.preventDefault()
             const formData = new FormData(createCatForm)
             const title = formData.get('title') as string
-            await fetch('/api/admin/categories', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ title })
-            })
-            createCatForm.reset()
-            this.loadData();
+            const fakeId = Date.now();
+            const localCat: Category = { id: fakeId, title };
+            this.cats = updateCachedData<Category>('/api/cats', oldCats => [...oldCats, localCat]);
+            this.displayCats();
+            createCatForm.reset();
+            
+            try {
+                const response = await fetch('/api/admin/categories', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title })
+                })
+
+                if (!response.ok) throw new Error('Error al crear');
+
+                const realCat: Category = await response.json();
+                this.cats = updateCachedData<Category>('/api/cats', oldCats =>
+                    oldCats.map(c => c.id === fakeId ? realCat : c)
+                );
+                const catElements = this.shadowRoot!.querySelectorAll('cat-admin-item') as NodeListOf<any>;
+                catElements.forEach(el => {
+                    if (el.cat?.id === fakeId) el.cat = realCat;
+                });
+
+            } catch (err) {
+                console.error('Error al crear categoría', err);
+                this.cats = updateCachedData<Category>('/api/cats', oldCats => oldCats.filter(c => c.id !== fakeId));
+                this.displayCats();
+                alert("Error de conexión al crear la categoría.");
+            }
         }
     }
 

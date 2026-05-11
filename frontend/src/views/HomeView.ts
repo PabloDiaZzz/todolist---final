@@ -274,6 +274,7 @@ export class HomeView extends HTMLElement {
       if (!response.ok) throw new Error('Error al obtener tareas');
 
       const freshTasks: TaskResponseDTO[] = await response.json();
+      freshTasks.sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
 
       if (!isEqual(this.tasks, freshTasks)) {
         this.tasks = freshTasks;
