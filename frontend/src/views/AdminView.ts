@@ -71,8 +71,6 @@ export class AdminView extends HTMLElement {
         root.addEventListener('click', (e) => {
             if (buscarCatContainer.contains(e.target as Node)) {
                 buscarCatContainer.dataset.active = 'true';
-            } else if (root.querySelector('.delete-cat-form')?.contains(e.target as Node)) {
-                this.loadData();
             } else {
                 buscarCatContainer.dataset.active = 'false';
             }
