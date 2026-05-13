@@ -6,10 +6,10 @@ import es.educastur.gjv64177.todolist.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class CategoryService {
@@ -21,14 +21,17 @@ public class CategoryService {
 		return categoryRepository.save(category);
 	}
 
+	@Transactional
 	public void deleteById(Long id) {
+
 		taskRepository.findByCategories_Id(id).forEach(t -> {
-			t.setCategories(t.getCategories().stream().filter(c -> !c.getId().equals(id)).collect(Collectors.toSet()));
+			t.getCategories().removeIf(c -> c.getId().equals(id));
 			taskRepository.save(t);
 		});
+		
 		categoryRepository.deleteById(id);
 	}
-
+	
 	public List<Category> findAll() {
 		return categoryRepository.findAll();
 	}

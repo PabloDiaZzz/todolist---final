@@ -264,7 +264,7 @@ export class HomeView extends HTMLElement {
       const response = await fetch('/api/cats');
       if (!response.ok) throw new Error('Error al obtener categorías');
 
-      const freshCats: Category[] = await response.json();
+      const freshCats: Category[] = (await response.json()).sort((a, b) => a.title.localeCompare(b.title));
 
       if (!isEqual(this.cats, freshCats)) {
         this.cats = freshCats;
