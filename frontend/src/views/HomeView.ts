@@ -585,7 +585,7 @@ export class HomeView extends HTMLElement {
 
         const div = document.createElement('div')
         div.className = `flex items-center gap-3 px-4 py-2.5 cursor-pointer rounded-lg transition-colors ${isSelected
-          ? 'bg-indigo-50 dark:bg-indigo-900/30'
+          ? 'bg-blue-50 dark:bg-indigo-900/30'
           : 'hover:bg-gray-100 dark:hover:bg-slate-700'
           }`
 
@@ -593,7 +593,7 @@ export class HomeView extends HTMLElement {
         checkbox.type = 'checkbox'
         checkbox.value = String(cat.id);
         checkbox.className =
-          'w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 cursor-pointer'
+          'w-4 h-4 text-blue-500 dark:text-indigo-600 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-indigo-500 cursor-pointer'
         checkbox.checked = isSelected
 
         const span = document.createElement('span')

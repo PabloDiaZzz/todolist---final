@@ -42,7 +42,7 @@
                     <div class="flex md:flex-row flex-col gap-4 max-md:*:w-full">
                         <div class="relative flex flex-col flex-1 gap-2" id="category-dropdown-container">
                             <button type="button"
-                                class="group inline-flex justify-between items-center bg-gray-50 dark:bg-slate-900 px-1 py-3 border border-gray-300 hover:border-indigo-400 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full text-gray-700 dark:text-gray-200 text-sm transition-all cursor-pointer category-dropdown-btn">
+                                class="group inline-flex justify-between items-center bg-gray-50 dark:bg-slate-900 px-1 py-3 border border-gray-300 hover:border-indigo-400 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 w-full text-gray-700 dark:text-gray-200 text-sm transition-all cursor-pointer category-dropdown-btn">
                                 <span class="px-2 truncate category-dropdown-label">Categorías: 0</span>
                                 <svg class="w-5 h-5 text-gray-500 dark:group-hover:text-indigo-400 group-hover:text-blue-500 transition-transform duration-300"
                                     viewBox="0 0 20 20" fill="currentColor">
@@ -56,7 +56,7 @@
                                 class="hidden top-12 left-0 z-50 absolute bg-white dark:bg-slate-800 shadow-xl border border-gray-200 dark:border-slate-700 rounded-xl w-full overflow-hidden category-dropdown-menu">
                                 <div class="relative p-2 border-gray-200 dark:border-slate-700 border-b">
                                     <input type="text" placeholder="Buscar categoría..."
-                                        class="bg-gray-50 dark:bg-slate-900 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full text-gray-800 dark:text-gray-200 text-sm category-search">
+                                        class="bg-gray-50 dark:bg-slate-900 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 w-full text-gray-800 dark:text-gray-200 text-sm category-search">
                                 </div>
                                 <div
                                     class="scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-slate-500 scrollbar-track-gray-100 dark:scrollbar-track-slate-700 scrollbar-thumb-rounded-full p-1 max-h-52 overflow-y-auto category-list">
@@ -245,7 +245,7 @@
                     <button id="cancel-edit-task" type="button"
                         class="bg-gray-200 hover:bg-gray-300 dark:bg-slate-700 dark:hover:bg-slate-600 px-5 py-2 rounded-xl transition cursor-pointer">Cancelar</button>
                     <button id="save-edit-task" type="submit"
-                        class="bg-indigo-600 hover:bg-indigo-700 px-5 py-2 rounded-xl text-white transition cursor-pointer">Guardar</button>
+                        class="bg-brand px-5 py-2 rounded-xl text-white transition cursor-pointer">Guardar</button>
                 </div>
             </form>
         </div>
@@ -289,25 +289,4 @@
                 class="self-stretch bg-red-500 p-2 rounded-xl outline-none text-white hover:scale-101 transition-all cursor-pointer item-stretch">Cerrar</button>
         </div>
     </dialog>
-
-    <script>
-        function abrirEditModal(btn) {
-            const article = btn.closest('.task-item');
-            const modal = document.getElementById('edit-modal');
-
-            document.getElementById('edit-form').action = `/tasks/${article.dataset.id}/edit`;
-
-            document.getElementById('edit-title').value = article.dataset.title;
-            document.getElementById('edit-desc').value = article.dataset.description || '';
-            document.getElementById('edit-category').value = article.dataset.category || '';
-            document.getElementById('edit-tags').value = article.dataset.tags || '';
-
-            const tagIds = article.dataset.tags ? article.dataset.tags.split(',') : [];
-            document.querySelectorAll('.edit-tag-checkbox').forEach(cb => {
-                cb.checked = tagIds.includes(cb.value);
-            });
-
-            modal.showModal();
-        }
-    </script>
 </div>
