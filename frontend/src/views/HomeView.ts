@@ -247,7 +247,7 @@ export class HomeView extends HTMLElement {
   }
 
   private async loadCats() {
-    const catsOptions = this.shadowRoot!.getElementById('category-options-filter').querySelector('div') as HTMLDivElement;
+    const catsOptions = this.shadowRoot!.getElementById('category-options-filter')?.querySelector('div') as HTMLDivElement;
     if (prefetchCache.has('/api/cats')) {
       this.cats = prefetchCache.get('/api/cats');
       this.loadCatsDropdown('category-dropdown-container');
@@ -256,7 +256,7 @@ export class HomeView extends HTMLElement {
         const option = document.createElement('option');
         option.value = cat.id?.toString() ?? '';
         option.textContent = cat.title ?? '';
-        catsOptions.appendChild(option);
+        if (catsOptions) catsOptions.appendChild(option);
       });
     }
 
@@ -264,7 +264,7 @@ export class HomeView extends HTMLElement {
       const response = await fetch('/api/cats');
       if (!response.ok) throw new Error('Error al obtener categorías');
 
-      const freshCats: Category[] = (await response.json()).sort((a, b) => a.title.localeCompare(b.title));
+      const freshCats: Category[] = (await response.json()).sort((a: Category, b: Category) => a.title!.localeCompare(b.title!));
 
       if (!isEqual(this.cats, freshCats)) {
         this.cats = freshCats;
