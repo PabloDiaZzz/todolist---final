@@ -1,12 +1,11 @@
 import style from "../style.css?inline";
 import html from "./html/UserInfoView.html?raw";
-import type { Category, TaskRequestDTO, TaskResponseDTO, UserTasksDTO, UsuarioDTO } from "../types/api-types";
+import type { Category, TaskResponseDTO, UserTasksDTO, UsuarioDTO } from "../types/api-types";
 import { syncThemeWithObserver } from "../utils/theme";
 import { authService } from "../services/AuthService";
 import { setupPrefetch } from "../utils/prefetch";
 import "../components/TaskInfo";
-import { prefetchCache, updateCachedData } from "../utils/store";
-import { Datepicker } from "flowbite";
+import { prefetchCache } from "../utils/store";
 import { isEqual } from "lodash";
 import type { TaskInfo } from "../components/TaskInfo";
 
