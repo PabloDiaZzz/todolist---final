@@ -593,7 +593,7 @@ export class HomeView extends HTMLElement {
         checkbox.type = 'checkbox'
         checkbox.value = String(cat.id);
         checkbox.className =
-          'w-4 h-4 text-blue-500 dark:text-indigo-600 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-indigo-500 cursor-pointer'
+          'w-4 h-4 text-blue-500 dark:text-indigo-600 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-indigo-600 cursor-pointer'
         checkbox.checked = isSelected
 
         const span = document.createElement('span')

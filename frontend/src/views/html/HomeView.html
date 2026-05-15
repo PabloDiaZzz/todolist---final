@@ -3,7 +3,7 @@
     <header class="md:top-0 z-10 md:fixed bg-white dark:bg-slate-800 shadow-md dark:shadow-lg py-4 w-full">
         <div class="flex justify-between items-center gap-2 mx-auto px-3 w-full max-w-250 md:max-w-327.5">
             <div class="flex flex-col gap-2">
-                <h1 class="font-semibold text-blue-600 dark:text-indigo-400 text-2xl">Aplicación ToDo List</h1>
+                <h1 class="font-semibold text-color text-2xl">Aplicación ToDo List</h1>
                 <p id="user-name" class="font-semibold text-gray-600 dark:text-gray-400"></p>
             </div>
 
@@ -32,7 +32,7 @@
         <div class="relative flex flex-col pb-19">
             <section
                 class="bg-white dark:bg-slate-800 shadow-md p-6 border border-gray-200 dark:border-slate-700 rounded-2xl">
-                <h2 class="mb-4 font-bold text-blue-600 dark:text-indigo-400 text-xl">Nueva Tarea</h2>
+                <h2 class="mb-4 font-bold text-color text-xl">Nueva Tarea</h2>
                 <form id="task-form" class="flex flex-col gap-3">
                     <input type="text" name="title" placeholder="¿Qué necesitas hacer?" required
                         class="bg-gray-50 dark:bg-slate-900 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 w-full dark:text-white">
@@ -93,8 +93,7 @@
                         </div>
                     </div>
 
-                    <button type="submit"
-                        class="md:self-end bg-blue-600 hover:bg-blue-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 mt-2 px-6 py-2.5 rounded-xl w-full md:w-fit font-bold text-white transition-colors cursor-pointer">
+                    <button type="submit" class="md:self-end bg-brand mt-2 px-6 py-2.5 rounded-xl w-full md:w-fit font-bold text-white">
                         Añadir Tarea
                     </button>
                 </form>
@@ -108,7 +107,7 @@
                 <div
                     class="invisible group-data-[active=true]/taskopts:visible flex flex-row justify-between items-center gap-3 opacity-0 group-data-[active=true]/taskopts:opacity-100 h-full dark:text-white group-data-[active=true]/taskopts:*:scale-100 *:scale-0 transition-all *:transition-all duration-300 group-data-[active=true]/taskopts:*:duration-500 group-data-[active=true]/taskopts:duration-500 group-data-[active=true]/taskopts:*:delay-0 group-data-[active=true]/taskopts:delay-500 *:delay-500 *:flex-1">
                     <select name="category-options-filter" id="category-options-filter"
-                        class="bg-blue-600 dark:bg-indigo-600 px-5 py-2 rounded-lg text-white outline-none border-none base-select cursor-pointer">
+                        class="bg-element-primary px-5 py-2 rounded-lg text-white outline-none border-none base-select cursor-pointer">
                         <button class="flex items-center justify-between gap-3 w-full outline-none">
                             <selectedcontent></selectedcontent>
                             <svg width="20" height="20" viewBox="0 0 24 24" class="transition-transform duration-300">
@@ -121,7 +120,7 @@
                     </select>
 
                     <select name="complete-options-filter" id="complete-options-filter"
-                        class="bg-blue-600 dark:bg-indigo-600 px-5 py-2 rounded-lg text-white outline-none border-none base-select cursor-pointer">
+                        class="bg-element-primary px-5 py-2 rounded-lg text-white outline-none border-none base-select cursor-pointer">
                         <button class="flex items-center justify-between gap-3 w-full outline-none">
                             <selectedcontent></selectedcontent>
                             <svg width="20" height="20" viewBox="0 0 24 24" class="transition-transform duration-300">
@@ -136,7 +135,7 @@
                     </select>
 
                     <select name="sort-options-filter" id="sort-options-filter"
-                        class="bg-blue-600 dark:bg-indigo-600 px-5 py-2 rounded-lg text-white outline-none border-none base-select cursor-pointer">
+                        class="bg-element-primary px-5 py-2 rounded-lg text-white outline-none border-none base-select cursor-pointer">
                         <button class="flex items-center justify-between gap-3 w-full outline-none">
                             <selectedcontent></selectedcontent>
                             <svg width="20" height="20" viewBox="0 0 24 24" class="transition-transform duration-300">
@@ -265,7 +264,7 @@
 
             </div>
             <pre id="task-info-desc"
-                class="bg-gray-100 dark:bg-slate-900 p-2 border border-gray-300 dark:border-slate-600 rounded-xl max-w-[500px] font-sans dark:text-white whitespace-pre-wrap"></pre>
+                class="bg-gray-100 dark:bg-slate-900 p-2 border border-gray-300 dark:border-slate-600 rounded-xl max-w-125 font-sans dark:text-white whitespace-pre-wrap"></pre>
             <div class="info-field-['Fecha_limite:']">
                 <p id="task-info-deadline"
                     class="bg-gray-100 dark:bg-slate-900 p-2 border border-gray-300 dark:border-slate-600 rounded-xl dark:text-white">

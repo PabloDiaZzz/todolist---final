@@ -37,12 +37,13 @@ input:-webkit-autofill:active {
 }
 
 @layer utilities {
+
   .bg-brand {
-    @apply bg-blue-500 dark:bg-indigo-600 hover:bg-blue-600 dark:hover:bg-indigo-700;
+    @apply bg-blue-600 dark:bg-indigo-600 hover:bg-blue-700 dark:hover:bg-indigo-700 cursor-pointer transition-colors;
   }
 
   .bg-element-primary {
-    @apply bg-blue-500 dark:bg-indigo-600;
+    @apply bg-blue-600 dark:bg-indigo-600;
   }
 
   .bg-back-primary {
@@ -54,11 +55,11 @@ input:-webkit-autofill:active {
   }
 
   .text-color {
-    @apply text-blue-500 dark:text-indigo-400;
+    @apply text-blue-600 dark:text-indigo-400;
   }
 
   .text-color-hover {
-    @apply text-blue-600 dark:text-indigo-500 hover:text-blue-700 dark:hover:text-indigo-600;
+    @apply text-blue-600 dark:text-indigo-400 hover:text-blue-700 dark:hover:text-indigo-500;
   }
 
   .text-color-secondary {
@@ -66,21 +67,17 @@ input:-webkit-autofill:active {
   }
 
   .base-select {
-    /* 1. Forzamos base-select en el elemento y en el picker */
     appearance: base-select;
     background-image: none;
-    /* Quitamos la flecha de Flowbite */
 
     &::picker(select) {
       appearance: base-select;
       border-radius: 12px;
-      /* ¡AQUÍ ESTÁ EL REDONDEO! */
       padding: 0;
       border: 1px solid #e5e7eb;
       box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
       background-color: transparent;
       overflow: hidden;
-      /* Corta lo que sobresalga */
     }
 
     /* 2. Ocultamos la flecha rebelde del navegador */

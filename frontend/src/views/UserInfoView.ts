@@ -4,11 +4,11 @@ import type { Category, TaskRequestDTO, TaskResponseDTO, UserTasksDTO, UsuarioDT
 import { syncThemeWithObserver } from "../utils/theme";
 import { authService } from "../services/AuthService";
 import { setupPrefetch } from "../utils/prefetch";
-import type { TaskItem } from "../components/TaskItem";
-import "../components/TaskItem";
+import "../components/TaskInfo";
 import { prefetchCache, updateCachedData } from "../utils/store";
 import { Datepicker } from "flowbite";
 import { isEqual } from "lodash";
+import type { TaskInfo } from "../components/TaskInfo";
 
 export default class UserInfoView extends HTMLElement {
     private themeObserver: MutationObserver | null = null;
@@ -91,10 +91,6 @@ export default class UserInfoView extends HTMLElement {
             this.showInfoTask(e.detail)
         }) as EventListener)
 
-        root.addEventListener('task-edit', ((e: CustomEvent<{ taskElement: TaskItem, task: TaskResponseDTO }>) => {
-            this.showEditTask(e.detail.taskElement, e.detail.task)
-        }) as EventListener)
-
         root.getElementById('close-task-info')!.addEventListener('click', () =>
             (root.getElementById('task-info') as HTMLDialogElement).close()
         )
@@ -131,7 +127,7 @@ export default class UserInfoView extends HTMLElement {
         if (taskList) {
             taskList.innerHTML = '';
             this.tasks.forEach(task => {
-                const taskElement = document.createElement('task-item') as TaskItem;
+                const taskElement = document.createElement('task-info') as TaskInfo;
                 taskElement.task = task;
                 taskList!.appendChild(taskElement);
             });
@@ -233,216 +229,6 @@ export default class UserInfoView extends HTMLElement {
             ? new Date(task.lastEdit).toLocaleString('es-ES', dateConfig)
             : ''
         dialog.showModal()
-    }
-
-    private showEditTask(_taskElement: TaskItem, task: TaskResponseDTO) {
-        const dialog = this.shadowRoot!.getElementById('task-edit') as HTMLDialogElement
-        const modalBox = this.shadowRoot!.getElementById('edit-modal-box') as HTMLElement;
-        const form = this.shadowRoot!.getElementById('edit-form') as HTMLFormElement;
-        const title = this.shadowRoot!.getElementById('edit-title') as HTMLInputElement
-        const desc = this.shadowRoot!.getElementById('edit-desc') as HTMLTextAreaElement
-        const dateDeadline = this.shadowRoot!.getElementById('date-deadline-edit') as HTMLInputElement
-        const timeDeadline = this.shadowRoot!.getElementById('time-deadline-edit') as HTMLInputElement
-        const tags = this.shadowRoot!.getElementById('edit-tags') as HTMLInputElement
-        const cancel = this.shadowRoot!.getElementById('cancel-edit-task') as HTMLButtonElement
-        const dateConfig: Intl.DateTimeFormatOptions = {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit'
-        }
-        const dp = new Datepicker(dateDeadline, {
-            autohide: true,
-            format: 'dd/mm/yyyy',
-            orientation: 'top',
-            language: 'es',
-            minDate: Date.now().toString(),
-            buttons: true,
-            autoSelectToday: 1,
-            container: modalBox
-        })
-
-        title.value = task.title ?? ''
-        desc.value = task.description ?? ''
-        if (task.deadline) {
-            const d = new Date(task.deadline);
-            dateDeadline.value = d.toLocaleDateString('es-ES', dateConfig);
-            dp.setDate(d);
-            timeDeadline.value = d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-        } else {
-            dateDeadline.value = '';
-            timeDeadline.value = '00:00';
-        }
-        this.loadCatsDropdown('category-edit-dropdown-container', task.categories ?? []);
-        tags.value = task.tags?.map(t => t.name).join(', ') || '';
-        cancel.onclick = () => {
-            dp.destroy()
-            dialog.close()
-        }
-        modalBox.onclick = (e) => {
-            if (dateDeadline.contains(e.target as Node)) return;
-            dp.hide()
-        }
-        dialog.onclick = (e) => {
-            if (e.target === dialog) {
-                dp.destroy()
-                dialog.close()
-                document.body.classList.remove('overflow-hidden');
-            }
-        };
-        form.onsubmit = async (e) => {
-            e.preventDefault();
-            const formData = new FormData(form);
-            let finalDeadline: string | undefined = undefined;
-
-            if (dateDeadline.value && timeDeadline.value) {
-                const [day, month, year] = dateDeadline.value.split('/');
-                finalDeadline = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${timeDeadline.value}:00`;
-            }
-            const checkedBoxes = modalBox.querySelectorAll('.category-list input[type="checkbox"]:checked') as NodeListOf<HTMLInputElement>;
-            const categoryIds = Array.from(checkedBoxes).map(cb => Number(cb.value));
-            const taskSubmit: TaskRequestDTO = {
-                title: formData.get('title') as string,
-                description: formData.get('description') as string,
-                deadline: finalDeadline,
-                categoryIds: categoryIds,
-                tagsInput: formData.get('tagsInput') as string
-            };
-            const originalTask = { ...task };
-
-            const localTask: TaskResponseDTO = {
-                ...task,
-                title: taskSubmit.title,
-                description: taskSubmit.description,
-                deadline: taskSubmit.deadline,
-                categories: this.cats.filter(c => taskSubmit.categoryIds?.includes(c.id!)),
-                tags: taskSubmit.tagsInput ? taskSubmit.tagsInput.split(',').map(name => ({ name: name.trim() })) : [],
-                lastEdit: new Date().toISOString()
-            };
-
-            updateCachedData<TaskResponseDTO>('/api/tasks', oldTasks =>
-                oldTasks.map(t => t.id === task.id ? localTask : t)
-            );
-
-            this.tasks = this.tasks.map(t => t.id === task.id ? localTask : t);
-
-            _taskElement.task = localTask;
-
-            dp.destroy();
-            dialog.close();
-            document.body.classList.remove('overflow-hidden');
-
-            try {
-                const response = await fetch('/api/tasks/' + task.id, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(taskSubmit)
-                });
-
-                if (!response.ok) throw new Error('Error al editar la tarea');
-
-                const realTask: TaskResponseDTO = await response.json();
-
-                updateCachedData<TaskResponseDTO>('/api/tasks', oldTasks =>
-                    oldTasks.map(t => t.id === task.id ? realTask : t)
-                );
-                this.tasks = this.tasks.map(t => t.id === task.id ? realTask : t);
-                _taskElement.task = realTask;
-
-            } catch (err) {
-                console.error('Error al editar la tarea:', err);
-
-                updateCachedData<TaskResponseDTO>('/api/tasks', oldTasks =>
-                    oldTasks.map(t => t.id === task.id ? originalTask : t)
-                );
-                this.tasks = this.tasks.map(t => t.id === task.id ? originalTask : t);
-                _taskElement.task = originalTask;
-
-                alert("Error de conexión: No se pudieron guardar los cambios.");
-            }
-        }
-        dialog.show();
-    }
-
-    private loadCatsDropdown(id: string, selectedCategories: Category[] = []) {
-        const root = this.shadowRoot!
-        const container = root.getElementById(id)! as HTMLDivElement
-        const dropdownBtn = container.querySelector('.category-dropdown-btn') as HTMLButtonElement
-        const dropdownMenu = container.querySelector('.category-dropdown-menu') as HTMLDivElement
-        const dropdownLabel = container.querySelector('.category-dropdown-label') as HTMLSpanElement
-        const searchInput = container.querySelector('.category-search') as HTMLInputElement
-        const categoryList = container.querySelector('.category-list')! as HTMLDivElement
-        const dropdownIcon = dropdownBtn.querySelector('svg')! as SVGElement
-
-        const renderCategoryList = (searchTerm = '') => {
-            categoryList.innerHTML = ''
-            const filtered = this.cats.filter(c =>
-                (c.title ?? '').toLowerCase().includes(searchTerm.toLowerCase())
-            )
-
-            filtered.forEach(cat => {
-                if (cat.id === undefined) return
-                const isSelected = selectedCategories.some(sc => sc.id === cat.id)
-
-                const div = document.createElement('div')
-                div.className = `flex items-center gap-3 px-4 py-2.5 cursor-pointer rounded-lg transition-colors ${isSelected
-                    ? 'bg-blue-50 dark:bg-indigo-900/30'
-                    : 'hover:bg-gray-100 dark:hover:bg-slate-700'
-                    }`
-
-                const checkbox = document.createElement('input')
-                checkbox.type = 'checkbox'
-                checkbox.value = String(cat.id);
-                checkbox.className =
-                    'w-4 h-4 text-blue-500 dark:text-indigo-600 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-indigo-500 cursor-pointer'
-                checkbox.checked = isSelected
-
-                const span = document.createElement('span')
-                span.className = 'text-sm font-medium text-gray-700 dark:text-gray-200'
-                span.textContent = cat.title ?? ''
-
-                div.appendChild(checkbox)
-                div.appendChild(span)
-
-                div.onclick = e => {
-                    e.stopPropagation()
-                    if (e.target !== checkbox) checkbox.checked = !checkbox.checked
-
-                    if (checkbox.checked) {
-                        selectedCategories.push(cat)
-                    } else {
-                        selectedCategories = selectedCategories.filter(
-                            sc => sc.id !== cat.id
-                        )
-                    }
-                    updateUI()
-                }
-
-                categoryList.appendChild(div)
-            })
-        }
-
-        dropdownBtn.onclick = (e) => {
-            e.preventDefault();
-            dropdownMenu.classList.toggle('hidden')
-            dropdownIcon.classList.toggle('rotate-180')
-            if (!dropdownMenu.classList.contains('hidden')) searchInput.focus()
-        }
-
-        searchInput.oninput = (e) => {
-            renderCategoryList((e.target as HTMLInputElement).value)
-        }
-
-        const updateUI = () => {
-            dropdownLabel.textContent = `Categorías: ${selectedCategories.length}`
-
-            renderList(searchInput.value)
-        }
-
-        const renderList = renderCategoryList
-        renderList();
-        updateUI();
     }
 }
 

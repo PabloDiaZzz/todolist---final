@@ -1,0 +1,39 @@
+<article
+    class="group flex justify-between items-stretch gap-4 bg-white dark:bg-slate-800 shadow-sm hover:shadow-md p-5 border border-gray-200 dark:border-slate-700 rounded-2xl transition-all task-wrapper">
+    <div class="flex items-start gap-4 w-full">
+        <div class="flex flex-col justify-between items-center gap-4 h-full">
+            <button disabled type="button" class="mt-1 toggle-btn">
+                <div
+                    class="flex justify-center items-center border-2 border-gray-400 dark:border-gray-500 rounded-full size-6 status-icon">
+                </div>
+            </button>
+            <svg class="bottom-5 left-5 opacity-0 group-hover:opacity-100 size-5 text-gray-400 hover:text-blue-500 dark:hover:text-indigo-400 transition-all cursor-pointer info-btn"
+                fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                viewBox="0 0 24 24" id="info-icon">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 16v-4"></path>
+                <path d="M12 8h.01"></path>
+            </svg>
+        </div>
+
+        <div class="flex flex-col flex-1 text-gray-800 dark:text-gray-200 task-content">
+            <div class="flex items-center gap-2 task-info-text">
+                <h3 class="font-bold text-lg leading-tight tittle-text">{{title}}</h3>
+                <status-info class="date-text" type="custom" color="yellow" text="{{date}}"></status-info>
+            </div>
+            <pre class="mt-1 font-sans text-sm description-text">{{description}}</pre>
+
+            <div class="flex flex-wrap gap-2 mt-2 category-container">
+            </div>
+            <div class="flex flex-wrap gap-2 mt-2 tags-container">
+            </div>
+        </div>
+    </div>
+</article>
+<template id="tag-template">
+    <span class="bg-gray-300 dark:bg-slate-700 px-2.5 py-1 rounded-md text-gray-600 dark:text-gray-300 text-xs"></span>
+</template>
+<template id="category-template">
+    <span
+        class="bg-blue-200 dark:bg-indigo-900/50 px-2.5 py-1 rounded-md font-semibold text-blue-800 dark:text-indigo-300 text-xs"></span>
+</template>
