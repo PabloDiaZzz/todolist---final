@@ -15,6 +15,10 @@ class AuthService {
         return this.currentUser?.role === 'ROLE_ADMIN';
     }
 
+    isManager(): boolean {
+        return this.currentUser?.role === 'ROLE_MANAGER';
+    }
+
     async checkSession(): Promise<boolean> {
         try {
             const response = await fetch('/api/user/me', {

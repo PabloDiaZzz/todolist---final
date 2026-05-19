@@ -116,12 +116,26 @@ export default class UserInfoView extends HTMLElement {
         const userInfoTitle = this.shadowRoot!.getElementById("user-info-title");
         const userInfoFullname = this.shadowRoot!.getElementById("user-info-fullname");
         const userInfoEmail = this.shadowRoot!.getElementById("user-info-email");
+        const userInfoRole = this.shadowRoot!.getElementById("user-info-role");
         const taskList = this.shadowRoot!.getElementById("task-list");
 
         userName!.textContent = authService.getUser()?.fullName ?? ''
         userInfoTitle!.textContent = `${this.user.username}`
         userInfoFullname!.textContent = `${this.user.fullName}`
         userInfoEmail!.textContent = `${this.user.email}`
+        if (this.user.role === 'ROLE_ADMIN') {
+            userInfoRole!.textContent = 'Administrador'
+            userInfoRole!.classList.add('text-amber-600')
+        } else if (this.user.role === 'ROLE_USER') {
+            userInfoRole!.textContent = 'Usuario'
+            userInfoRole!.classList.add('text-color')
+        } else if (this.user.role === 'ROLE_MANAGER') {
+            userInfoRole!.textContent = 'Gestor'
+            userInfoRole!.classList.add('text-red-600')
+        } else {
+            userInfoRole!.textContent = 'No autorizado'
+            userInfoRole!.classList.add('text-gray-400', 'dark:text-gray-600')
+        }
 
         if (taskList) {
             taskList.innerHTML = '';

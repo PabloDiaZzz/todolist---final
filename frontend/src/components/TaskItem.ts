@@ -4,10 +4,20 @@ import { updateCachedData } from '../utils/store';
 
 export class TaskItem extends HTMLElement {
     private _task!: TaskResponseDTO;
+    private _isSyncing: boolean = false
+
+    set syncing(val: boolean) {
+        this._isSyncing = val;
+        this.render();
+    }
 
     set task(data: TaskResponseDTO) {
         this._task = data;
         this.render();
+    }
+
+    get task(): TaskResponseDTO {
+        return this._task;
     }
 
     private render() {
@@ -52,10 +62,21 @@ export class TaskItem extends HTMLElement {
         const categoryContainer = this.querySelector('.category-container');
         const deleteBtn = this.querySelector('.delete-btn') as HTMLButtonElement;
         const editBtn = this.querySelector('.edit-btn') as HTMLButtonElement;
-        const infoBtn = this.querySelector('.info-btn');
+        const infoBtn = this.querySelector('.info-btn') as HTMLButtonElement;
+        const toggleBtn = this.querySelector('.toggle-btn') as HTMLButtonElement;
 
-        const toggleBtn = this.querySelector('.toggle-btn');
+        if (this._isSyncing) {
+            if (toggleBtn) toggleBtn.disabled = true;
+            if (deleteBtn) deleteBtn.disabled = true;
+            this.classList.add('opacity-70', 'cursor-progress');
+        } else {
+            if (toggleBtn) toggleBtn.disabled = false;
+            if (deleteBtn) deleteBtn.disabled = false;
+            this.classList.remove('opacity-70', 'cursor-progress');
+        }
+
         toggleBtn?.addEventListener('click', async () => {
+            if (this._isSyncing) return;
             const originalState = task.completed;
             task.completed = !originalState;
             this.render();
@@ -76,6 +97,7 @@ export class TaskItem extends HTMLElement {
         });
 
         this.querySelector('.delete-btn')?.addEventListener('click', async () => {
+            if (this._isSyncing) return;
             if (deleteBtn.dataset.state === 'initial') {
                 deleteBtn.dataset.state = 'confirm';
                 deleteBtn.classList.add('hover:bg-red-500', 'dark:hover:bg-red-500', 'text-white', 'dark:text-white');

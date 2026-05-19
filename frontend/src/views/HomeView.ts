@@ -185,7 +185,7 @@ export class HomeView extends HTMLElement {
       }
 
       const fakeId = Date.now();
-      const localTask: TaskResponseDTO = {
+      const localTask = {
         id: fakeId,
         title: taskRequest.title,
         description: taskRequest.description,
@@ -194,8 +194,9 @@ export class HomeView extends HTMLElement {
         categories: this.cats.filter(c => taskRequest.categoryIds?.includes(c.id!)),
         tags: taskRequest.tagsInput ? taskRequest.tagsInput.split(',').map(name => ({ name: name.trim() })) : [],
         createdAt: new Date().toISOString(),
-        lastEdit: new Date().toISOString()
-      };
+        lastEdit: new Date().toISOString(),
+        isSyncing: true
+      } as TaskResponseDTO & { isSyncing?: boolean };
 
       this.tasks = updateCachedData<TaskResponseDTO>('/api/tasks', oldTasks => {
         return [...oldTasks, localTask];
@@ -226,6 +227,7 @@ export class HomeView extends HTMLElement {
           taskElements.forEach(el => {
             if (el.task?.id === fakeId) {
               el.task = realTask;
+              el.syncing = false;
             }
           });
         }
@@ -333,15 +335,18 @@ export class HomeView extends HTMLElement {
       }
     }
 
-    tasksToRender.forEach((taskData: TaskResponseDTO) => {
-      const taskElement = document.createElement('task-item') as any;
+    tasksToRender.forEach((taskData: TaskResponseDTO & { isSyncing?: boolean }) => {
+      const taskElement = document.createElement('task-item') as TaskItem;
+      if (taskData.isSyncing) {
+        taskElement.syncing = true;
+      }
       taskElement.task = taskData;
       container.appendChild(taskElement);
     });
   }
 
   private async showInfoTask(task: TaskResponseDTO) {
-    const taskElement = document.createElement('task-item') as any
+    const taskElement = document.createElement('task-item') as TaskItem;
     taskElement.task = task
     const dialog = this.shadowRoot!.getElementById(
       'task-info'

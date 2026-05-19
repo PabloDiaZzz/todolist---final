@@ -21,7 +21,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		Usuario usuario = usuarioRepository.findByUsername(username)
-				.orElseThrow(() -> new UsernameNotFoundException("El código de profesor no existe: " + username));
+				.orElseThrow(() -> new UsernameNotFoundException("El usuario no existe: " + username));
 
 		return new User(
 				usuario.getUsername(),
