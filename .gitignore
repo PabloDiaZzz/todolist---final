@@ -32,3 +32,5 @@ node_modules/
 # --- SISTEMA ---
 .DS_Store
 Thumbs.db
+.gemini-instructions.md
+frontend/.agent

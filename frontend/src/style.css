@@ -38,7 +38,7 @@ input:-webkit-autofill:active {
 
 @layer utilities {
   .input-underline {
-    @apply bg-transparent border-0 border-b-2 rounded-none outline-none shadow-none;
+    @apply bg-transparent border-0 border-b-2 border-gray-300 dark:border-slate-600 rounded-none outline-none shadow-none transition-colors duration-200;
     -webkit-appearance: none;
     appearance: none;
 
@@ -47,8 +47,15 @@ input:-webkit-autofill:active {
       box-shadow: none !important;
       ring: 0 !important;
     }
+
+    &.border-red-500 {
+      @apply border-red-500!;
+    }
+
+    &.border-green-500 {
+      @apply border-green-500!;
+    }
   }
-}
 
 
   .bg-brand {

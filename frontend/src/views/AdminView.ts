@@ -5,6 +5,7 @@ import '../components/UserAdminItem';
 import '../components/CatAdminItem';
 import '../components/TaskAdminItem';
 import '../components/StatusInfo';
+import '../components/AppHeader';
 import type { UserAdminItem } from '../components/UserAdminItem';
 import type { CatAdminItem } from '../components/CatAdminItem';
 import type { TaskAdminItem } from '../components/TaskAdminItem';
@@ -12,7 +13,24 @@ import { isEqual } from 'lodash';
 import { authService } from '../services/AuthService';
 import { syncThemeWithObserver } from '../utils/theme';
 import { prefetchCache, updateCachedData } from '../utils/store';
-import { setupPrefetch } from '../utils/prefetch';
+
+function sanitizeTaskUser(tu: TaskUserDTO) {
+    if (!tu || !tu.task) return tu;
+    const { lastEdit, ...restTask } = tu.task;
+    return {
+        author: tu.author,
+        task: {
+            ...restTask,
+            categories: restTask.categories?.map(({ id, title }) => ({ id, title })).sort((a, b) => (a.id ?? 0) - (b.id ?? 0)) ?? [],
+            tags: restTask.tags?.map(({ name }) => ({ name })).sort((a, b) => (a.name || '').localeCompare(b.name || '')) ?? []
+        }
+    };
+}
+
+function areTaskUserListsEqual(a: TaskUserDTO[], b: TaskUserDTO[]): boolean {
+    if (a.length !== b.length) return false;
+    return isEqual(a.map(sanitizeTaskUser), b.map(sanitizeTaskUser));
+}
 
 export class AdminView extends HTMLElement {
 
@@ -47,7 +65,6 @@ export class AdminView extends HTMLElement {
 
     async setupEvents() {
         const root = this.shadowRoot!
-        const userBtn = root.getElementById('user-button') as HTMLButtonElement;
         const buscarCatContainer = root.getElementById('buscar-cat-container') as HTMLDivElement;
         const buscarCatInput = root.getElementById('buscar-cat-input') as HTMLInputElement
         const createCatForm = root.getElementById('create-cat-form') as HTMLFormElement
@@ -58,18 +75,6 @@ export class AdminView extends HTMLElement {
             this.users = prefetchCache.get('/api/admin/users') || [];
             this.cats = prefetchCache.get('/api/cats') || [];
         });
-
-        if (userBtn) {
-            const urlsPrefetch = [
-                '/api/tasks',
-                '/api/cats',
-            ]
-            setupPrefetch(userBtn, urlsPrefetch, {
-                timeout: 150,
-                once: true,
-                checkNetwork: true,
-            })
-        }
 
         const buscarUserContainer = root.getElementById('buscar-user-container') as HTMLDivElement;
         const buscarUserInput = root.getElementById('buscar-user-input') as HTMLInputElement;
@@ -95,15 +100,6 @@ export class AdminView extends HTMLElement {
                 buscarTaskContainer.dataset.active = 'false';
             }
         })
-
-        const logoutForm = root.getElementById('logout-form') as HTMLFormElement
-        if (logoutForm) {
-            logoutForm.addEventListener('submit', async (e) => {
-                e.preventDefault()
-                await authService.logout();
-                window.navigate('/login?logout');
-            })
-        }
 
         if (buscarCatInput) {
             buscarCatInput.addEventListener('input', () => {
@@ -278,18 +274,13 @@ export class AdminView extends HTMLElement {
     }
 
     private async loadData() {
-        const userName = this.shadowRoot!.getElementById('user-name')!;
-
         this.me = authService.getUser()!;
-        userName.textContent = this.me.fullName ? `${this.me.fullName} (@${this.me.username})` : `@${this.me.username}`;
         
-        const panelTitle = this.shadowRoot!.getElementById('panel-title')!;
         const usersSection = this.shadowRoot!.getElementById('users-section')!;
         const tasksSection = this.shadowRoot!.getElementById('tasks-section')!;
         const adminMain = this.shadowRoot!.getElementById('admin-main')!;
         
         if (authService.isManager()) {
-            panelTitle.textContent += ' (GESTOR)';
             usersSection.classList.add('hidden');
             usersSection.classList.remove('flex');
             tasksSection.classList.add('hidden');
@@ -299,8 +290,6 @@ export class AdminView extends HTMLElement {
                 adminMain.classList.remove('md:grid-cols-3', 'max-w-6xl');
                 adminMain.classList.add('md:grid-cols-1', 'max-w-2xl');
             }
-        } else {
-            panelTitle.textContent += ' (ADMIN)';
         }
 
         if (!authService.isManager() && prefetchCache.has('/api/admin/tasks')) {
@@ -329,14 +318,19 @@ export class AdminView extends HTMLElement {
         }
 
         await Promise.all(fetches).then(([freshCats, freshTasks, users]) => {
-            const tasksChanged = !isEqual(this.tasks, freshTasks);
+            const tasksChanged = !areTaskUserListsEqual(this.tasks, freshTasks);
             const catsChanged = !isEqual(this.cats, freshCats);
             const usersChanged = !isEqual(this.users, users);
 
-            if (!authService.isManager() && tasksChanged) {
-                this.tasks = freshTasks;
-                prefetchCache.set('/api/admin/tasks', freshTasks);
-                this.displayTasks();
+            if (!authService.isManager()) {
+                if (tasksChanged) {
+                    this.tasks = freshTasks;
+                    prefetchCache.set('/api/admin/tasks', freshTasks);
+                    this.displayTasks();
+                } else {
+                    this.tasks = freshTasks;
+                    prefetchCache.set('/api/admin/tasks', freshTasks);
+                }
             }
 
             if (catsChanged) {

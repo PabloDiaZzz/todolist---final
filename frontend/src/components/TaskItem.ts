@@ -20,63 +20,15 @@ export class TaskItem extends HTMLElement {
         return this._task;
     }
 
-    private render() {
-        this.innerHTML = html;
-        const task = this._task;
-        const categoryTemplate = this.querySelector('#category-template') as HTMLTemplateElement;
-        const tagTemplate = this.querySelector('#tag-template') as HTMLTemplateElement;
-        const titleEl = this.querySelector('.tittle-text');
-        const descEl = this.querySelector('.description-text');
-        const dateEl = this.querySelector('.date-text');
-
-        const deadline = task.deadline ? new Date(task.deadline) : null;
-
-        titleEl!.textContent = task.title!;
-        descEl!.textContent = task.description ?? '';
-        if (!deadline) dateEl?.remove();
-
-        if (deadline && Date.now() > deadline.getTime()) {
-            dateEl?.setAttribute('color', 'red');
-            dateEl?.setAttribute('text', deadline.toLocaleString('es-ES', {
-                year: 'numeric',
-                month: 'short',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit'
-            }));
-        } else if (deadline) {
-            dateEl?.setAttribute('color', 'yellow');
-            dateEl?.setAttribute('text', deadline.toLocaleString('es-ES', {
-                year: 'numeric',
-                month: 'short',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit'
-            }));
-        }
-
-        const wrapper = this.querySelector('.task-wrapper');
-        const statusIcon = this.querySelector('.status-icon');
-        const content = this.querySelector('.task-content');
-        const tagsContainer = this.querySelector('.tags-container');
-        const categoryContainer = this.querySelector('.category-container');
+    private setupEventListeners() {
+        const toggleBtn = this.querySelector('.toggle-btn') as HTMLButtonElement;
         const deleteBtn = this.querySelector('.delete-btn') as HTMLButtonElement;
         const editBtn = this.querySelector('.edit-btn') as HTMLButtonElement;
         const infoBtn = this.querySelector('.info-btn') as HTMLButtonElement;
-        const toggleBtn = this.querySelector('.toggle-btn') as HTMLButtonElement;
-
-        if (this._isSyncing) {
-            if (toggleBtn) toggleBtn.disabled = true;
-            if (deleteBtn) deleteBtn.disabled = true;
-            this.classList.add('opacity-70', 'cursor-progress');
-        } else {
-            if (toggleBtn) toggleBtn.disabled = false;
-            if (deleteBtn) deleteBtn.disabled = false;
-            this.classList.remove('opacity-70', 'cursor-progress');
-        }
 
         toggleBtn?.addEventListener('click', async () => {
             if (this._isSyncing) return;
+            const task = this._task;
             const originalState = task.completed;
             task.completed = !originalState;
             this.render();
@@ -96,17 +48,20 @@ export class TaskItem extends HTMLElement {
             }
         });
 
-        this.querySelector('.delete-btn')?.addEventListener('click', async () => {
+        deleteBtn?.addEventListener('click', async () => {
             if (this._isSyncing) return;
+            const task = this._task;
             if (deleteBtn.dataset.state === 'initial') {
                 deleteBtn.dataset.state = 'confirm';
                 deleteBtn.classList.add('hover:bg-red-500', 'dark:hover:bg-red-500', 'text-white', 'dark:text-white');
                 deleteBtn.classList.remove('hover:bg-red-50', 'dark:hover:bg-red-900/30');
-                deleteBtn.addEventListener('mouseleave', () => {
+                
+                const onMouseLeave = () => {
                     deleteBtn.dataset.state = 'initial';
                     deleteBtn.classList.add('hover:bg-red-50', 'dark:hover:bg-red-900/30');
                     deleteBtn.classList.remove('hover:bg-red-500', 'dark:hover:bg-red-500', 'text-white', 'dark:text-white');
-                }, { once: true });
+                };
+                deleteBtn.addEventListener('mouseleave', onMouseLeave, { once: true });
             } else if (deleteBtn.dataset.state === 'confirm') {
                 this.style.display = 'none';
                 updateCachedData<TaskResponseDTO>('/api/tasks', oldTasks => oldTasks.filter(t => t.id !== task.id));
@@ -133,50 +88,127 @@ export class TaskItem extends HTMLElement {
             }
         });
 
+        editBtn?.addEventListener('click', () => {
+            this.dispatchEvent(new CustomEvent('task-edit', { bubbles: true, composed: true, detail: { taskElement: this, task: this._task } }));
+        });
+
+        infoBtn?.addEventListener('click', () => {
+            this.dispatchEvent(new CustomEvent('task-info', { bubbles: true, composed: true, detail: this._task }));
+        });
+    }
+
+    private render() {
+        const isFirstRender = !this.querySelector('.task-wrapper');
+        if (isFirstRender) {
+            this.innerHTML = html;
+            this.setupEventListeners();
+        }
+
+        const task = this._task;
+        const categoryTemplate = this.querySelector('#category-template') as HTMLTemplateElement;
+        const tagTemplate = this.querySelector('#tag-template') as HTMLTemplateElement;
+        const titleEl = this.querySelector('.tittle-text');
+        const descEl = this.querySelector('.description-text');
+        const dateEl = this.querySelector('.date-text');
+
+        titleEl!.textContent = task.title!;
+        descEl!.textContent = task.description ?? '';
+
+        const deadline = task.deadline ? new Date(task.deadline) : null;
+        if (!deadline) {
+            dateEl?.classList.add('hidden');
+        } else {
+            dateEl?.classList.remove('hidden');
+            if (Date.now() > deadline.getTime()) {
+                dateEl?.setAttribute('color', 'red');
+                dateEl?.setAttribute('text', deadline.toLocaleString('es-ES', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                }));
+            } else {
+                dateEl?.setAttribute('color', 'yellow');
+                dateEl?.setAttribute('text', deadline.toLocaleString('es-ES', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                }));
+            }
+        }
+
+        const wrapper = this.querySelector('.task-wrapper');
+        const statusIcon = this.querySelector('.status-icon');
+        const content = this.querySelector('.task-content');
+        const tagsContainer = this.querySelector('.tags-container');
+        const categoryContainer = this.querySelector('.category-container');
+        const deleteBtn = this.querySelector('.delete-btn') as HTMLButtonElement;
+        const editBtn = this.querySelector('.edit-btn') as HTMLButtonElement;
+        const infoBtn = this.querySelector('.info-btn') as HTMLButtonElement;
+        const toggleBtn = this.querySelector('.toggle-btn') as HTMLButtonElement;
+
+        statusIcon?.classList.remove('bg-green-500', 'border-transparent', 'border-2', 'border-gray-400');
+        if (statusIcon) statusIcon.innerHTML = '';
+
         if (task.completed) {
             wrapper?.classList.add('opacity-75');
-            statusIcon?.classList.replace('border-2', 'bg-green-500');
-            statusIcon?.classList.replace('border-gray-400', 'border-transparent');
+            statusIcon?.classList.add('bg-green-500', 'border-transparent');
             if (statusIcon) statusIcon.innerHTML = '<span class="text-white text-sm font-bold">✓</span>';
             content?.classList.add('line-through', 'text-gray-400', 'dark:text-gray-500');
+            
             editBtn.disabled = true;
             editBtn.classList.add('opacity-50', 'cursor-not-allowed');
             editBtn.classList.remove('hover:bg-blue-200', 'dark:hover:bg-blue-900/30');
             editBtn.classList.remove('text-blue-600', 'dark:text-indigo-400');
             editBtn.classList.add('text-gray-300', 'dark:text-gray-600');
             dateEl?.setAttribute('color', 'green');
-            infoBtn?.classList.add('invisible');
         } else {
-            editBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-            editBtn.classList.add('hover:bg-blue-200', 'dark:hover:bg-blue-900/30');
+            wrapper?.classList.remove('opacity-75');
+            statusIcon?.classList.add('border-2', 'border-gray-400');
+            content?.classList.remove('line-through', 'text-gray-400', 'dark:text-gray-500');
+            
             editBtn.disabled = false;
-            infoBtn?.classList.remove('invisible');
+            editBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'text-gray-300', 'dark:text-gray-600');
+            editBtn.classList.add('hover:bg-blue-200', 'dark:hover:bg-blue-900/30', 'text-blue-600', 'dark:text-indigo-400');
         }
 
-        editBtn.addEventListener('click', () => {
-            this.dispatchEvent(new CustomEvent('task-edit', { bubbles: true, composed: true, detail: { taskElement: this, task: task } }));
-        });
+        infoBtn?.classList.remove('invisible');
 
-        infoBtn?.addEventListener('click', () => {
-            this.dispatchEvent(new CustomEvent('task-info', { bubbles: true, composed: true, detail: task }));
-        })
-
-        if (task.categories && categoryTemplate && categoryContainer) {
-            task.categories.forEach(cat => {
-                const clone = categoryTemplate.content.cloneNode(true) as DocumentFragment;
-                const span = clone.querySelector('span');
-                if (span) span.textContent = cat.title ?? '';
-                categoryContainer.appendChild(clone);
-            });
+        if (this._isSyncing) {
+            if (toggleBtn) toggleBtn.disabled = true;
+            if (deleteBtn) deleteBtn.disabled = true;
+            this.classList.add('opacity-70', 'cursor-progress');
+        } else {
+            if (toggleBtn) toggleBtn.disabled = false;
+            if (deleteBtn) deleteBtn.disabled = false;
+            this.classList.remove('opacity-70', 'cursor-progress');
         }
 
-        if (task.tags && tagTemplate && tagsContainer) {
-            task.tags.forEach(tag => {
-                const clone = tagTemplate.content.cloneNode(true) as DocumentFragment;
-                const span = clone.querySelector('span');
-                if (span) span.textContent = `#${tag.name}`;
-                tagsContainer.appendChild(clone);
-            });
+        if (categoryContainer) {
+            categoryContainer.innerHTML = '';
+            if (task.categories && categoryTemplate) {
+                task.categories.forEach(cat => {
+                    const clone = categoryTemplate.content.cloneNode(true) as DocumentFragment;
+                    const span = clone.querySelector('span');
+                    if (span) span.textContent = cat.title ?? '';
+                    categoryContainer.appendChild(clone);
+                });
+            }
+        }
+
+        if (tagsContainer) {
+            tagsContainer.innerHTML = '';
+            if (task.tags && tagTemplate) {
+                task.tags.forEach(tag => {
+                    const clone = tagTemplate.content.cloneNode(true) as DocumentFragment;
+                    const span = clone.querySelector('span');
+                    if (span) span.textContent = `#${tag.name}`;
+                    tagsContainer.appendChild(clone);
+                });
+            }
         }
     }
 }

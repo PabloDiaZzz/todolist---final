@@ -1,11 +1,10 @@
 import style from "../style.css?inline";
 import html from "./html/UserInfoView.html?raw";
-import type { Category, TaskResponseDTO, UserTasksDTO, UsuarioDTO } from "../types/api-types";
+import type { Category, TaskResponseDTO, TaskUserDTO, UserTasksDTO, UsuarioDTO } from "../types/api-types";
 import { syncThemeWithObserver } from "../utils/theme";
-import { authService } from "../services/AuthService";
-import { setupPrefetch } from "../utils/prefetch";
 import "../components/TaskInfo";
-import { prefetchCache } from "../utils/store";
+import "../components/AppHeader";
+import { prefetchCache, updateCachedData } from "../utils/store";
 import { isEqual } from "lodash";
 import type { TaskInfo } from "../components/TaskInfo";
 
@@ -67,23 +66,6 @@ export default class UserInfoView extends HTMLElement {
             }
         } catch (error) {
             console.warn("Info: Usando categorías en caché (sin conexión).");
-        }
-
-        const adminBtn = root.getElementById("admin-button") as HTMLButtonElement;
-        if (adminBtn) {
-            adminBtn.onclick = () => {
-                window.navigate('/admin')
-            }
-            const urlsPrefetch = [
-                '/api/admin/tasks',
-                '/api/admin/users',
-                '/api/cats'
-            ]
-            setupPrefetch(adminBtn, urlsPrefetch, {
-                timeout: 150,
-                once: true,
-                checkNetwork: true,
-            })
         }
 
         root.addEventListener('task-info', ((e: CustomEvent<TaskResponseDTO>) => {
@@ -186,7 +168,7 @@ export default class UserInfoView extends HTMLElement {
             usernameTimer = setTimeout(() => checkField(
                 usernameInput, usernameFeedback,
                 '/api/auth/check-username', 'username',
-                this.user.username ?? '', 'Nombre de usuario',
+                this.user.username ?? '', 'Usuario',
                 (v) => { usernameAvailable = v; }
             ), 500);
         });
@@ -233,8 +215,10 @@ export default class UserInfoView extends HTMLElement {
 
                 if (!newFullName || !newUsername || !newEmail) return;
 
+                const originalUsername = this.user.username;
+
                 try {
-                    const res = await fetch(`/api/admin/users/${encodeURIComponent(this.user.username!)}`, {
+                    const res = await fetch(`/api/admin/users/${encodeURIComponent(originalUsername!)}`, {
                         method: 'PATCH',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ username: newUsername, fullName: newFullName, email: newEmail })
@@ -250,6 +234,23 @@ export default class UserInfoView extends HTMLElement {
 
                     const updatedUser: UsuarioDTO = await res.json();
                     this.user = { ...this.user, ...updatedUser };
+
+                    // Update window.history.state to preserve changes on reload
+                    const stateData = window.history.state;
+                    if (stateData && stateData.user) {
+                        stateData.user = this.user;
+                        window.history.replaceState(stateData, '');
+                    }
+
+                    // Update cached users in prefetchCache
+                    updateCachedData<UsuarioDTO>('/api/admin/users', oldUsers =>
+                        oldUsers.map(u => u.username === originalUsername ? this.user : u)
+                    );
+
+                    // Update cached tasks in prefetchCache to update author details
+                    updateCachedData<TaskUserDTO>('/api/admin/tasks', oldTasks =>
+                        oldTasks.map(t => t.author?.username === originalUsername ? { ...t, author: this.user } : t)
+                    );
 
                 } catch {
                     alert('Error de conexión al guardar.');
@@ -285,7 +286,6 @@ export default class UserInfoView extends HTMLElement {
 
 
     render() {
-        const userName = this.shadowRoot!.getElementById("user-name");
         const userInfoTitle = this.shadowRoot!.getElementById("user-info-title");
         const userInfoFullname = this.shadowRoot!.getElementById("user-info-fullname");
         const userInfoUsernameSub = this.shadowRoot!.getElementById("user-info-username-sub");
@@ -295,7 +295,6 @@ export default class UserInfoView extends HTMLElement {
         const userTaskCount = this.shadowRoot!.getElementById("user-info-task-count");
         const taskList = this.shadowRoot!.getElementById("task-list");
 
-        userName!.textContent = authService.getUser()?.fullName ?? '';
         userInfoTitle!.textContent = this.user.fullName ?? this.user.username ?? '';
         userInfoFullname!.textContent = this.user.fullName ?? '';
         userInfoUsernameSub!.textContent = `@${this.user.username}`;

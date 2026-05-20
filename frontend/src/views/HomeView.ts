@@ -1,14 +1,11 @@
 import html from './html/HomeView.html?raw'
 import styles from '../style.css?inline'
-import type { Category } from '../types/api-types'
-import type { TaskRequestDTO } from '../types/api-types'
-import type { TaskResponseDTO } from '../types/api-types'
+import type { Category, TaskRequestDTO, TaskResponseDTO } from '../types/api-types'
 import '../components/TaskItem'
 import '../components/StatusInfo'
+import '../components/AppHeader'
 import { Datepicker } from 'flowbite'
-import { setupPrefetch } from '../utils/prefetch'
 import type { TaskItem } from '../components/TaskItem'
-import { authService } from '../services/AuthService'
 import { syncThemeWithObserver } from '../utils/theme'
 import { prefetchCache, updateCachedData } from '../utils/store'
 import { isEqual } from 'lodash'
@@ -17,6 +14,21 @@ declare module 'flowbite' {
   interface DatepickerOptions {
     container?: HTMLElement | string
   }
+}
+
+function sanitizeTask(task: TaskResponseDTO & { isSyncing?: boolean }) {
+  if (!task) return task;
+  const { lastEdit, isSyncing, ...rest } = task;
+  return {
+    ...rest,
+    categories: rest.categories?.map(({ id, title }) => ({ id, title })).sort((a, b) => (a.id ?? 0) - (b.id ?? 0)) ?? [],
+    tags: rest.tags?.map(({ name }) => ({ name })).sort((a, b) => (a.name || '').localeCompare(b.name || '')) ?? []
+  };
+}
+
+function areTaskListsEqual(a: TaskResponseDTO[], b: TaskResponseDTO[]): boolean {
+  if (a.length !== b.length) return false;
+  return isEqual(a.map(sanitizeTask), b.map(sanitizeTask));
 }
 
 export class HomeView extends HTMLElement {
@@ -48,17 +60,106 @@ export class HomeView extends HTMLElement {
       this.themeObserver.disconnect();
     }
   }
-
   private async setupEvents() {
     const root = this.shadowRoot!
-    const userName = root.getElementById('user-name')!
+
+    const taskFormHeader = root.getElementById('task-form-header')! as HTMLDivElement
+    const taskFormCollapseContainer = root.getElementById('task-form-collapse-container')! as HTMLDivElement
+    const toggleBtnIcon = root.getElementById('toggle-task-form-icon')! as HTMLElement
+    const addTaskIcon = root.getElementById('add-task-icon')! as HTMLElement
+    const formSection = taskFormHeader.closest('section')! as HTMLElement
+
+    const updateCollapseState = (collapsed: boolean, animate = true) => {
+      if (!animate) {
+        taskFormCollapseContainer.style.transition = 'none';
+        formSection.style.transition = 'none';
+        taskFormHeader.style.transition = 'none';
+        addTaskIcon.style.transition = 'none';
+      } else {
+        taskFormCollapseContainer.style.transition = 'max-height 0.3s ease-in-out, opacity 0.3s ease-in-out';
+        formSection.style.transition = 'padding 0.3s ease-in-out';
+        taskFormHeader.style.transition = 'margin-bottom 0.3s ease-in-out';
+        addTaskIcon.style.transition = 'opacity 0.3s ease-in-out, transform 0.3s ease-in-out, width 0.3s ease-in-out, margin-right 0.3s ease-in-out';
+      }
+
+      if (collapsed) {
+        taskFormCollapseContainer.style.overflow = 'hidden';
+        taskFormCollapseContainer.style.maxHeight = '0px';
+        taskFormCollapseContainer.style.opacity = '0';
+        taskFormCollapseContainer.style.pointerEvents = 'none';
+        
+        toggleBtnIcon.style.transform = 'rotate(-180deg)';
+        
+        addTaskIcon.style.opacity = '1';
+        addTaskIcon.style.transform = 'scale(1)';
+        addTaskIcon.style.width = '24px';
+        addTaskIcon.style.marginRight = '8px';
+        
+        taskFormHeader.classList.remove('mb-4');
+        taskFormHeader.classList.add('mb-0');
+        
+        formSection.classList.remove('p-6');
+        formSection.classList.add('p-4');
+      } else {
+        taskFormCollapseContainer.style.overflow = 'hidden';
+        taskFormCollapseContainer.style.maxHeight = `${taskFormCollapseContainer.scrollHeight}px`;
+        taskFormCollapseContainer.style.opacity = '1';
+        taskFormCollapseContainer.style.pointerEvents = 'auto';
+        
+        toggleBtnIcon.style.transform = 'rotate(0deg)';
+        
+        addTaskIcon.style.opacity = '0';
+        addTaskIcon.style.transform = 'scale(0)';
+        addTaskIcon.style.width = '0px';
+        addTaskIcon.style.marginRight = '0px';
+        
+        taskFormHeader.classList.remove('mb-0');
+        taskFormHeader.classList.add('mb-4');
+        
+        formSection.classList.remove('p-4');
+        formSection.classList.add('p-6');
+
+        if (animate) {
+          const onTransitionEnd = (e: TransitionEvent) => {
+            if (e.propertyName === 'max-height' && !isCollapsed) {
+              taskFormCollapseContainer.style.overflow = 'visible';
+              taskFormCollapseContainer.style.maxHeight = 'none';
+              taskFormCollapseContainer.removeEventListener('transitionend', onTransitionEnd);
+            }
+          };
+          taskFormCollapseContainer.addEventListener('transitionend', onTransitionEnd);
+        } else {
+          taskFormCollapseContainer.style.overflow = 'visible';
+          taskFormCollapseContainer.style.maxHeight = 'none';
+        }
+      }
+
+      if (!animate) {
+        taskFormCollapseContainer.offsetHeight;
+        taskFormCollapseContainer.style.transition = 'max-height 0.3s ease-in-out, opacity 0.3s ease-in-out';
+        formSection.style.transition = 'padding 0.3s ease-in-out';
+        taskFormHeader.style.transition = 'margin-bottom 0.3s ease-in-out';
+        addTaskIcon.style.transition = 'opacity 0.3s ease-in-out, transform 0.3s ease-in-out, width 0.3s ease-in-out, margin-right 0.3s ease-in-out';
+      }
+    };
+
+    let isCollapsed = localStorage.getItem('task-form-collapsed') === 'true';
+    updateCollapseState(isCollapsed, false);
+
+    taskFormHeader.addEventListener('click', () => {
+      isCollapsed = !isCollapsed;
+      if (isCollapsed) {
+        taskFormCollapseContainer.style.maxHeight = `${taskFormCollapseContainer.scrollHeight}px`;
+        taskFormCollapseContainer.offsetHeight;
+      }
+      updateCollapseState(isCollapsed, true);
+      localStorage.setItem('task-form-collapsed', String(isCollapsed));
+    });
 
     const closeInfoTask = root.getElementById(
       'close-task-info'
     ) as HTMLButtonElement
 
-    const adminBtn = root.getElementById('admin-button')! as HTMLButtonElement;
-    const managerBtn = root.getElementById('manager-button')! as HTMLButtonElement;
     const catDropdownContainer = root.getElementById('category-dropdown-container')! as HTMLDivElement;
     const dateInput = root.getElementById('date-input') as HTMLInputElement
     const timeInput = root.getElementById('time-input') as HTMLInputElement
@@ -74,28 +175,6 @@ export class HomeView extends HTMLElement {
       container: root.getElementById('theme-wrapper') as HTMLElement
     })
 
-    const user = authService.getUser()!;
-    userName.textContent = user.fullName ? `${user.fullName} (@${user.username})` : `@${user.username}`;
-    
-    if (authService.isAdmin()) {
-      adminBtn.classList.remove('hidden')
-    } else {
-      adminBtn.classList.add('hidden')
-    }
-
-    if (authService.isManager()) {
-      managerBtn.classList.remove('hidden')
-    } else {
-      managerBtn.classList.add('hidden')
-    }
-
-    const logoutForm = root.getElementById('logout-form')!
-    logoutForm.addEventListener('submit', async e => {
-      e.preventDefault();
-      await authService.logout();
-      window.navigate('/login?logout');
-    })
-
     root.addEventListener('task-info', ((e: CustomEvent<TaskResponseDTO>) => {
       this.showInfoTask(e.detail)
     }) as EventListener)
@@ -107,31 +186,6 @@ export class HomeView extends HTMLElement {
     closeInfoTask.addEventListener('click', () =>
       (root.getElementById('task-info') as HTMLDialogElement).close()
     )
-
-    if (adminBtn) {
-      const urlsPrefetch = [
-        '/api/admin/tasks',
-        '/api/admin/users',
-        '/api/cats'
-      ]
-      setupPrefetch(adminBtn, urlsPrefetch, {
-        timeout: 150,
-        once: true,
-        checkNetwork: true,
-      })
-    }
-
-    if (managerBtn) {
-      const urlsPrefetch = [
-        '/api/admin/tasks',
-        '/api/cats'
-      ]
-      setupPrefetch(managerBtn, urlsPrefetch, {
-        timeout: 150,
-        once: true,
-        checkNetwork: true,
-      })
-    }
 
     root.addEventListener('task-updated', () => this.loadTasks())
 
@@ -317,10 +371,13 @@ export class HomeView extends HTMLElement {
       const freshTasks: TaskResponseDTO[] = await response.json();
       freshTasks.sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
 
-      if (!isEqual(this.tasks, freshTasks)) {
+      if (!areTaskListsEqual(this.tasks, freshTasks)) {
         this.tasks = freshTasks;
         prefetchCache.set('/api/tasks', freshTasks);
         this.renderTasks();
+      } else {
+        this.tasks = freshTasks;
+        prefetchCache.set('/api/tasks', freshTasks);
       }
 
     } catch (err) {
