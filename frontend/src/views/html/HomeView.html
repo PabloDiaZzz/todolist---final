@@ -99,14 +99,11 @@
                     </form>
                 </div>
             </section>
-            <section id="task-options" data-active="false"
-                class="group/taskopts right-0 bottom-0 absolute bg-white dark:bg-slate-800 shadow-md p-4 data-[active=true]:px-2 border border-gray-200 dark:border-slate-700 rounded-2xl data-[active=false]:hover:rounded-xl data-[active=true]:w-full max-w-full data-[active=true]:h-15 size-4 transition-all duration-500 delay-200 data-[active=true]:delay-0 cursor-pointer">
-                <svg
-                    class="top-1/2 left-1/2 absolute opacity-100 group-data-[active=true]/taskopts:opacity-0 size-6 text-blue-800 dark:group-hover/taskopts:dark:text-indigo-400 dark:text-indigo-300 group-hover/taskopts:text-blue-500 transition-all -translate-x-1/2 -translate-y-1/2 duration-500 group-data-[active=true]/taskopts:duration-50 delay-500 group-data-[active=true]/taskopts:delay-0 pointer-events-none">
+            <section id="task-options" data-active="false" class="p-4 size-4">
+                <svg class="filter-icon">
                     <use href="/main.svg#filter"></use>
                 </svg>
-                <div
-                    class="invisible group-data-[active=true]/taskopts:visible flex flex-row justify-between items-center gap-3 opacity-0 group-data-[active=true]/taskopts:opacity-100 h-full dark:text-white group-data-[active=true]/taskopts:*:scale-100 *:scale-0 transition-all *:transition-all duration-300 group-data-[active=true]/taskopts:*:duration-500 group-data-[active=true]/taskopts:duration-500 group-data-[active=true]/taskopts:*:delay-0 group-data-[active=true]/taskopts:delay-500 *:delay-500 *:flex-1">
+                <div class="filters-content">
                     <select name="category-options-filter" id="category-options-filter"
                         class="bg-element-primary px-5 py-2 rounded-lg text-white outline-none border-none base-select cursor-pointer">
                         <button class="flex items-center justify-between gap-3 w-full outline-none">

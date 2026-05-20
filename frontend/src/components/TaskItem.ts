@@ -1,6 +1,7 @@
 import html from './html/TaskItem.html?raw';
 import type { TaskResponseDTO } from '../types/api-types';
 import { updateCachedData } from '../utils/store';
+import type { StatusInfo } from './StatusInfo';
 
 export class TaskItem extends HTMLElement {
     private _task!: TaskResponseDTO;
@@ -107,9 +108,9 @@ export class TaskItem extends HTMLElement {
         const task = this._task;
         const categoryTemplate = this.querySelector('#category-template') as HTMLTemplateElement;
         const tagTemplate = this.querySelector('#tag-template') as HTMLTemplateElement;
-        const titleEl = this.querySelector('.tittle-text');
-        const descEl = this.querySelector('.description-text');
-        const dateEl = this.querySelector('.date-text');
+        const titleEl = this.querySelector('.title-text') as HTMLHeadingElement;
+        const descEl = this.querySelector('.description-text') as HTMLPreElement;
+        const dateEl = this.querySelector('.date-text') as StatusInfo;
 
         titleEl!.textContent = task.title!;
         descEl!.textContent = task.description ?? '';

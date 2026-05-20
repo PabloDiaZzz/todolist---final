@@ -87,17 +87,17 @@ export class HomeView extends HTMLElement {
         taskFormCollapseContainer.style.maxHeight = '0px';
         taskFormCollapseContainer.style.opacity = '0';
         taskFormCollapseContainer.style.pointerEvents = 'none';
-        
+
         toggleBtnIcon.style.transform = 'rotate(-180deg)';
-        
+
         addTaskIcon.style.opacity = '1';
         addTaskIcon.style.transform = 'scale(1)';
         addTaskIcon.style.width = '24px';
         addTaskIcon.style.marginRight = '8px';
-        
+
         taskFormHeader.classList.remove('mb-4');
         taskFormHeader.classList.add('mb-0');
-        
+
         formSection.classList.remove('p-6');
         formSection.classList.add('p-4');
       } else {
@@ -105,17 +105,17 @@ export class HomeView extends HTMLElement {
         taskFormCollapseContainer.style.maxHeight = `${taskFormCollapseContainer.scrollHeight}px`;
         taskFormCollapseContainer.style.opacity = '1';
         taskFormCollapseContainer.style.pointerEvents = 'auto';
-        
+
         toggleBtnIcon.style.transform = 'rotate(0deg)';
-        
+
         addTaskIcon.style.opacity = '0';
         addTaskIcon.style.transform = 'scale(0)';
         addTaskIcon.style.width = '0px';
         addTaskIcon.style.marginRight = '0px';
-        
+
         taskFormHeader.classList.remove('mb-0');
         taskFormHeader.classList.add('mb-4');
-        
+
         formSection.classList.remove('p-4');
         formSection.classList.add('p-6');
 
@@ -414,10 +414,12 @@ export class HomeView extends HTMLElement {
 
     tasksToRender.forEach((taskData: TaskResponseDTO & { isSyncing?: boolean }) => {
       const taskElement = document.createElement('task-item') as TaskItem;
+
+      taskElement.task = taskData;
       if (taskData.isSyncing) {
         taskElement.syncing = true;
       }
-      taskElement.task = taskData;
+
       container.appendChild(taskElement);
     });
   }
