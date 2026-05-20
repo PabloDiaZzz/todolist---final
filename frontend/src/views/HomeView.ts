@@ -58,6 +58,7 @@ export class HomeView extends HTMLElement {
     ) as HTMLButtonElement
 
     const adminBtn = root.getElementById('admin-button')! as HTMLButtonElement;
+    const managerBtn = root.getElementById('manager-button')! as HTMLButtonElement;
     const catDropdownContainer = root.getElementById('category-dropdown-container')! as HTMLDivElement;
     const dateInput = root.getElementById('date-input') as HTMLInputElement
     const timeInput = root.getElementById('time-input') as HTMLInputElement
@@ -74,11 +75,18 @@ export class HomeView extends HTMLElement {
     })
 
     const user = authService.getUser()!;
-    userName.textContent = user.fullName ?? '';
-    if (user.role !== 'ROLE_ADMIN') {
-      adminBtn.classList.add('hidden')
-    } else {
+    userName.textContent = user.fullName ? `${user.fullName} (@${user.username})` : `@${user.username}`;
+    
+    if (authService.isAdmin()) {
       adminBtn.classList.remove('hidden')
+    } else {
+      adminBtn.classList.add('hidden')
+    }
+
+    if (authService.isManager()) {
+      managerBtn.classList.remove('hidden')
+    } else {
+      managerBtn.classList.add('hidden')
     }
 
     const logoutForm = root.getElementById('logout-form')!
@@ -107,6 +115,18 @@ export class HomeView extends HTMLElement {
         '/api/cats'
       ]
       setupPrefetch(adminBtn, urlsPrefetch, {
+        timeout: 150,
+        once: true,
+        checkNetwork: true,
+      })
+    }
+
+    if (managerBtn) {
+      const urlsPrefetch = [
+        '/api/admin/tasks',
+        '/api/cats'
+      ]
+      setupPrefetch(managerBtn, urlsPrefetch, {
         timeout: 150,
         once: true,
         checkNetwork: true,

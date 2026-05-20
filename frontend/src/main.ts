@@ -69,6 +69,14 @@ async function router() {
       case '/admin':
         app.innerHTML = '<admin-view></admin-view>';
         break;
+      case '/manager':
+        if (authService.isManager()) {
+          app.innerHTML = '<admin-view></admin-view>';
+        } else {
+          app.innerHTML = '<home-view></home-view>';
+          window.history.replaceState({}, '', '/home');
+        }
+        break;
       case '/userinfo':
         const stateData = window.history.state;
 

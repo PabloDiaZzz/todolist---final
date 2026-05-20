@@ -96,12 +96,9 @@ export default class UserInfoView extends HTMLElement {
 
         root.addEventListener('click', (e) => {
             const target = e.target as Node;
-            
             const openMenus = root.querySelectorAll('.category-dropdown-menu:not(.hidden)');
-            
             openMenus.forEach(menu => {
                 const container = menu.closest('[id*="dropdown-container"]');
-                
                 if (container && !container.contains(target)) {
                     menu.classList.add('hidden');
                     const icon = container.querySelector('.category-dropdown-btn svg');
@@ -109,32 +106,215 @@ export default class UserInfoView extends HTMLElement {
                 }
             });
         });
+
+        this.setupEditProfile(root);
     }
+
+    private setupEditProfile(root: ShadowRoot) {
+        const editBtn = root.getElementById('edit-profile-btn') as HTMLButtonElement;
+        const editIcon = root.getElementById('edit-icon') as HTMLElement;
+        const saveIcon = root.getElementById('save-icon') as HTMLElement;
+
+        const fullnameText = root.getElementById('user-info-fullname') as HTMLParagraphElement;
+        const usernameText = root.getElementById('user-info-username') as HTMLParagraphElement;
+        const emailText = root.getElementById('user-info-email') as HTMLParagraphElement;
+        const titleText = root.getElementById('user-info-title') as HTMLHeadingElement;
+        const usernameSub = root.getElementById('user-info-username-sub') as HTMLParagraphElement;
+
+        const fullnameInput = root.getElementById('edit-fullname') as HTMLInputElement;
+        const usernameInput = root.getElementById('edit-username') as HTMLInputElement;
+        const emailInput = root.getElementById('edit-email') as HTMLInputElement;
+        const usernameFeedback = root.getElementById('username-feedback') as HTMLParagraphElement;
+        const emailFeedback = root.getElementById('email-feedback') as HTMLParagraphElement;
+
+        let isEditing = false;
+        let usernameAvailable = true;
+        let emailAvailable = true;
+        let usernameTimer: ReturnType<typeof setTimeout>;
+        let emailTimer: ReturnType<typeof setTimeout>;
+
+        const checkField = async (
+            input: HTMLInputElement,
+            feedback: HTMLParagraphElement,
+            url: string,
+            param: string,
+            currentValue: string,
+            label: string,
+            setAvailable: (v: boolean) => void
+        ) => {
+            const value = input.value.trim();
+            clearTimeout(usernameTimer); // reuse; each field has own timer via closure
+
+            if (value === currentValue) {
+                feedback.textContent = '';
+                feedback.className = 'hidden text-xs font-medium';
+                input.classList.remove('border-red-500', 'border-green-500');
+                setAvailable(true);
+                return;
+            }
+            if (value.length < 3) {
+                feedback.textContent = 'Mínimo 3 caracteres';
+                feedback.className = 'text-xs font-medium text-gray-400 dark:text-gray-500';
+                setAvailable(false);
+                return;
+            }
+            feedback.textContent = 'Comprobando...';
+            feedback.className = 'text-xs font-medium text-gray-400 dark:text-gray-500';
+            try {
+                const res = await fetch(`${url}?${param}=${encodeURIComponent(value)}`);
+                const exists = await res.json();
+                if (exists) {
+                    feedback.textContent = `${label} en uso`;
+                    feedback.className = 'text-xs font-medium text-red-500';
+                    input.classList.replace('border-green-500', 'border-red-500') || input.classList.add('border-red-500');
+                    setAvailable(false);
+                } else {
+                    feedback.textContent = 'Disponible';
+                    feedback.className = 'text-xs font-medium text-green-500';
+                    input.classList.replace('border-red-500', 'border-green-500') || input.classList.add('border-green-500');
+                    setAvailable(true);
+                }
+            } catch {
+                feedback.textContent = 'Error de conexión';
+                feedback.className = 'text-xs font-medium text-red-500';
+                setAvailable(false);
+            }
+        };
+
+        usernameInput.addEventListener('input', () => {
+            clearTimeout(usernameTimer);
+            usernameTimer = setTimeout(() => checkField(
+                usernameInput, usernameFeedback,
+                '/api/auth/check-username', 'username',
+                this.user.username ?? '', 'Nombre de usuario',
+                (v) => { usernameAvailable = v; }
+            ), 500);
+        });
+
+        emailInput.addEventListener('input', () => {
+            clearTimeout(emailTimer);
+            emailTimer = setTimeout(() => checkField(
+                emailInput, emailFeedback,
+                '/api/auth/check-email', 'email',
+                this.user.email ?? '', 'Correo electrónico',
+                (v) => { emailAvailable = v; }
+            ), 500);
+        });
+
+        editBtn.addEventListener('click', async () => {
+            if (!isEditing) {
+                isEditing = true;
+                editIcon.classList.add('hidden');
+                saveIcon.classList.remove('hidden');
+
+                fullnameText.classList.add('hidden');
+                usernameText.classList.add('hidden');
+                emailText.classList.add('hidden');
+
+                fullnameInput.value = this.user.fullName ?? '';
+                usernameInput.value = this.user.username ?? '';
+                emailInput.value = this.user.email ?? '';
+
+                [usernameFeedback, emailFeedback].forEach(fb => { fb.textContent = ''; fb.className = 'hidden text-xs font-medium'; });
+                usernameAvailable = true;
+                emailAvailable = true;
+
+                fullnameInput.classList.remove('hidden');
+                usernameInput.classList.remove('hidden');
+                emailInput.classList.remove('hidden');
+
+                fullnameInput.focus();
+            } else {
+                if (!usernameAvailable || !emailAvailable) return;
+
+                const newFullName = fullnameInput.value.trim();
+                const newUsername = usernameInput.value.trim();
+                const newEmail = emailInput.value.trim();
+
+                if (!newFullName || !newUsername || !newEmail) return;
+
+                try {
+                    const res = await fetch(`/api/admin/users/${encodeURIComponent(this.user.username!)}`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username: newUsername, fullName: newFullName, email: newEmail })
+                    });
+
+                    if (!res.ok) {
+                        if (res.status === 409) {
+                            usernameFeedback.textContent = 'Ya está en uso';
+                            usernameFeedback.className = 'text-xs font-medium text-red-500';
+                        }
+                        return;
+                    }
+
+                    const updatedUser: UsuarioDTO = await res.json();
+                    this.user = { ...this.user, ...updatedUser };
+
+                } catch {
+                    alert('Error de conexión al guardar.');
+                    return;
+                }
+
+                isEditing = false;
+                editIcon.classList.remove('hidden');
+                saveIcon.classList.add('hidden');
+
+                fullnameInput.classList.add('hidden');
+                usernameInput.classList.add('hidden');
+                emailInput.classList.add('hidden');
+
+                [usernameFeedback, emailFeedback].forEach(fb => {
+                    fb.textContent = '';
+                    fb.className = 'hidden text-xs font-medium';
+                });
+
+                fullnameText.classList.remove('hidden');
+                usernameText.classList.remove('hidden');
+                emailText.classList.remove('hidden');
+
+                fullnameText.textContent = this.user.fullName ?? '';
+                usernameText.textContent = `@${this.user.username}`;
+                emailText.textContent = this.user.email ?? '';
+                titleText.textContent = this.user.fullName ?? this.user.username ?? '';
+                usernameSub.textContent = `@${this.user.username}`;
+            }
+        });
+    }
+
+
 
     render() {
         const userName = this.shadowRoot!.getElementById("user-name");
         const userInfoTitle = this.shadowRoot!.getElementById("user-info-title");
         const userInfoFullname = this.shadowRoot!.getElementById("user-info-fullname");
+        const userInfoUsernameSub = this.shadowRoot!.getElementById("user-info-username-sub");
+        const userInfoUsername = this.shadowRoot!.getElementById("user-info-username");
         const userInfoEmail = this.shadowRoot!.getElementById("user-info-email");
         const userInfoRole = this.shadowRoot!.getElementById("user-info-role");
+        const userTaskCount = this.shadowRoot!.getElementById("user-info-task-count");
         const taskList = this.shadowRoot!.getElementById("task-list");
 
-        userName!.textContent = authService.getUser()?.fullName ?? ''
-        userInfoTitle!.textContent = `${this.user.username}`
-        userInfoFullname!.textContent = `${this.user.fullName}`
-        userInfoEmail!.textContent = `${this.user.email}`
-        if (this.user.role === 'ROLE_ADMIN') {
-            userInfoRole!.textContent = 'Administrador'
-            userInfoRole!.classList.add('text-amber-600')
-        } else if (this.user.role === 'ROLE_USER') {
-            userInfoRole!.textContent = 'Usuario'
-            userInfoRole!.classList.add('text-color')
-        } else if (this.user.role === 'ROLE_MANAGER') {
-            userInfoRole!.textContent = 'Gestor'
-            userInfoRole!.classList.add('text-red-600')
-        } else {
-            userInfoRole!.textContent = 'No autorizado'
-            userInfoRole!.classList.add('text-gray-400', 'dark:text-gray-600')
+        userName!.textContent = authService.getUser()?.fullName ?? '';
+        userInfoTitle!.textContent = this.user.fullName ?? this.user.username ?? '';
+        userInfoFullname!.textContent = this.user.fullName ?? '';
+        userInfoUsernameSub!.textContent = `@${this.user.username}`;
+        userInfoUsername!.textContent = `@${this.user.username}`;
+        userInfoEmail!.textContent = this.user.email ?? '';
+        userTaskCount!.textContent = `${this.tasks.length} ${this.tasks.length === 1 ? 'tarea' : 'tareas'}`;
+
+        // Badge de rol
+        if (userInfoRole) {
+            userInfoRole.className = 'shrink-0 px-3 py-1.5 rounded-full text-xs font-bold tracking-wide border border-white/30 bg-white/15 text-white backdrop-blur-sm';
+            if (this.user.role === 'ROLE_ADMIN') {
+                userInfoRole.textContent = 'Administrador';
+            } else if (this.user.role === 'ROLE_USER') {
+                userInfoRole.textContent = 'Usuario';
+            } else if (this.user.role === 'ROLE_MANAGER') {
+                userInfoRole.textContent = 'Gestor';
+            } else {
+                userInfoRole.textContent = 'No autorizado';
+            }
         }
 
         if (taskList) {

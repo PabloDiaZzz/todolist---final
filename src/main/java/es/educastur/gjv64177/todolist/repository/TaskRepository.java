@@ -13,6 +13,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 	List<Task> findByAuthor(Usuario author);
 
 	List<Task> findByCategories_Id(Long categoryId);
+	long countByCategories_Id(Long categoryId);
 
 	boolean existsByTags(Tag tag);
 }

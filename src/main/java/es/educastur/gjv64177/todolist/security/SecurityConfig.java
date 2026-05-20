@@ -24,10 +24,12 @@ public class SecurityConfig {
 		http.csrf(AbstractHttpConfigurer::disable);
 		http.authorizeHttpRequests(auth -> auth.requestMatchers("/", "/login", "/register", "/css/**", "/js/**", "/assets/**", "/favicon-login.svg", "/api/auth/*","/error", "/forgot-password", "/v3/api-docs", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
 				.permitAll()
+				.requestMatchers("/api/admin/users/**", "/api/admin/users")
+				.hasRole("ADMIN")
+				.requestMatchers("/api/admin/categories/**", "/api/admin/categories", "/api/admin/tasks/**", "/api/admin/tasks")
+				.hasAnyRole("ADMIN", "MANAGER")
 				.requestMatchers("/admin/**", "/api/admin/**")
 				.hasRole("ADMIN")
-				.requestMatchers("/api/admin/categories/**", "/api/admin/categories")
-				.hasRole("MANAGER")
 				.anyRequest()
 				.authenticated());
 

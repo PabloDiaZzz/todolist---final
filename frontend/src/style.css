@@ -37,6 +37,19 @@ input:-webkit-autofill:active {
 }
 
 @layer utilities {
+  .input-underline {
+    @apply bg-transparent border-0 border-b-2 rounded-none outline-none shadow-none;
+    -webkit-appearance: none;
+    appearance: none;
+
+    &:focus {
+      outline: none !important;
+      box-shadow: none !important;
+      ring: 0 !important;
+    }
+  }
+}
+
 
   .bg-brand {
     @apply bg-blue-600 dark:bg-indigo-600 hover:bg-blue-700 dark:hover:bg-indigo-700 cursor-pointer transition-colors;
@@ -72,12 +85,7 @@ input:-webkit-autofill:active {
 
     &::picker(select) {
       appearance: base-select;
-      border-radius: 12px;
-      padding: 0;
-      border: 1px solid #e5e7eb;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-      background-color: transparent;
-      overflow: hidden;
+      @apply rounded-xl p-0 border border-gray-200 dark:border-slate-700 shadow-lg bg-transparent overflow-hidden;
     }
 
     /* 2. Ocultamos la flecha rebelde del navegador */
@@ -87,34 +95,17 @@ input:-webkit-autofill:active {
 
     /* 3. Rotamos NUESTRO svg cuando el select está abierto */
     &:open>button svg {
-      transform: rotate(180deg);
+      @apply rotate-180;
     }
 
     /* Estilos para las opciones dentro del div */
     >div option {
-      padding: 10px 15px;
-      cursor: pointer;
-      transition: background-color 0.2s;
+      @apply px-2 py-2 cursor-pointer transition-colors duration-200;
     }
 
     >div option:hover,
-    >div option:focus {
-      background-color: #f3f4f6;
-      /* bg-gray-100 para el hover */
-    }
-
-    /* Estilo en modo oscuro para las opciones */
-    @media (prefers-color-scheme: dark) {
-      &::picker(select) {
-        border-color: #334155;
-        /* slate-700 */
-      }
-
-      >div option:hover,
-      >div option:focus {
-        background-color: #334155;
-        /* slate-700 */
-      }
+    >div option:focus-visible {
+      @apply bg-gray-100 dark:bg-slate-700;
     }
   }
 }

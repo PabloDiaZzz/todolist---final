@@ -100,9 +100,40 @@ public class UsuarioService {
 	}
 
 	@Transactional
-	public void makeAdmin(String username) {
+	public void changeRole(String username, Role role) {
 		Usuario user = usuarioRepository.findByUsername(username).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
-		user.setRole(Role.ROLE_ADMIN);
+		user.setRole(role);
 		usuarioRepository.save(user);
+	}
+
+	@Transactional
+	public void makeAdmin(String username) {
+		changeRole(username, Role.ROLE_ADMIN);
+	}
+
+	@Transactional
+	public Usuario updateProfile(String currentUsername, String newUsername, String newFullName, String newEmail) {
+		Usuario user = usuarioRepository.findByUsername(currentUsername)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+
+		if (newFullName != null && !newFullName.isBlank()) {
+			user.setFullName(newFullName.trim());
+		}
+
+		if (newUsername != null && !newUsername.isBlank() && !newUsername.equals(currentUsername)) {
+			if (usuarioRepository.existsByUsername(newUsername)) {
+				throw new ResponseStatusException(HttpStatus.CONFLICT, "El nombre de usuario ya está en uso");
+			}
+			user.setUsername(newUsername.trim());
+		}
+
+		if (newEmail != null && !newEmail.isBlank() && !newEmail.equals(user.getEmail())) {
+			if (usuarioRepository.existsByEmail(newEmail)) {
+				throw new ResponseStatusException(HttpStatus.CONFLICT, "El correo electrónico ya está en uso");
+			}
+			user.setEmail(newEmail.trim());
+		}
+
+		return usuarioRepository.save(user);
 	}
 }

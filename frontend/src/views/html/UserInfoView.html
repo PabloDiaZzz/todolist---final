@@ -25,21 +25,90 @@
         </div>
     </header>
 
-    <main class="flex flex-col gap-4 mx-auto mt-8 px-4 md:pt-20 pb-10 w-full max-w-2xl">
-        <section class="flex flex-col bg-back-secondary p-6 rounded-lg w-full gap-3">
-            <div class="flex justify-between w-full">
-                <h1 id="user-info-title" class="font-semibold text-color text-2xl"></h1>
-                <svg class="fill-gray-600 dark:fill-gray-400 size-9 cursor-pointer hover:scale-103 transition-all hover:bg-gray-200 dark:hover:bg-slate-700 p-2 rounded-full">
-                    <use href="/main.svg#edit"></use>
-                </svg>
-            </div>
-            <p id="user-info-fullname" class="font-medium text-gray-600 dark:text-gray-400 text-sm"></p>
-            <p id="user-info-email" class="font-medium text-gray-600 dark:text-gray-400 text-sm"></p>
-            <p id="user-info-role" class="font-medium text-sm"></p>
+    <main class="flex flex-col gap-5 mx-auto mt-8 px-4 md:pt-20 pb-10 w-full max-w-2xl">
+        <section class="bg-back-secondary rounded-2xl shadow-sm overflow-hidden w-full">
 
+            <div class="bg-blue-500 dark:bg-indigo-700 px-6 py-5 flex items-center justify-between gap-4">
+                <div class="min-w-0">
+                    <p
+                        class="text-blue-100 dark:text-indigo-300 text-xs font-semibold uppercase tracking-widest mb-0.5">
+                        Perfil de usuario</p>
+                    <h2 id="user-info-title" class="text-white font-bold text-xl truncate"></h2>
+                    <p id="user-info-username-sub"
+                        class="text-blue-100/80 dark:text-indigo-200/70 text-sm font-medium mt-0.5"></p>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                    <span id="user-info-role"
+                        class="px-3 py-1.5 rounded-full text-xs font-bold tracking-wide border border-white/30 bg-white/15 text-white">
+                    </span>
+                    <button id="edit-profile-btn" type="button"
+                        class="size-9 flex items-center justify-center rounded-full bg-white/15 hover:bg-white/25 border border-white/30 text-white transition-colors cursor-pointer"
+                        title="Editar perfil">
+                        <svg id="edit-icon" class="size-4" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125" />
+                        </svg>
+                        <svg id="save-icon" class="size-4 hidden" fill="none" stroke="currentColor" stroke-width="2.5"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="px-6 py-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                <div
+                    class="flex flex-col gap-1.5 p-3 rounded-xl bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700">
+                    <p class="text-xs text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-wide">Nombre
+                        completo</p>
+                    <p id="user-info-fullname" class="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">
+                    </p>
+                    <input id="edit-fullname" type="text" autocomplete="off"
+                        class="hidden input-underline text-sm font-semibold text-gray-800 dark:text-gray-100 border-none ring-0 outline-none w-full bg-transparent">
+                </div>
+
+                <div
+                    class="flex flex-col gap-1.5 p-3 rounded-xl bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700">
+                    <p class="text-xs text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-wide">Usuario
+                    </p>
+                    <p id="user-info-username" class="text-sm font-semibold text-gray-800 dark:text-gray-100"></p>
+                    <input id="edit-username" type="text" autocomplete="off"
+                        class="hidden input-underline text-sm font-semibold text-gray-800 dark:text-gray-100 border-none ring-0 outline-none w-full bg-transparent">
+                    <p id="username-feedback" class="hidden text-xs font-medium"></p>
+                </div>
+
+                <div
+                    class="flex flex-col gap-1.5 p-3 rounded-xl bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 sm:col-span-2">
+                    <p class="text-xs text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-wide">Correo
+                        electrónico</p>
+                    <p id="user-info-email" class="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate"></p>
+                    <input id="edit-email" type="email" autocomplete="off"
+                        class="hidden input-underline text-sm font-semibold text-gray-800 dark:text-gray-100 border-none ring-0 outline-none w-full bg-transparent">
+                    <p id="email-feedback" class="hidden text-xs font-medium"></p>
+                </div>
+
+                <div
+                    class="flex flex-col gap-1.5 p-3 rounded-xl bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 sm:col-span-2">
+                    <p class="text-xs text-gray-400 dark:text-gray-500 font-semibold uppercase tracking-wide">Tareas
+                        asignadas</p>
+                    <p id="user-info-task-count" class="text-sm font-semibold text-gray-800 dark:text-gray-100"></p>
+                </div>
+
+            </div>
         </section>
-        <section class="flex flex-col bg-back-secondary p-6 rounded-lg w-full gap-2" id="task-list">
+
+
+        <section class="flex flex-col bg-back-secondary p-6 rounded-2xl shadow-sm w-full gap-3">
+            <h2
+                class="font-bold text-gray-900 dark:text-white text-lg border-b border-gray-100 dark:border-slate-700 pb-3">
+                Tareas</h2>
+            <ul id="task-list" class="flex flex-col gap-2">
+            </ul>
         </section>
+
+
 
     </main>
 

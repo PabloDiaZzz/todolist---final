@@ -4,8 +4,19 @@
         <button class="user-name-btn username-text font-bold text-sm cursor-pointer m-0 p-0 hover:text-blue-600 dark:hover:text-indigo-400 transition"></button>
         <p class="role-text text-xs text-gray-500"></p>
     </div>
-    <form class="promote-form">
-        <button type="submit"
-            class="text-xs bg-brand text-white px-3 py-1.5 rounded-md font-semibold transition cursor-pointer">Hacer Admin</button>
-    </form>
+    <div class="promote-container">
+        <select class="role-select base-select text-xs bg-brand text-white px-3 py-1.5 rounded-md font-semibold transition cursor-pointer border-0 outline-none flex items-center">
+            <button type="button" class="flex items-center justify-between gap-1 bg-transparent border-0 text-white font-semibold cursor-pointer text-xs p-0 m-0 outline-none">
+                <span>Cambiar Rol</span>
+                <svg class="size-3 fill-current transition-transform duration-200" viewBox="0 0 20 20">
+                    <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                </svg>
+            </button>
+            <div class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-xl rounded-xl overflow-hidden">
+                <option value="" disabled selected class="hidden">Cambiar Rol</option>
+                <option value="ROLE_ADMIN" class="hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-900 dark:text-white text-xs font-semibold">Hacer Admin</option>
+                <option value="ROLE_MANAGER" class="hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-900 dark:text-white text-xs font-semibold">Hacer Gestor</option>
+            </div>
+        </select>
+    </div>
 </div>

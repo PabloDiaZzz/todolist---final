@@ -4,6 +4,7 @@ import es.educastur.gjv64177.todolist.Service.CategoryService;
 import es.educastur.gjv64177.todolist.Service.TaskService;
 import es.educastur.gjv64177.todolist.Service.UsuarioService;
 import es.educastur.gjv64177.todolist.dto.TaskUserDTO;
+import es.educastur.gjv64177.todolist.dto.UpdateProfileDTO;
 import es.educastur.gjv64177.todolist.dto.UserTasksDTO;
 import es.educastur.gjv64177.todolist.dto.UsuarioDTO;
 import es.educastur.gjv64177.todolist.mapper.TaskMapper;
@@ -11,6 +12,7 @@ import es.educastur.gjv64177.todolist.mapper.UsuarioMapper;
 import es.educastur.gjv64177.todolist.model.Category;
 import es.educastur.gjv64177.todolist.model.Task;
 import es.educastur.gjv64177.todolist.model.Usuario;
+import es.educastur.gjv64177.todolist.model.Role;
 import es.educastur.gjv64177.todolist.repository.CategoryRepository;
 import es.educastur.gjv64177.todolist.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,9 +54,26 @@ public class AdminController {
 	}
 
 	@PatchMapping("/users/{username}/promote")
-	public ResponseEntity<Void> makeAdmin(@PathVariable String username) {
-		usuarioService.makeAdmin(username);
+	public ResponseEntity<Void> makeAdmin(@PathVariable String username, @RequestParam(required = false) String role) {
+		if ("ROLE_MANAGER".equals(role)) {
+			usuarioService.changeRole(username, Role.ROLE_MANAGER);
+		} else if ("ROLE_USER".equals(role)) {
+			usuarioService.changeRole(username, Role.ROLE_USER);
+		} else {
+			usuarioService.changeRole(username, Role.ROLE_ADMIN);
+		}
 		return ResponseEntity.ok().build();
+	}
+
+	@PatchMapping("/users/{username}")
+	public ResponseEntity<UsuarioDTO> updateUserProfile(@PathVariable String username,
+	                                                    @RequestBody UpdateProfileDTO dto) {
+		try {
+			Usuario updated = usuarioService.updateProfile(username, dto.username(), dto.fullName(), dto.email());
+			return ResponseEntity.ok(usuarioMapper.toDTO(updated));
+		} catch (org.springframework.web.server.ResponseStatusException ex) {
+			return ResponseEntity.status(ex.getStatusCode()).build();
+		}
 	}
 
 	@PostMapping("/categories")
@@ -70,11 +89,17 @@ public class AdminController {
 	public ResponseEntity<Void> borrarCategoria(@PathVariable Long id) {
 		List<Task> tareasAfectadas = taskRepository.findByCategories_Id(id);
 		for (Task t : tareasAfectadas) {
-			t.setCategories(null);
+			t.getCategories().removeIf(c -> c.getId().equals(id));
 			taskService.save(t);
 		}
 		categoryService.deleteById(id);
 		return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping("/categories/{id}/tasks/count")
+	public ResponseEntity<Long> countTasksByCategory(@PathVariable Long id) {
+		long count = taskRepository.countByCategories_Id(id);
+		return ResponseEntity.ok(count);
 	}
 
 	@GetMapping("/tasks")

@@ -19,44 +19,74 @@ export class UserAdminItem extends HTMLElement {
 
         const usernameEl = this.querySelector('.username-text')!;
         const roleEl = this.querySelector('.role-text')!;
-        const form = this.querySelector('.promote-form') as HTMLFormElement;
+        const select = this.querySelector('.role-select') as HTMLSelectElement;
 
         usernameEl.textContent = this._user.username ?? '';
         roleEl.textContent = this._user.role ?? '';
 
         if (this._user.role === 'ROLE_ADMIN') {
-            form.remove();
+            select.remove();
         } else {
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
+            const optionsDiv = select.querySelector('div')!;
+            const buttonSpan = select.querySelector('button span')!;
+            
+            const buttonText = 'Cambiar Rol';
+            if (this._user.role === 'ROLE_USER') {
+                optionsDiv.innerHTML = `
+                    <option value="" disabled selected class="hidden">${buttonText}</option>
+                    <option value="ROLE_ADMIN" class="hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-900 dark:text-white text-xs font-semibold">Hacer Admin</option>
+                    <option value="ROLE_MANAGER" class="hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-900 dark:text-white text-xs font-semibold">Hacer Gestor</option>
+                `;
+            } else if (this._user.role === 'ROLE_MANAGER') {
+                optionsDiv.innerHTML = `
+                    <option value="" disabled selected class="hidden">${buttonText}</option>
+                    <option value="ROLE_ADMIN" class="hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-900 dark:text-white text-xs font-semibold">Hacer Admin</option>
+                    <option value="ROLE_USER" class="hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-900 dark:text-white text-xs font-semibold">Hacer Usuario</option>
+                `;
+            }
+
+            if (buttonSpan) {
+                buttonSpan.textContent = buttonText;
+            }
+
+            select.addEventListener('change', async () => {
+                const selectedRole = select.value;
+                if (!selectedRole) return;
+
                 const originalRole = this._user.role;
-                this._user.role = 'ROLE_ADMIN';
-                roleEl.textContent = 'ROLE_ADMIN';
-                form.style.display = 'none';
+                this._user.role = selectedRole;
+                roleEl.textContent = selectedRole;
+
+                if (selectedRole === 'ROLE_ADMIN') {
+                    select.remove();
+                } else {
+                    this.render();
+                }
+
                 updateCachedData<UsuarioDTO>('/api/admin/users', oldUsers =>
-                    oldUsers.map(u => u.username === this._user.username ? { ...u, role: 'ROLE_ADMIN' } : u)
+                    oldUsers.map(u => u.username === this._user.username ? { ...u, role: selectedRole } : u)
                 );
                 this.dispatchEvent(new CustomEvent('sync-memory', { bubbles: true, composed: true }));
 
                 try {
-                    const response = await fetch(`/api/admin/users/${this._user.username}/promote`, {
+                    const response = await fetch(`/api/admin/users/${this._user.username}/promote?role=${selectedRole}`, {
                         method: 'PATCH'
                     });
 
-                    if (!response.ok) throw new Error('Error al promover');
-                    form.remove();
+                    if (!response.ok) throw new Error('Error al cambiar de rol');
 
                 } catch (error) {
-                    console.error('Error al promover al usuario:', error);
+                    console.error('Error al cambiar rol del usuario:', error);
                     this._user.role = originalRole;
-                    roleEl.textContent = originalRole ?? '';
-                    form.style.display = '';
+                    
+                    // Re-render component to completely restore original DOM state
+                    this.render();
                     
                     updateCachedData<UsuarioDTO>('/api/admin/users', oldUsers =>
                         oldUsers.map(u => u.username === this._user.username ? { ...u, role: originalRole } : u)
                     );
                     this.dispatchEvent(new CustomEvent('sync-memory', { bubbles: true, composed: true }));
-                    alert('Error de conexión: No se pudo hacer Admin al usuario.');
+                    alert('Error de conexión: No se pudo cambiar el rol del usuario.');
                 }
             });
         }
