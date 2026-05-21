@@ -1,4 +1,5 @@
 <div id="theme-wrapper" class="flex flex-col items-center bg-gray-100 dark:bg-slate-900 m-0 w-full min-h-screen font-sans antialiased overflow-x-hidden transition-colors duration-300">
+    <a href="#profile-form" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-white focus:dark:bg-slate-800 focus:p-3 focus:rounded-xl focus:shadow-xl focus:text-indigo-600 focus:dark:text-indigo-400 focus:font-bold skip-link">Saltar al contenido principal</a>
     <app-header class="block w-full" current-view="settings"></app-header>
 
     <main class="flex flex-col gap-6 mx-auto mt-8 px-4 md:pt-20 pb-16 w-full max-w-4xl">
@@ -13,10 +14,10 @@
             <p class="text-gray-500 dark:text-gray-400 text-sm">Gestiona tu perfil, preferencias visuales y utilidades de cuenta.</p>
         </div>
 
-        <!-- Layout de Configuración -->
+        
         <div class="flex flex-col md:flex-row gap-6 bg-white/75 dark:bg-slate-800/75 border border-gray-200 dark:border-slate-700/60 rounded-3xl p-4 md:p-6 shadow-xl backdrop-blur-md">
             
-            <!-- Barra Lateral / Tabuladores -->
+            
             <aside class="flex flex-col gap-1 pb-4 md:pb-0 border-b md:border-b-0 md:border-r border-gray-200 dark:border-slate-700 md:pr-6 shrink-0 md:w-56">
                 <button type="button" data-tab="profile"
                     class="tab-btn active flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all duration-300 cursor-pointer select-none">
@@ -58,10 +59,10 @@
                 </button>
             </aside>
 
-            <!-- Contenido de las Pestañas -->
+            
             <div class="flex-1 min-h-[360px] md:pl-4 transition-all duration-300">
                 
-                <!-- Pestaña: Perfil -->
+                
                 <section id="tab-content-profile" class="tab-content block">
                     <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-4">Información de Perfil</h3>
                     <form id="profile-form" class="flex flex-col gap-4 max-w-lg">
@@ -89,7 +90,7 @@
                     </form>
                 </section>
 
-                <!-- Pestaña: Seguridad (Contraseña) -->
+                
                 <section id="tab-content-security" class="tab-content hidden">
                     <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-4">Actualizar Contraseña</h3>
                     <form id="password-form" class="flex flex-col gap-4 max-w-lg">
@@ -116,13 +117,13 @@
                     </form>
                 </section>
 
-                <!-- Pestaña: Preferencias de Aspecto (Tema) -->
+                
                 <section id="tab-content-preferences" class="tab-content hidden">
                     <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2">Tema y Aspecto</h3>
                     <p class="text-gray-500 dark:text-gray-400 text-sm mb-6">Elige el estilo visual que mejor se adapte a tu entorno de trabajo. El tema se sincronizará en todos tus dispositivos.</p>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl">
-                        <!-- Tarjeta Tema Claro -->
+                        
                         <div data-theme-val="LIGHT" class="theme-card border-2 border-gray-200 dark:border-slate-700/60 bg-gray-50 dark:bg-slate-900/40 hover:border-blue-400 rounded-2xl p-4 flex flex-col items-center gap-3 cursor-pointer transition-all duration-300 select-none">
                             <div class="size-10 rounded-full bg-amber-100 dark:bg-amber-950/30 flex items-center justify-center text-amber-500">
                                 <svg class="size-6 fill-none stroke-current" stroke-width="2.5" viewBox="0 0 24 24">
@@ -132,7 +133,7 @@
                             <span class="font-bold text-sm text-slate-800 dark:text-slate-200">Tema Claro</span>
                         </div>
 
-                        <!-- Tarjeta Tema Oscuro -->
+                        
                         <div data-theme-val="DARK" class="theme-card border-2 border-gray-200 dark:border-slate-700/60 bg-gray-50 dark:bg-slate-900/40 hover:border-indigo-400 rounded-2xl p-4 flex flex-col items-center gap-3 cursor-pointer transition-all duration-300 select-none">
                             <div class="size-10 rounded-full bg-indigo-100 dark:bg-indigo-950/30 flex items-center justify-center text-indigo-500">
                                 <svg class="size-6 fill-none stroke-current" stroke-width="2.5" viewBox="0 0 24 24">
@@ -142,7 +143,7 @@
                             <span class="font-bold text-sm text-slate-800 dark:text-slate-200">Tema Oscuro</span>
                         </div>
 
-                        <!-- Tarjeta Tema Sistema -->
+                        
                         <div data-theme-val="SYSTEM" class="theme-card border-2 border-gray-200 dark:border-slate-700/60 bg-gray-50 dark:bg-slate-900/40 hover:border-slate-400 rounded-2xl p-4 flex flex-col items-center gap-3 cursor-pointer transition-all duration-300 select-none">
                             <div class="size-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400">
                                 <svg class="size-6 fill-none stroke-current" stroke-width="2.5" viewBox="0 0 24 24">
@@ -154,13 +155,13 @@
                     </div>
                 </section>
 
-                <!-- Pestaña: Datos y Limpieza -->
+                
                 <section id="tab-content-data" class="tab-content hidden">
                     <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2">Datos y Limpieza</h3>
                     <p class="text-gray-500 dark:text-gray-400 text-sm mb-6">Herramientas útiles para exportar tu información o limpiar las tareas que ya has completado.</p>
                     
                     <div class="flex flex-col gap-6 max-w-2xl">
-                        <!-- Limpieza -->
+                        
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-900/20 rounded-2xl">
                             <div class="flex flex-col gap-1">
                                 <h4 class="text-sm font-bold text-slate-800 dark:text-slate-200">Vaciar Tareas Completadas</h4>
@@ -172,7 +173,7 @@
                             </button>
                         </div>
 
-                        <!-- Exportar -->
+                        
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-900/20 rounded-2xl">
                             <div class="flex flex-col gap-1">
                                 <h4 class="text-sm font-bold text-slate-800 dark:text-slate-200">Copia de Seguridad (JSON)</h4>
@@ -186,7 +187,7 @@
                     </div>
                 </section>
 
-                <!-- Pestaña: Zona de Peligro (Eliminar Cuenta) -->
+                
                 <section id="tab-content-danger" class="tab-content hidden">
                     <h3 class="text-xl font-bold text-red-500 mb-2">Zona Crítica</h3>
                     <p class="text-gray-500 dark:text-gray-400 text-sm mb-6">Las siguientes acciones son irreversibles y afectarán tu cuenta de forma definitiva. Por favor, procede con cautela.</p>
@@ -198,7 +199,7 @@
                                 <p class="text-xs text-gray-500 dark:text-gray-400">Esto borrará tu cuenta de usuario, tus tareas y todas las configuraciones asociadas de forma irreversible.</p>
                             </div>
                             
-                            <!-- Input de seguridad -->
+                            
                             <div class="flex flex-col gap-2 max-w-md bg-white dark:bg-slate-900 border border-red-200 dark:border-red-950/40 p-3.5 rounded-xl">
                                 <span class="text-[11px] font-bold text-red-500 uppercase tracking-wide">Para confirmar, escribe tu nombre de usuario:</span>
                                 <input type="text" id="delete-confirm-input" placeholder="Nombre de usuario" autocomplete="off"
@@ -217,7 +218,7 @@
         </div>
     </main>
 
-    <!-- Modal / Toast de Notificaciones Flotante -->
+    
     <div id="toast" class="hidden fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-white/90 dark:bg-slate-800/90 border border-gray-200/80 dark:border-slate-700/60 text-slate-800 dark:text-white shadow-2xl px-5 py-4 rounded-2xl backdrop-blur-md transform translate-y-2 opacity-0 transition-all duration-300">
         <span id="toast-message" class="text-xs font-bold"></span>
     </div>

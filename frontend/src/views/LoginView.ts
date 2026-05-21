@@ -101,6 +101,29 @@ export class LoginView extends HTMLElement {
             }
         });
 
+        const goToRegister = root.getElementById('go-to-register') as HTMLButtonElement;
+        const goToForgot = root.getElementById('go-to-forgot-password') as HTMLButtonElement;
+
+        if (goToRegister) {
+            goToRegister.onclick = () => window.navigate('/register');
+            goToRegister.onkeydown = (e: KeyboardEvent) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    window.navigate('/register');
+                }
+            };
+        }
+
+        if (goToForgot) {
+            goToForgot.onclick = () => window.navigate('/forgot-password');
+            goToForgot.onkeydown = (e: KeyboardEvent) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    window.navigate('/forgot-password');
+                }
+            };
+        }
+
         this.checkUrlParams(root);
     }
 }

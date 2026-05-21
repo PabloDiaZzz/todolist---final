@@ -16,7 +16,7 @@ export class ForgotPasswordView extends HTMLElement {
         this.shadowRoot!.adoptedStyleSheets = [sheet];
 
         this.shadowRoot!.innerHTML = `
-            <div id="theme-wrapper" class="font-sans antialiased h-dvh flex items-center justify-center text-slate-900 dark:text-white relative overflow-hidden">
+            <div id="theme-wrapper" class="font-sans antialiased h-svh flex items-center justify-center text-slate-900 dark:text-white relative overflow-hidden">
                 ${html}
             </div>
         `;
@@ -38,6 +38,17 @@ export class ForgotPasswordView extends HTMLElement {
         const root = this.shadowRoot!;
         const form = root.querySelector('#forgot-form') as HTMLFormElement;
         const alertError = root.querySelector('#forgot-alert') as HTMLDivElement;
+        const backToLogin = root.querySelector('#back-to-login') as HTMLButtonElement;
+
+        if (backToLogin) {
+            backToLogin.onclick = () => (window as any).navigate('/login');
+            backToLogin.onkeydown = (e: KeyboardEvent) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    (window as any).navigate('/login');
+                }
+            };
+        }
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();

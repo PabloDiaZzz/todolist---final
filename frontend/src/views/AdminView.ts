@@ -386,7 +386,7 @@ export class AdminView extends HTMLElement {
             minute: '2-digit'
         };
 
-        // Wire clipboard copying functionality for dates
+        
         Array.from([createdAt, updatedAt, deadline]).forEach(el => {
             if (!el) return;
             el.parentElement!.onclick = async () => {
@@ -428,7 +428,7 @@ export class AdminView extends HTMLElement {
             ? new Date(task.deadline).toLocaleString('es-ES', dateConfig)
             : 'No establecida';
 
-        // Render categories directly with the beautiful tags styling
+        
         categories.innerHTML = '';
         if (task.categories) {
             task.categories.forEach(cat => {
@@ -439,7 +439,7 @@ export class AdminView extends HTMLElement {
             });
         }
 
-        // Render tags directly with styling
+        
         tags.innerHTML = '';
         if (task.tags) {
             task.tags.forEach(tag => {

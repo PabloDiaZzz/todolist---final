@@ -106,11 +106,11 @@ export class TaskItem extends HTMLElement {
             const nextState = !originalState;
             task.important = nextState;
 
-            // Trigger animation locally first
+            
             const starIcon = starBtn.querySelector('.star-icon');
             if (starIcon) {
                 starIcon.classList.remove('animate-star-pop', 'animate-star-shrink');
-                void (starIcon as HTMLElement).offsetWidth; // force reflow
+                void (starIcon as HTMLElement).offsetWidth; 
                 if (nextState) {
                     starIcon.classList.add('animate-star-pop');
                 } else {
@@ -118,7 +118,7 @@ export class TaskItem extends HTMLElement {
                 }
             }
 
-            // Start API request immediately in background
+            
             const apiPromise = (async () => {
                 try {
                     const response = await fetch(`/api/tasks/${task.id}/important`, { method: 'PATCH' });
@@ -131,13 +131,13 @@ export class TaskItem extends HTMLElement {
                 }
             })();
 
-            // Wait 350ms (animation duration) for animation to complete before rendering the list
+            
             setTimeout(async () => {
                 const apiResult = await apiPromise;
                 if (apiResult !== null) {
                     task.important = apiResult;
                 } else {
-                    task.important = originalState; // rollback on error
+                    task.important = originalState; 
                 }
 
                 this.render();
@@ -206,13 +206,13 @@ export class TaskItem extends HTMLElement {
                 starIcon.classList.add('text-amber-500', 'fill-amber-500', 'drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]');
                 starIcon.classList.remove('text-gray-400', 'dark:text-slate-500', 'fill-none');
                 
-                // Show the star button
+                
                 starBtn.classList.remove('hidden');
             } else {
                 starIcon.classList.remove('text-amber-500', 'fill-amber-500', 'drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]');
                 starIcon.classList.add('text-gray-400', 'dark:text-slate-500', 'fill-none');
                 
-                // Hide the star button completely so it doesn't take up space or show up at all
+                
                 starBtn.classList.add('hidden');
             }
         }

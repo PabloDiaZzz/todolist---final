@@ -1,5 +1,6 @@
 <div id="theme-wrapper"
     class="flex flex-col items-center bg-gray-200 dark:bg-slate-900 m-0 w-full min-h-screen overflow-x-hidden font-sans antialiased">
+    <a href="#tasks-container" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-white focus:dark:bg-slate-800 focus:p-3 focus:rounded-xl focus:shadow-xl focus:text-indigo-600 focus:dark:text-indigo-400 focus:font-bold skip-link">Saltar al contenido principal</a>
     <app-header class="block w-full" current-view="home"></app-header>
 
     <main class="flex flex-col gap-4 mx-auto mt-8 px-4 md:pt-20 pb-10 w-full max-w-2xl">
@@ -30,7 +31,7 @@
                 <div id="task-form-collapse-container"
                     style="transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out; overflow: hidden;">
                     <form id="task-form" class="flex flex-col gap-3">
-                        <input type="text" name="title" placeholder="¿Qué necesitas hacer?" required
+                        <input type="text" name="title" placeholder="¿Qué necesitas hacer?" required aria-label="Título de la nueva tarea"
                             class="bg-gray-50 dark:bg-slate-900 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 w-full dark:text-white">
                         <textarea name="description" placeholder="Detalles (opcional)..."
                             class="bg-gray-50 dark:bg-slate-900 px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 w-full h-20 dark:text-white resize-none"></textarea>
@@ -51,7 +52,7 @@
                                 <div
                                     class="hidden top-12 left-0 z-50 absolute bg-white dark:bg-slate-800 shadow-xl border border-gray-200 dark:border-slate-700 rounded-xl w-full overflow-hidden category-dropdown-menu">
                                     <div class="relative p-2 border-gray-200 dark:border-slate-700 border-b">
-                                        <input type="text" placeholder="Buscar categoría..."
+                                        <input type="text" placeholder="Buscar categoría..." aria-label="Buscar categoría"
                                             class="bg-gray-50 dark:bg-slate-900 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 w-full text-gray-800 dark:text-gray-200 text-sm category-search">
                                     </div>
                                     <div
@@ -61,7 +62,7 @@
                             </div>
 
                             <input type="text" name="tagsInput" autocomplete="off"
-                                placeholder="Tags (ej: urgente, compras)"
+                                placeholder="Tags (ej: urgente, compras)" aria-label="Etiquetas de la tarea"
                                 class="bg-gray-50 dark:bg-slate-900 px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 w-2/3 dark:text-white">
                         </div>
                         <div class="flex flex-row items-center gap-3 w-full">
@@ -113,27 +114,27 @@
                 </svg>
                 <div class="filters-content">
                     <select name="category-options-filter" id="category-options-filter"
-                        class="bg-element-primary text-white outline-none border-none base-select cursor-pointer shrink-0 rounded-xl font-medium shadow-sm border border-white/15 flex-[1_1_calc(50%-0.25rem)] sm:flex-1 h-[34px] sm:h-[38px] text-[13px] sm:text-sm px-2.5 sm:px-5 py-1.25 sm:py-2">
-                        <button class="flex items-center justify-between gap-3 w-full outline-none">
+                        class="bg-element-primary text-white outline-none border-none base-select cursor-pointer shrink-0 rounded-xl font-medium shadow-sm border border-white/15 flex-[1_1_calc(50%-0.25rem)] sm:flex-1 h-[34px] sm:h-[38px] text-[12px] xs:text-[13px] sm:text-sm px-2 xs:px-3 sm:px-5 py-1.25 sm:py-2">
+                        <button class="whitespace-nowrap flex items-center justify-between gap-3 w-full outline-none">
                             <selectedcontent></selectedcontent>
                             <svg width="20" height="20" viewBox="0 0 24 24" class="transition-transform duration-300">
                                 <path fill="currentColor" d="m7 10l5 5l5-5z" />
                             </svg>
                         </button>
-                        <div class="bg-white dark:bg-slate-800 text-black dark:text-white flex flex-col">
+                        <div class="bg-white dark:bg-slate-800 text-black dark:text-white flex flex-col *:whitespace-nowrap">
                             <option value="">- Categoria -</option>
                         </div>
                     </select>
 
                     <select name="complete-options-filter" id="complete-options-filter"
-                        class="bg-element-primary text-white outline-none border-none base-select cursor-pointer shrink-0 rounded-xl font-medium shadow-sm border border-white/15 flex-[1_1_calc(50%-0.25rem)] sm:flex-1 h-[34px] sm:h-[38px] text-[13px] sm:text-sm px-2.5 sm:px-5 py-1.25 sm:py-2">
-                        <button class="flex items-center justify-between gap-3 w-full outline-none">
+                        class="bg-element-primary text-white outline-none border-none base-select cursor-pointer shrink-0 rounded-xl font-medium shadow-sm border border-white/15 flex-[1_1_calc(50%-0.25rem)] sm:flex-1 h-[34px] sm:h-[38px] text-[12px] xs:text-[13px] sm:text-sm px-2 xs:px-3 sm:px-5 py-1.25 sm:py-2">
+                        <button class="whitespace-nowrap flex items-center justify-between gap-3 w-full outline-none">
                             <selectedcontent></selectedcontent>
                             <svg width="20" height="20" viewBox="0 0 24 24" class="transition-transform duration-300">
                                 <path fill="currentColor" d="m7 10l5 5l5-5z" />
                             </svg>
                         </button>
-                        <div class="bg-white dark:bg-slate-800 text-black dark:text-white flex flex-col">
+                        <div class="bg-white dark:bg-slate-800 text-black dark:text-white flex flex-col *:whitespace-nowrap">
                             <option value="">- Completado -</option>
                             <option value="true">Completadas</option>
                             <option value="false">Incompletas</option>
@@ -141,14 +142,14 @@
                     </select>
 
                     <select name="sort-options-filter" id="sort-options-filter"
-                        class="bg-element-primary text-white outline-none border-none base-select cursor-pointer shrink-0 rounded-xl font-medium shadow-sm border border-white/15 flex-auto sm:flex-1 h-[34px] sm:h-[38px] text-[13px] sm:text-sm px-2.5 sm:px-5 py-1.25 sm:py-2">
-                        <button class="flex items-center justify-between gap-3 w-full outline-none">
+                        class=" bg-element-primary text-white outline-none border-none base-select cursor-pointer shrink-0 rounded-xl font-medium shadow-sm border border-white/15 flex-auto sm:flex-1 h-[34px] sm:h-[38px] text-[12px] xs:text-[13px] sm:text-sm px-2 xs:px-3 sm:px-5 py-1.25 sm:py-2">
+                        <button class="whitespace-nowrap flex items-center justify-between gap-3 w-full outline-none">
                             <selectedcontent></selectedcontent>
                             <svg width="20" height="20" viewBox="0 0 24 24" class="transition-transform duration-300">
                                 <path fill="currentColor" d="m7 10l5 5l5-5z" />
                             </svg>
                         </button>
-                        <div class="bg-white dark:bg-slate-800 text-black dark:text-white flex flex-col">
+                        <div class="bg-white dark:bg-slate-800 text-black dark:text-white flex flex-col *:whitespace-nowrap">
                             <option value="">- Ordenar por -</option>
                             <option value="title">Titulo</option>
                             <option value="description">Descripción</option>
@@ -162,7 +163,7 @@
                     </select>
 
                     <button type="button" id="important-filter-btn" data-active="false"
-                        class="bg-element-primary rounded-lg text-white flex items-center justify-center hover:bg-blue-700 dark:hover:bg-indigo-700 transition-all cursor-pointer select-none shrink-0 w-[34px] h-[34px] sm:w-[38px] sm:h-[38px] p-0"
+                        class="bg-element-primary rounded-lg text-white flex items-center justify-center hover:bg-blue-700 dark:hover:bg-indigo-700 transition-all cursor-pointer select-none shrink-0 w-min min-w-[34px] h-[34px] sm:w-[38px] sm:h-[38px] p-0"
                         title="Filtrar por tareas importantes"
                         aria-label="Filtrar por tareas importantes">
                         <svg class="size-5 filter-star-icon transition-all duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -219,7 +220,7 @@
                         <div
                             class="hidden top-12 left-0 z-50 absolute bg-white dark:bg-slate-800 shadow-xl border border-gray-200 dark:border-slate-700 rounded-xl w-full overflow-hidden category-dropdown-menu">
                             <div class="relative p-2 border-gray-200 dark:border-slate-700 border-b">
-                                <input type="text" placeholder="Buscar categoría..."
+                                <input type="text" placeholder="Buscar categoría..." aria-label="Buscar categoría"
                                     class="bg-gray-50 dark:bg-slate-900 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full text-gray-800 dark:text-gray-200 text-sm category-search">
                             </div>
                             <div
@@ -274,7 +275,7 @@
     </dialog>
 
     <dialog id="task-info"
-        class="bg-white dark:bg-slate-800 shadow-xl m-auto p-6 border-none rounded-2xl outline-none min-w-md">
+        class="bg-white dark:bg-slate-800 shadow-xl m-auto p-6 border-none rounded-2xl outline-none w-[90%] max-w-md">
         <div id="task-info-content" class="flex flex-col items-stretch gap-4">
             <div class="flex justify-between items-center">
                 <h2 id="task-info-title"
@@ -295,7 +296,7 @@
                 <span class="text-amber-700 dark:text-amber-400 text-sm font-semibold">Tarea Importante</span>
             </div>
             <pre id="task-info-desc"
-                class="bg-gray-100 dark:bg-slate-900 p-2 border border-gray-300 dark:border-slate-600 rounded-xl max-w-125 font-sans dark:text-white whitespace-pre-wrap"></pre>
+                class="bg-gray-100 dark:bg-slate-900 p-2 border border-gray-300 dark:border-slate-600 rounded-xl font-sans dark:text-white whitespace-pre-wrap w-full max-w-full break-words overflow-x-auto"></pre>
             <div class="info-field-['Fecha_limite:']">
                 <p id="task-info-deadline"
                     class="bg-gray-100 dark:bg-slate-900 p-2 border border-gray-300 dark:border-slate-600 rounded-xl dark:text-white">

@@ -1,7 +1,7 @@
-<div id="theme-wrapper" class="relative flex justify-center items-center h-dvh overflow-hidden font-sans text-slate-900 dark:text-white antialiased">
-    <img src="/wall-login.webp" class="top-0 left-0 -z-10 absolute w-full h-dvh" alt="Fondo de pantalla artístico para el inicio de sesión">
+<div id="theme-wrapper" class="relative flex justify-center items-center h-svh overflow-hidden font-sans text-slate-900 dark:text-white antialiased">
+    <img src="/wall-login.webp" class="top-0 left-0 -z-10 absolute w-full h-svh" alt="Fondo de pantalla artístico para el inicio de sesión">
     <div
-        class="top-0 left-0 -z-10 absolute backdrop-blur-sm dark:backdrop-brightness-50 dark:backdrop-contrast-150 w-full h-dvh">
+        class="top-0 left-0 -z-10 absolute backdrop-blur-sm dark:backdrop-brightness-50 dark:backdrop-contrast-150 w-full h-svh">
     </div>
 
     <section
@@ -21,8 +21,8 @@
                         class="absolute group-hover:opacity-0 font-bold text-blue-600 dark:text-indigo-400 text-2xl group-hover:-translate-x-10">
                         LOGIN
                     </h1>
-                    <button type="button" onclick="navigate('/register')"
-                        class="absolute flex items-center gap-2 hover:bg-gray-200 dark:hover:bg-slate-700 opacity-0 group-hover:opacity-100 px-3 py-2 rounded-xl text-gray-600 dark:text-gray-400 text-lg whitespace-nowrap translate-x-10 group-hover:translate-x-0 cursor-pointer">
+                    <button type="button" id="go-to-register"
+                        class="absolute flex items-center gap-2 hover:bg-gray-200 dark:hover:bg-slate-700 opacity-0 group-hover:opacity-100 px-3 py-2 rounded-xl text-gray-600 dark:text-gray-400 text-lg whitespace-nowrap translate-x-10 group-hover:translate-x-0 cursor-pointer focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 focus:outline-none">
                         Registrarse
                     </button>
                 </div>
@@ -90,8 +90,8 @@
 
                     <hr class="self-center border-gray-300 dark:border-slate-700 w-[95%]">
 
-                    <button type="button" onclick="navigate('/forgot-password')"
-                        class="hover:bg-blue-100 dark:hover:bg-slate-700 py-2.5 border border-blue-600 dark:border-indigo-400 rounded-xl font-medium text-blue-600 dark:text-indigo-400 text-center transition-colors cursor-pointer">
+                    <button type="button" id="go-to-forgot-password"
+                        class="hover:bg-blue-100 dark:hover:bg-slate-700 py-2.5 border border-blue-600 dark:border-indigo-400 rounded-xl font-medium text-blue-600 dark:text-indigo-400 text-center transition-colors cursor-pointer focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 focus:outline-none">
                         Olvidé mi contraseña
                     </button>
                 </div>

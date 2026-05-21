@@ -18,9 +18,9 @@ async function router() {
 
   if (isFirstLoad) {
     app.innerHTML = `
-      <div id="theme-wrapper" class="relative flex justify-center items-center h-dvh overflow-hidden font-sans text-slate-900 dark:text-white antialiased">
-          <img src="/wall-login.webp" class="top-0 left-0 -z-10 absolute w-full h-dvh object-cover" alt="">
-          <div class="top-0 left-0 -z-10 absolute backdrop-blur-sm dark:backdrop-brightness-50 dark:backdrop-contrast-150 w-full h-dvh"></div>
+      <div id="theme-wrapper" class="relative flex justify-center items-center h-svh overflow-hidden font-sans text-slate-900 dark:text-white antialiased">
+          <img src="/wall-login.webp" class="top-0 left-0 -z-10 absolute w-full h-svh object-cover" alt="">
+          <div class="top-0 left-0 -z-10 absolute backdrop-blur-sm dark:backdrop-brightness-50 dark:backdrop-contrast-150 w-full h-svh"></div>
           
           <!-- Un discreto spinner en el centro para que el usuario sepa que está cargando -->
           <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-600 dark:border-indigo-400"></div>
@@ -31,15 +31,15 @@ async function router() {
   try {
     const isLoggedIn = await authService.checkSession();
 
-    // Apply user's custom persisted theme immediately on session load
+    
     if (isLoggedIn) {
       const user = authService.getUser();
       if (user) {
         const localTheme = localStorage.getItem('app-theme');
         if (user.theme === 'SYSTEM' && (localTheme === 'LIGHT' || localTheme === 'DARK')) {
-          // Keep and re-apply explicit local preference over server system default (e.g. after DB reset)
+          
           applyAppTheme(localTheme);
-          // Sync theme preference back to the server in the background
+          
           fetch('/api/user/profile', {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
@@ -130,9 +130,9 @@ async function router() {
     }
   } catch (error) {
     app.innerHTML = `
-      <div id="theme-wrapper" class="relative flex justify-center items-center h-dvh overflow-hidden font-sans text-slate-900 dark:text-white antialiased">
-          <img src="/wall-login.webp" class="top-0 left-0 -z-10 absolute w-full h-dvh object-cover" alt="">
-          <div class="top-0 left-0 -z-10 absolute backdrop-blur-sm dark:backdrop-brightness-50 dark:backdrop-contrast-150 w-full h-dvh"></div>
+      <div id="theme-wrapper" class="relative flex justify-center items-center h-svh overflow-hidden font-sans text-slate-900 dark:text-white antialiased">
+          <img src="/wall-login.webp" class="top-0 left-0 -z-10 absolute w-full h-svh object-cover" alt="">
+          <div class="top-0 left-0 -z-10 absolute backdrop-blur-sm dark:backdrop-brightness-50 dark:backdrop-contrast-150 w-full h-svh"></div>
           
           <div class="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-2xl flex flex-col items-center text-center max-w-sm mx-4">
               <svg class="size-16 text-amber-500 mb-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
@@ -159,7 +159,7 @@ export function applyAppTheme(theme: string) {
   } else if (theme === 'DARK') {
     document.documentElement.classList.add('dark');
   } else {
-    // SYSTEM
+    
     const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
     if (darkQuery.matches) {
       document.documentElement.classList.add('dark');
@@ -175,7 +175,7 @@ function initDarkMode() {
   darkModeMediaQuery.addEventListener('change', (e) => {
     const cachedTheme = localStorage.getItem('app-theme') || 'SYSTEM';
     if (cachedTheme !== 'SYSTEM') {
-      return; // Persisted custom preference takes precedence
+      return; 
     }
     if (e.matches) {
       document.documentElement.classList.add('dark');
@@ -185,7 +185,7 @@ function initDarkMode() {
   });
 }
 
-// Set dynamic baseline OS or cached user preference prior to routing to prevent FOUC (flash of unstyled content)
+
 const cachedTheme = localStorage.getItem('app-theme') || 'SYSTEM';
 applyAppTheme(cachedTheme);
 

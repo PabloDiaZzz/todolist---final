@@ -259,6 +259,17 @@ export class RegisterView extends HTMLElement {
             'correo electrónico'
         );
         this.setUpRegister(root);
+
+        const goToLogin = root.getElementById('go-to-login') as HTMLButtonElement;
+        if (goToLogin) {
+            goToLogin.onclick = () => window.navigate('/login');
+            goToLogin.onkeydown = (e: KeyboardEvent) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    window.navigate('/login');
+                }
+            };
+        }
     }
 }
 

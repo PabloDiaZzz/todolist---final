@@ -1,85 +1,69 @@
-/* eslint-disable */
-/* tslint:disable */
-// @ts-nocheck
-/*
- * ---------------------------------------------------------------
- * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
- * ##                                                           ##
- * ## AUTHOR: acacode                                           ##
- * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
- * ---------------------------------------------------------------
- */
+
+
+
+
 
 export interface TaskRequestDTO {
   title?: string;
   description?: string;
-  /** @format date-time */
+  
   deadline?: string;
-  /** @uniqueItems true */
+  
   categoryIds?: number[];
   tagsInput?: string;
   important?: boolean;
 }
 
 export interface CategoryDTO {
-  /** @format int64 */
+  
   id?: number;
   title?: string;
 }
 
 export interface TagDTO {
-  /** @minLength 1 */
+  
   name: string;
 }
 
 export interface TaskResponseDTO {
-  /** @format int64 */
+  
   id?: number;
   title?: string;
   description?: string;
   completed?: boolean;
-  /** @format date-time */
+  
   createdAt?: string;
-  /** @format date-time */
+  
   deadline?: string;
-  /** @format date-time */
+  
   lastEdit?: string;
-  /** @uniqueItems true */
+  
   categories?: CategoryDTO[];
-  /** @uniqueItems true */
+  
   tags?: TagDTO[];
   important?: boolean;
 }
 
 export interface Tag {
-  /** @format int64 */
+  
   id?: number;
   name?: string;
 }
 
 export interface UsuarioRegistroDTO {
-  /**
-   * @minLength 3
-   * @maxLength 50
-   */
+  
   username: string;
-  /** @minLength 1 */
+  
   fullName: string;
-  /**
-   * @format email
-   * @minLength 1
-   */
+  
   email: string;
-  /**
-   * @minLength 1
-   * @pattern ^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!.])(?=\S+$).{8,}$
-   */
+  
   password: string;
   confirmPassword?: string;
 }
 
 export interface Category {
-  /** @format int64 */
+  
   id?: number;
   title?: string;
 }
@@ -118,21 +102,21 @@ export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
 
 export interface FullRequestParams extends Omit<RequestInit, "body"> {
-  /** set parameter to `true` for call `securityWorker` for this request */
+  
   secure?: boolean;
-  /** request path */
+  
   path: string;
-  /** content type of request body */
+  
   type?: ContentType;
-  /** query params */
+  
   query?: QueryParamsType;
-  /** format of response (i.e. response.json() -> format: "json") */
+  
   format?: ResponseFormat;
-  /** request body */
+  
   body?: unknown;
-  /** base url */
+  
   baseUrl?: string;
-  /** request cancellation token */
+  
   cancelToken?: CancelToken;
 }
 
@@ -158,13 +142,14 @@ export interface HttpResponse<D extends unknown, E extends unknown = unknown>
 
 type CancelToken = Symbol | string | number;
 
-export enum ContentType {
-  Json = "application/json",
-  JsonApi = "application/vnd.api+json",
-  FormData = "multipart/form-data",
-  UrlEncoded = "application/x-www-form-urlencoded",
-  Text = "text/plain",
-}
+export const ContentType = {
+  Json: "application/json",
+  JsonApi: "application/vnd.api+json",
+  FormData: "multipart/form-data",
+  UrlEncoded: "application/x-www-form-urlencoded",
+  Text: "text/plain",
+} as const;
+export type ContentType = typeof ContentType[keyof typeof ContentType];
 
 export class HttpClient<SecurityDataType = unknown> {
   public baseUrl: string = "http://127.0.0.1:8080";
@@ -369,22 +354,12 @@ export class HttpClient<SecurityDataType = unknown> {
   };
 }
 
-/**
- * @title OpenAPI definition
- * @version v0
- * @baseUrl http://127.0.0.1:8080
- */
+
 export class Api<
   SecurityDataType extends unknown,
 > extends HttpClient<SecurityDataType> {
   api = {
-    /**
-     * No description
-     *
-     * @tags task-controller
-     * @name EditTask
-     * @request PUT:/api/tasks/{id}
-     */
+    
     editTask: (id: number, data: TaskRequestDTO, params: RequestParams = {}) =>
       this.request<TaskResponseDTO, any>({
         path: `/api/tasks/${id}`,
@@ -394,13 +369,7 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags task-controller
-     * @name DeleteTask
-     * @request DELETE:/api/tasks/{id}
-     */
+    
     deleteTask: (id: number, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/api/tasks/${id}`,
@@ -408,13 +377,7 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags tag-controller
-     * @name Update
-     * @request PUT:/api/tag/{id}
-     */
+    
     update: (id: number, data: TagDTO, params: RequestParams = {}) =>
       this.request<Tag, any>({
         path: `/api/tag/${id}`,
@@ -424,13 +387,7 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags task-controller
-     * @name GetMyTasks
-     * @request GET:/api/tasks
-     */
+    
     getMyTasks: (params: RequestParams = {}) =>
       this.request<TaskResponseDTO[], any>({
         path: `/api/tasks`,
@@ -438,13 +395,7 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags task-controller
-     * @name CreateTask
-     * @request POST:/api/tasks
-     */
+    
     createTask: (data: TaskRequestDTO, params: RequestParams = {}) =>
       this.request<TaskResponseDTO, any>({
         path: `/api/tasks`,
@@ -454,13 +405,7 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags tag-controller
-     * @name ListAll
-     * @request GET:/api/tag
-     */
+    
     listAll: (params: RequestParams = {}) =>
       this.request<Tag[], any>({
         path: `/api/tag`,
@@ -468,13 +413,7 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags tag-controller
-     * @name Create
-     * @request POST:/api/tag
-     */
+    
     create: (data: TagDTO, params: RequestParams = {}) =>
       this.request<Tag, any>({
         path: `/api/tag`,
@@ -484,13 +423,7 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags auth-controller
-     * @name ProcesarRegistro
-     * @request POST:/api/auth/register
-     */
+    
     procesarRegistro: (
       query: {
         registroDTO: UsuarioRegistroDTO;
@@ -504,13 +437,7 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags auth-controller
-     * @name ProcesarRecuperacion
-     * @request POST:/api/auth/forgot-password
-     */
+    
     procesarRecuperacion: (
       query: {
         email: string;
@@ -524,13 +451,7 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags admin-controller
-     * @name CreateCat
-     * @request POST:/api/admin/categories
-     */
+    
     createCat: (data: Category, params: RequestParams = {}) =>
       this.request<Category, any>({
         path: `/api/admin/categories`,
@@ -540,13 +461,7 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags usuario-controller
-     * @name UpdateProfile
-     * @request PATCH:/api/user/profile
-     */
+    
     updateProfile: (data: UpdateProfileDTO, params: RequestParams = {}) =>
       this.request<UsuarioDTO, any>({
         path: `/api/user/profile`,
@@ -556,13 +471,7 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags usuario-controller
-     * @name UpdatePassword
-     * @request PATCH:/api/user/password
-     */
+    
     updatePassword: (data: UpdatePasswordRequest, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/api/user/password`,
@@ -572,13 +481,7 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags task-controller
-     * @name ToggleTask
-     * @request PATCH:/api/tasks/{id}/toggle
-     */
+    
     toggleTask: (id: number, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/api/tasks/${id}/toggle`,
@@ -586,13 +489,7 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags task-controller
-     * @name ToggleImportant
-     * @request PATCH:/api/tasks/{id}/important
-     */
+    
     toggleImportant: (id: number, params: RequestParams = {}) =>
       this.request<TaskResponseDTO, any>({
         path: `/api/tasks/${id}/important`,
@@ -600,13 +497,7 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags admin-controller
-     * @name UpdateUserProfile
-     * @request PATCH:/api/admin/users/{username}
-     */
+    
     updateUserProfile: (
       username: string,
       data: UpdateProfileDTO,
@@ -620,13 +511,7 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags admin-controller
-     * @name MakeAdmin
-     * @request PATCH:/api/admin/users/{username}/promote
-     */
+    
     makeAdmin: (
       username: string,
       query?: {
@@ -641,13 +526,7 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags usuario-controller
-     * @name GetCurrentUser
-     * @request GET:/api/user/me
-     */
+    
     getCurrentUser: (params: RequestParams = {}) =>
       this.request<UsuarioDTO, any>({
         path: `/api/user/me`,
@@ -655,13 +534,7 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags usuario-controller
-     * @name DeleteAccount
-     * @request DELETE:/api/user/me
-     */
+    
     deleteAccount: (params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/api/user/me`,
@@ -669,13 +542,7 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags tag-controller
-     * @name GetByName
-     * @request GET:/api/tag/name/{name}
-     */
+    
     getByName: (name: string, params: RequestParams = {}) =>
       this.request<Tag, any>({
         path: `/api/tag/name/${name}`,
@@ -683,13 +550,7 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags tag-controller
-     * @name DeleteByName
-     * @request DELETE:/api/tag/name/{name}
-     */
+    
     deleteByName: (name: string, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/api/tag/name/${name}`,
@@ -697,13 +558,7 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags data-controller
-     * @name GetInitialData
-     * @request GET:/api/init
-     */
+    
     getInitialData: (params: RequestParams = {}) =>
       this.request<object, any>({
         path: `/api/init`,
@@ -711,13 +566,7 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags cat-controller
-     * @name ListAll1
-     * @request GET:/api/cats
-     */
+    
     listAll1: (params: RequestParams = {}) =>
       this.request<Category[], any>({
         path: `/api/cats`,
@@ -725,17 +574,11 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags cat-controller
-     * @name GetById
-     * @request GET:/api/cats/{id}
-     */
+    
     getById: (
       id: string,
       query: {
-        /** @format int64 */
+        
         id: number;
       },
       params: RequestParams = {},
@@ -747,13 +590,7 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags auth-controller
-     * @name CheckUsername
-     * @request GET:/api/auth/check-username
-     */
+    
     checkUsername: (
       query: {
         username: string;
@@ -767,13 +604,7 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags auth-controller
-     * @name CheckEmail
-     * @request GET:/api/auth/check-email
-     */
+    
     checkEmail: (
       query: {
         email: string;
@@ -787,13 +618,7 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags admin-controller
-     * @name ListAll2
-     * @request GET:/api/admin/users
-     */
+    
     listAll2: (params: RequestParams = {}) =>
       this.request<UsuarioDTO[], any>({
         path: `/api/admin/users`,
@@ -801,13 +626,7 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags admin-controller
-     * @name GetFullUserProfile
-     * @request GET:/api/admin/users/{username}/full-profile
-     */
+    
     getFullUserProfile: (username: string, params: RequestParams = {}) =>
       this.request<UserTasksDTO, any>({
         path: `/api/admin/users/${username}/full-profile`,
@@ -815,13 +634,7 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags admin-controller
-     * @name GetAllTasks
-     * @request GET:/api/admin/tasks
-     */
+    
     getAllTasks: (params: RequestParams = {}) =>
       this.request<TaskUserDTO[], any>({
         path: `/api/admin/tasks`,
@@ -829,13 +642,7 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags admin-controller
-     * @name CountTasksByCategory
-     * @request GET:/api/admin/categories/{id}/tasks/count
-     */
+    
     countTasksByCategory: (id: number, params: RequestParams = {}) =>
       this.request<number, any>({
         path: `/api/admin/categories/${id}/tasks/count`,
@@ -843,13 +650,7 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags task-controller
-     * @name DeleteCompletedTasks
-     * @request DELETE:/api/tasks/completed
-     */
+    
     deleteCompletedTasks: (params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/api/tasks/completed`,
@@ -857,13 +658,7 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags tag-controller
-     * @name Delete
-     * @request DELETE:/api/tag/id/{id}
-     */
+    
     delete: (id: number, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/api/tag/id/${id}`,
@@ -871,13 +666,7 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags admin-controller
-     * @name DeleteTask1
-     * @request DELETE:/api/admin/tasks/{id}
-     */
+    
     deleteTask1: (id: number, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/api/admin/tasks/${id}`,
@@ -885,13 +674,7 @@ export class Api<
         ...params,
       }),
 
-    /**
-     * No description
-     *
-     * @tags admin-controller
-     * @name BorrarCategoria
-     * @request DELETE:/api/admin/categories/{id}
-     */
+    
     borrarCategoria: (id: number, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/api/admin/categories/${id}`,

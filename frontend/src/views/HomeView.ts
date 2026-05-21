@@ -168,7 +168,7 @@ export class HomeView extends HTMLElement {
     const dateInput = root.getElementById('date-input') as HTMLInputElement
     const timeInput = root.getElementById('time-input') as HTMLInputElement
 
-    // Creation Star Binding
+    
     const createImportantBtn = root.getElementById('create-important-btn') as HTMLButtonElement
     const createImportantHidden = root.getElementById('create-important-hidden') as HTMLInputElement
     createImportantBtn?.addEventListener('click', () => {
@@ -178,7 +178,7 @@ export class HomeView extends HTMLElement {
       const starIcon = createImportantBtn.querySelector('.star-icon')
       if (starIcon) {
         starIcon.classList.remove('animate-star-pop', 'animate-star-shrink')
-        void (starIcon as HTMLElement).offsetWidth // force reflow
+        void (starIcon as HTMLElement).offsetWidth 
         
         if (nextImportant) {
           starIcon.classList.add('animate-star-pop', 'text-amber-500', 'fill-amber-500', 'drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]')
@@ -191,7 +191,7 @@ export class HomeView extends HTMLElement {
       }
     })
 
-    // Custom Event Listener for priority toggle inside cards
+    
     root.addEventListener('task-priority-changed', () => {
       if ((document as any).startViewTransition) {
         (document as any).startViewTransition(() => this.renderTasks());
@@ -670,7 +670,7 @@ export class HomeView extends HTMLElement {
       editImportantHidden.value = String(nextImportant);
       if (editStarIcon) {
         editStarIcon.classList.remove('animate-star-pop', 'animate-star-shrink');
-        void (editStarIcon as HTMLElement).offsetWidth; // force reflow
+        void (editStarIcon as HTMLElement).offsetWidth; 
         
         if (nextImportant) {
           editStarIcon.classList.add('animate-star-pop', 'text-amber-500', 'fill-amber-500', 'drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]');
@@ -912,19 +912,19 @@ export class HomeView extends HTMLElement {
     }
 
     processed.sort((a, b) => {
-      // 1. Group by completion state: active tasks first, completed tasks last
+      
       if (a.completed !== b.completed) {
         return a.completed ? 1 : -1;
       }
 
-      // 2. Sort by importance within their completion groups
+      
       const aImp = a.important ? 1 : 0;
       const bImp = b.important ? 1 : 0;
       if (aImp !== bImp) {
         return bImp - aImp;
       }
 
-      // 2. Secondary sort: user chosen criteria
+      
       if (sortFilter === 'title') {
         return (a.title || '').localeCompare(b.title || '');
       }
@@ -958,7 +958,7 @@ export class HomeView extends HTMLElement {
         return timeB - timeA;
       }
 
-      // Fallback: newer tasks first (ID descending)
+      
       return (b.id ?? 0) - (a.id ?? 0);
     });
 

@@ -125,7 +125,7 @@ export default class UserInfoView extends HTMLElement {
             setAvailable: (v: boolean) => void
         ) => {
             const value = input.value.trim();
-            clearTimeout(usernameTimer); // reuse; each field has own timer via closure
+            clearTimeout(usernameTimer); 
 
             if (value === currentValue) {
                 feedback.textContent = '';
@@ -235,19 +235,19 @@ export default class UserInfoView extends HTMLElement {
                     const updatedUser: UsuarioDTO = await res.json();
                     this.user = { ...this.user, ...updatedUser };
 
-                    // Update window.history.state to preserve changes on reload
+                    
                     const stateData = window.history.state;
                     if (stateData && stateData.user) {
                         stateData.user = this.user;
                         window.history.replaceState(stateData, '');
                     }
 
-                    // Update cached users in prefetchCache
+                    
                     updateCachedData<UsuarioDTO>('/api/admin/users', oldUsers =>
                         oldUsers.map(u => u.username === originalUsername ? this.user : u)
                     );
 
-                    // Update cached tasks in prefetchCache to update author details
+                    
                     updateCachedData<TaskUserDTO>('/api/admin/tasks', oldTasks =>
                         oldTasks.map(t => t.author?.username === originalUsername ? { ...t, author: this.user } : t)
                     );
@@ -302,7 +302,7 @@ export default class UserInfoView extends HTMLElement {
         userInfoEmail!.textContent = this.user.email ?? '';
         userTaskCount!.textContent = `${this.tasks.length} ${this.tasks.length === 1 ? 'tarea' : 'tareas'}`;
 
-        // Badge de rol
+        
         if (userInfoRole) {
             userInfoRole.className = 'shrink-0 px-3 py-1.5 rounded-full text-xs font-bold tracking-wide border border-white/30 bg-white/15 text-white backdrop-blur-sm';
             if (this.user.role === 'ROLE_ADMIN') {

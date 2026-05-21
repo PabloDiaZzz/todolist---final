@@ -1,11 +1,12 @@
 <div id="theme-wrapper"
     class="flex flex-col items-center bg-gray-200 dark:bg-slate-900 m-0 w-full min-h-screen overflow-x-hidden font-sans antialiased">
+    <a href="#admin-main" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-white focus:dark:bg-slate-800 focus:p-3 focus:rounded-xl focus:shadow-xl focus:text-indigo-600 focus:dark:text-indigo-400 focus:font-bold skip-link">Saltar al contenido principal</a>
     <app-header class="block w-full" current-view="admin"></app-header>
 
     <main id="admin-main"
         class="w-full max-w-6xl mx-auto px-4 xl:px-0 grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 pb-10 md:pt-20 text-black dark:text-white items-start">
 
-        <section id="users-section" class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm flex flex-col max-h-[calc(100dvh-7.5rem)]">
+        <section id="users-section" class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm flex flex-col max-h-[calc(100svh-7.5rem)]">
             <h2 class="text-xl font-bold border-b border-gray-200 dark:border-slate-700 pb-2 mb-4">
                 Gestión de Usuarios
             </h2>
@@ -40,12 +41,12 @@
         </section>
 
 
-        <section id="categories-section" class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm flex flex-col max-h-[calc(100dvh-9.5rem)]">
+        <section id="categories-section" class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm flex flex-col max-h-[calc(100svh-9.5rem)]">
             <h2 class="text-xl font-bold border-b border-gray-200 dark:border-slate-700 pb-2 mb-4">Gestión de Categorías
             </h2>
 
             <form id="create-cat-form" class="flex gap-2 mb-4 shrink-0">
-                <input type="text" name="title" placeholder="Nueva categoría..." required
+                <input type="text" name="title" placeholder="Nueva categoría..." required aria-label="Nueva categoría"
                     class="w-full border border-gray-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-gray-50 dark:bg-slate-900 text-sm outline-none focus:ring-2 focus:ring-indigo-500">
                 <button type="submit"
                     class="bg-brand text-white px-3 py-2 rounded-lg text-sm font-bold transition-all">Crear</button>
@@ -81,7 +82,7 @@
         </section>
 
 
-        <section id="tasks-section" class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm flex flex-col max-h-[calc(100dvh-7.5rem)]">
+        <section id="tasks-section" class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm flex flex-col max-h-[calc(100svh-7.5rem)]">
             <h2 class="text-xl font-bold border-b border-gray-200 dark:border-slate-700 pb-2 mb-4">Todas las Tareas</h2>
 
             <div id="buscar-task-container" data-active="false"
@@ -115,7 +116,7 @@
     </main>
 
     <dialog id="task-info"
-        class="bg-white dark:bg-slate-800 shadow-xl m-auto p-6 border-none rounded-2xl outline-none min-w-md">
+        class="bg-white dark:bg-slate-800 shadow-xl m-auto p-6 border-none rounded-2xl outline-none w-[90%] max-w-md">
         <div id="task-info-content" class="flex flex-col items-stretch gap-4">
             <div class="flex justify-between items-center">
                 <h2 id="task-info-title"
@@ -128,7 +129,7 @@
 
             </div>
             <pre id="task-info-desc"
-                class="bg-gray-100 dark:bg-slate-900 p-2 border border-gray-300 dark:border-slate-600 rounded-xl max-w-125 font-sans dark:text-white whitespace-pre-wrap"></pre>
+                class="bg-gray-100 dark:bg-slate-900 p-2 border border-gray-300 dark:border-slate-600 rounded-xl font-sans dark:text-white whitespace-pre-wrap w-full max-w-full break-words overflow-x-auto"></pre>
             <div class="info-field-['Fecha_limite:']">
                 <p id="task-info-deadline"
                     class="bg-gray-100 dark:bg-slate-900 p-2 border border-gray-300 dark:border-slate-600 rounded-xl dark:text-white">

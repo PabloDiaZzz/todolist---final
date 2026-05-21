@@ -28,7 +28,7 @@ export class AppHeader extends HTMLElement {
         const userBtn = this.querySelector('#user-button') as HTMLButtonElement;
         const logoutForm = this.querySelector('#logout-form') as HTMLFormElement;
 
-        // Set dynamic user name greeting
+        
         const user = authService.getUser();
         if (user) {
             userName.textContent = user.fullName ? `${user.fullName} (@${user.username})` : `@${user.username}`;
@@ -36,7 +36,7 @@ export class AppHeader extends HTMLElement {
             userName.textContent = '';
         }
 
-        // Configure layout and navigation based on the current view
+        
         if (currentView === 'home') {
             headerTitle.textContent = 'Aplicación ToDo List';
             headerTitle.className = 'font-semibold text-color text-lg sm:text-2xl';
@@ -103,7 +103,7 @@ export class AppHeader extends HTMLElement {
             }
         }
 
-        // Setup logout submission handler
+        
         if (logoutForm) {
             logoutForm.addEventListener('submit', async (e) => {
                 e.preventDefault();

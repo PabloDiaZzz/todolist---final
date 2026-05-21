@@ -4,7 +4,7 @@ import type { UsuarioDTO, UpdatePasswordRequest } from "../types/api-types";
 import { syncThemeWithObserver } from "../utils/theme";
 import { authService } from "../services/AuthService";
 
-// Helper dynamically applying theme selection
+
 export function applySelectedTheme(theme: string) {
     localStorage.setItem('app-theme', theme);
     if (theme === 'LIGHT') {
@@ -12,7 +12,7 @@ export function applySelectedTheme(theme: string) {
     } else if (theme === 'DARK') {
         document.documentElement.classList.add('dark');
     } else {
-        // SYSTEM
+        
         const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
         if (darkQuery.matches) {
             document.documentElement.classList.add('dark');
@@ -42,7 +42,7 @@ export default class SettingsView extends HTMLElement {
         const themeWrapper = this.shadowRoot!.getElementById('theme-wrapper');
         this.themeObserver = syncThemeWithObserver(themeWrapper);
 
-        // Fetch session if not available or load user
+        
         const loggedIn = await authService.checkSession();
         if (!loggedIn || !authService.getUser()) {
             (window as any).navigate('/login?required');
@@ -90,7 +90,7 @@ export default class SettingsView extends HTMLElement {
     private setupEvents() {
         const root = this.shadowRoot!;
 
-        // Tab Switching listeners
+        
         const tabBtns = root.querySelectorAll('.tab-btn');
         tabBtns.forEach(btn => {
             btn.addEventListener('click', () => {
@@ -101,19 +101,19 @@ export default class SettingsView extends HTMLElement {
             });
         });
 
-        // Profile Form Setup
+        
         this.setupProfileForm(root);
 
-        // Password Form Setup
+        
         this.setupPasswordForm(root);
 
-        // Theme Cards Setup
+        
         this.setupThemeCards(root);
 
-        // Data Tools Setup
+        
         this.setupDataTools(root);
 
-        // Danger Zone Setup
+        
         this.setupDangerZone(root);
     }
 
@@ -157,7 +157,7 @@ export default class SettingsView extends HTMLElement {
             const id = content.getAttribute('id');
             if (id === `tab-content-${activeTab}`) {
                 content.classList.remove('hidden');
-                // Premium soft fade-in micro-animation
+                
                 content.animate([
                     { opacity: 0, transform: 'translateY(6px)' },
                     { opacity: 1, transform: 'translateY(0)' }
@@ -180,7 +180,7 @@ export default class SettingsView extends HTMLElement {
         const usernameFeedback = root.getElementById('username-feedback') as HTMLParagraphElement;
         const emailFeedback = root.getElementById('email-feedback') as HTMLParagraphElement;
 
-        // Prepopulate inputs
+        
         fullnameInput.value = this.user.fullName ?? '';
         usernameInput.value = this.user.username ?? '';
         emailInput.value = this.user.email ?? '';
@@ -299,12 +299,12 @@ export default class SettingsView extends HTMLElement {
                     const updatedUser: UsuarioDTO = await res.json();
                     this.user = updatedUser;
                     
-                    // Sync internal AuthService user
+                    
                     await authService.checkSession();
 
                     this.showToast('¡Perfil actualizado correctamente!');
                     
-                    // Reset input success borders
+                    
                     usernameInput.classList.remove('border-green-500');
                     emailInput.classList.remove('border-green-500');
                     usernameFeedback.classList.add('hidden');
@@ -382,7 +382,7 @@ export default class SettingsView extends HTMLElement {
     private setupThemeCards(root: ShadowRoot) {
         const cards = root.querySelectorAll('.theme-card');
 
-        // Apply active class style to correct card initially
+        
         const currentTheme = this.user.theme ?? 'SYSTEM';
         this.updateThemeCardsStyle(currentTheme);
 
@@ -394,7 +394,7 @@ export default class SettingsView extends HTMLElement {
                     applySelectedTheme(selectedTheme);
                     this.setupSystemThemeListener(selectedTheme);
 
-                    // Persist to backend database
+                    
                     try {
                         const res = await fetch('/api/user/profile', {
                             method: 'PATCH',
@@ -510,12 +510,12 @@ export default class SettingsView extends HTMLElement {
             const doubleConfirm = confirm('⚠️ ADVERTENCIA CRÍTICA ⚠️\n¿Estás completamente seguro de que deseas eliminar permanentemente tu cuenta de usuario y todas tus tareas?\nEsta acción es irreversible y no se podrá restaurar ningún dato.');
             if (!doubleConfirm) return;
 
-            // Start loading state
+            
             deleteBtn.setAttribute('disabled', 'true');
             deleteBtn.classList.add('cursor-not-allowed', 'opacity-70');
             const originalHTML = deleteBtn.innerHTML;
             
-            // Add a beautiful spinner to the button
+            
             deleteBtn.innerHTML = `
                 <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" style="width: 1rem; height: 1rem; vertical-align: middle;">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -524,7 +524,7 @@ export default class SettingsView extends HTMLElement {
                 <span style="vertical-align: middle;">Eliminando cuenta...</span>
             `;
 
-            // Disable all sidebar tabs and navigation to prevent user from escaping during deletion
+            
             const sidebar = root.querySelector('aside') as HTMLElement;
             if (sidebar) {
                 sidebar.classList.add('pointer-events-none', 'opacity-50');
@@ -548,7 +548,7 @@ export default class SettingsView extends HTMLElement {
                     const errText = await res.text();
                     this.showToast(errText || 'Error al eliminar cuenta.', true);
                     
-                    // Reset state on error
+                    
                     deleteBtn.removeAttribute('disabled');
                     deleteBtn.classList.remove('cursor-not-allowed', 'opacity-70');
                     deleteBtn.innerHTML = originalHTML;
@@ -561,7 +561,7 @@ export default class SettingsView extends HTMLElement {
             } catch (err) {
                 this.showToast('Error de red al eliminar la cuenta.', true);
                 
-                // Reset state on error
+                
                 deleteBtn.removeAttribute('disabled');
                 deleteBtn.classList.remove('cursor-not-allowed', 'opacity-70');
                 deleteBtn.innerHTML = originalHTML;
@@ -589,7 +589,7 @@ export default class SettingsView extends HTMLElement {
             toast.className = "fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-white/90 dark:bg-slate-800/90 border border-gray-200/80 dark:border-slate-700/60 text-slate-800 dark:text-white shadow-2xl px-5 py-4 rounded-2xl backdrop-blur-md transition-all duration-300 translate-y-0 opacity-100";
         }
 
-        // Hide after 3 seconds with transition
+        
         setTimeout(() => {
             if (isError) {
                 toast.className = "fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-red-600 text-white border border-red-500 shadow-2xl px-5 py-4 rounded-2xl transition-all duration-300 translate-y-2 opacity-0 pointer-events-none";
@@ -600,7 +600,7 @@ export default class SettingsView extends HTMLElement {
     }
 
     private render() {
-        // Nothing heavy required in render since connectedCallback handles prepopulation
+        
     }
 }
 

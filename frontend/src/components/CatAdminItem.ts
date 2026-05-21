@@ -74,7 +74,7 @@ export class CatAdminItem extends HTMLElement {
         return new Promise((resolve) => {
             const rootNode = this.getRootNode() as ShadowRoot | Document;
             
-            // Create backdrop overlay with transition animation start state (opacity-0)
+            
             const backdrop = document.createElement('div');
             backdrop.className = 'fixed inset-0 z-[100] bg-black/60 backdrop-blur-md flex items-center justify-center p-4 transition-all duration-300 opacity-0';
             
@@ -82,7 +82,7 @@ export class CatAdminItem extends HTMLElement {
                 ? `Esta categoría está siendo usada por <strong class="text-blue-600 dark:text-indigo-400 font-semibold">${count} tareas</strong>. ¿Estás seguro de que deseas borrarla? <span class="block text-xs text-gray-400 dark:text-gray-500 mt-2 font-normal">Las tareas no se eliminarán.</span>`
                 : `¿Estás seguro de que deseas borrar la categoría <strong class="text-blue-600 dark:text-indigo-400 font-semibold">"${this._cat.title}"</strong>? <span class="block text-xs text-gray-400 dark:text-gray-500 mt-2 font-normal">Esta acción no se puede deshacer.</span>`;
 
-            // Create beautiful card structure with transition animation start state (scale-95 opacity-0)
+            
             backdrop.innerHTML = `
                 <div class="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-2xl p-6 max-w-sm w-full transform scale-95 opacity-0 transition-all duration-300 flex flex-col items-center">
                     <div class="flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 dark:bg-slate-700 text-blue-600 dark:text-indigo-400 mb-4 animate-pulse">
@@ -108,7 +108,7 @@ export class CatAdminItem extends HTMLElement {
                 </div>
             `;
             
-            // Append inside theme-wrapper so dark mode classes apply correctly, or fallback to rootNode
+            
             const themeWrapper = rootNode.getElementById('theme-wrapper');
             if (themeWrapper) {
                 themeWrapper.appendChild(backdrop);
@@ -118,14 +118,14 @@ export class CatAdminItem extends HTMLElement {
             
             const card = backdrop.firstElementChild as HTMLElement;
             
-            // Trigger animation in next tick
+            
             requestAnimationFrame(() => {
                 backdrop.classList.replace('opacity-0', 'opacity-100');
                 card.classList.replace('scale-95', 'scale-100');
                 card.classList.replace('opacity-0', 'opacity-100');
             });
 
-            // Remove scale/transform properties once the entry transition ends to prevent sub-pixel rendering blurriness
+            
             card.addEventListener('transitionend', (e) => {
                 if (e.target === card && (e.propertyName === 'transform' || e.propertyName === 'scale')) {
                     card.classList.remove('scale-100', 'transform');
@@ -133,7 +133,7 @@ export class CatAdminItem extends HTMLElement {
             }, { once: true });
             
             const cleanup = (confirmed: boolean) => {
-                // Re-add scale/transform classes to allow the exit animation to trigger correctly
+                
                 card.classList.add('transform', 'scale-100');
                 
                 requestAnimationFrame(() => {
@@ -151,14 +151,14 @@ export class CatAdminItem extends HTMLElement {
             backdrop.querySelector('.btn-cancel')!.addEventListener('click', () => cleanup(false));
             backdrop.querySelector('.btn-confirm')!.addEventListener('click', () => cleanup(true));
             
-            // Dismiss on backdrop click
+            
             backdrop.addEventListener('click', (e) => {
                 if (e.target === backdrop) {
                     cleanup(false);
                 }
             });
             
-            // Dismiss on escape key
+            
             const handleKeydown = (e: KeyboardEvent) => {
                 if (e.key === 'Escape') {
                     cleanup(false);

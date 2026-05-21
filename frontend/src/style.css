@@ -42,7 +42,7 @@ input:-webkit-autofill:active {
     scrollbar-gutter: stable;
   }
 
-  /* Chromium / Webkit thin overlay scrollbar with smooth auto-hide */
+  
   html::-webkit-scrollbar,
   body::-webkit-scrollbar {
     width: 8px;
@@ -135,20 +135,20 @@ input:-webkit-autofill:active {
 
     &::picker(select) {
       appearance: base-select;
-      @apply rounded-xl p-0 border border-gray-200 dark:border-slate-700 shadow-lg bg-transparent overflow-hidden;
+      @apply rounded-xl p-0 border border-gray-200 dark:border-slate-700 shadow-lg bg-white dark:bg-slate-800 overflow-hidden;
     }
 
-    /* 2. Ocultamos la flecha rebelde del navegador */
+    
     &::picker-icon {
       display: none;
     }
 
-    /* 3. Rotamos NUESTRO svg cuando el select está abierto */
+    
     &:open>button svg {
       @apply rotate-180;
     }
 
-    /* Estilos para las opciones dentro del div */
+    
     >div option {
       @apply px-2 py-2 cursor-pointer transition-colors duration-200;
     }
@@ -185,20 +185,20 @@ input:-webkit-autofill:active {
   }
 }
 
-/* --- Task Options (Filters Button/Panel) Custom Polish --- */
+
 #task-options {
   position: absolute;
   right: 0;
-  bottom: 1.25rem; /* Fixed center anchor point: center stays at 20px above parent bottom */
-  transform: translateY(50%); /* Shifts element down by half its own height, keeping vertical center constant during height transitions */
+  bottom: 1.25rem; 
+  transform: translateY(50%); 
   background-color: var(--color-white, #ffffff);
   box-shadow: var(--shadow-md);
   border: 1.5px solid var(--color-gray-200, #e5e7eb);
-  border-radius: 1rem; /* Keep rounded-2xl consistent */
+  border-radius: 1rem; 
   cursor: pointer;
-  overflow: hidden; /* Prevent visual layout spillage during transitions */
+  overflow: hidden; 
   
-  /* Extremely smooth custom transition for expanding/collapsing container */
+  
   transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1),
               height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
               padding 0.4s cubic-bezier(0.4, 0, 0.2, 1),
@@ -208,13 +208,13 @@ input:-webkit-autofill:active {
               background-color 0.3s ease;
 }
 
-/* Dark mode overrides */
+
 .dark #task-options {
   background-color: var(--color-slate-800, #1e293b);
   border-color: var(--color-slate-700, #334155);
 }
 
-/* Hover style on inactive container: NO radius change, show a distinct border */
+
 #task-options[data-active="false"]:hover {
   border-color: var(--color-blue-500, #3b82f6);
 }
@@ -222,36 +222,36 @@ input:-webkit-autofill:active {
   border-color: var(--color-indigo-400, #818cf8);
 }
 
-/* Active container state */
+
 #task-options[data-active="true"] {
   width: 100%;
   max-width: 100%;
-  height: 3.75rem; /* h-15 */
-  padding: 0.5rem 0.75rem !important; /* Perfect padding to completely override inherited p-4 top/bottom padding and prevent squishing */
+  height: 3.75rem; 
+  padding: 0.5rem 0.75rem !important; 
   cursor: default;
   bottom: 0 !important;
   transform: translateY(0) !important;
 }
 
-/* Dynamically push downstream content down when filters are active to prevent any overlap */
+
 .relative:has(#task-options[data-active="true"]) {
-  padding-bottom: 4.5rem !important; /* Make room for 60px active filter panel on desktop */
+  padding-bottom: 4.5rem !important; 
   transition: padding-bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* SVG Filter Icon within task options */
+
 #task-options svg.filter-icon {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) scale(1);
   opacity: 1;
-  width: 1.5rem; /* size-6 */
+  width: 1.5rem; 
   height: 1.5rem;
   color: var(--color-blue-800, #1e40af);
   pointer-events: none;
 
-  /* Transition timings for each separate property */
+  
   transition: color 0.15s ease,
               opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
               transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -262,19 +262,19 @@ input:-webkit-autofill:active {
   color: var(--color-indigo-300, #c7d2fe);
 }
 
-/* When container is closed: delay opacity and transform during collapsing so icon doesn't clip */
+
 #task-options[data-active="false"] svg.filter-icon {
   transition-delay: 0s, 0.3s, 0.3s;
 }
 
-/* Instantly hide icon on expand (no delay) */
+
 #task-options[data-active="true"] svg.filter-icon {
   opacity: 0;
   transform: translate(-50%, -50%) scale(0.7);
   transition-delay: 0s;
 }
 
-/* Hover on inactive container highlights the icon immediately */
+
 #task-options[data-active="false"]:hover svg.filter-icon {
   color: var(--color-blue-500, #3b82f6);
 }
@@ -282,7 +282,7 @@ input:-webkit-autofill:active {
   color: var(--color-indigo-400, #818cf8);
 }
 
-/* Filters content container */
+
 #task-options .filters-content {
   display: flex;
   flex-direction: row;
@@ -291,11 +291,11 @@ input:-webkit-autofill:active {
   gap: 0.75rem;
   height: 100%;
   width: 100%;
-  flex-wrap: nowrap; /* Prevent vertical wrapping/glitches during collapse */
+  flex-wrap: nowrap; 
   opacity: 0;
   visibility: hidden;
   
-  /* Exit transition: Clean fade out with zero delay so it vanishes before contraction starts */
+  
   transition: opacity 0.2s ease, visibility 0.2s ease;
   transition-delay: 0s;
 }
@@ -304,25 +304,25 @@ input:-webkit-autofill:active {
   opacity: 1;
   visibility: visible;
   
-  /* Entrance transition: Smooth ease-in delayed until container is sufficiently open */
+  
   transition: opacity 0.3s ease, visibility 0.3s ease;
   transition-delay: 0.2s;
 }
 
-/* Scale and slide-in effect for filter inputs */
+
 #task-options .filters-content > * {
   opacity: 0;
   transform: translateX(12px) scale(0.95);
   flex: 1;
-  flex-shrink: 0; /* Prevent select elements from squeezing below natural dimensions */
+  flex-shrink: 0; 
   
-  border-radius: 0.75rem !important; /* Unified rounded-xl matching date/time input controls */
-  font-size: 0.875rem !important; /* Premium text-sm matching other controls */
-  font-weight: 500 !important; /* Beautiful medium text density */
+  border-radius: 0.75rem !important; 
+  font-size: 0.875rem !important; 
+  font-weight: 500 !important; 
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.15) !important; /* Subtle premium border glow */
+  border: 1px solid rgba(255, 255, 255, 0.15) !important; 
   
-  /* Exit transition: Clean return to hidden state without any delay */
+  
   transition: opacity 0.2s ease, transform 0.2s ease;
   transition-delay: 0s;
 }
@@ -331,11 +331,11 @@ input:-webkit-autofill:active {
   opacity: 1;
   transform: translateX(0) scale(1);
   
-  /* Entrance transition: Fluid custom spring cubic-bezier curves for premium feel */
+  
   transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Premium staggered delay sequence only when opening panel */
+
 #task-options[data-active="true"] .filters-content > *:nth-child(1) {
   transition-delay: 0.22s;
 }
@@ -381,25 +381,25 @@ input:-webkit-autofill:active {
   animation: star-shrink 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
-/* --- Responsive Adjustments for Mobile Viewports --- */
+
 @media (max-width: 640px) {
-  /* Dynamic parent padding for mobile */
+  
   .relative:has(#task-options[data-active="true"]) {
-    padding-bottom: 6.5rem !important; /* Make room for 92px active filter panel on mobile */
+    padding-bottom: 6.5rem !important; 
   }
 
-  /* Allow active filters container to expand in height on mobile */
+  
   #task-options[data-active="true"] {
     height: auto !important;
-    min-height: 5.75rem !important; /* Perfect height to accommodate 2 rows comfortably */
-    padding: 0.625rem 0.75rem !important; /* Cozy padding to prevent compression */
+    min-height: 5.75rem !important; 
+    padding: 0.5rem 0.5rem !important; 
     bottom: 0 !important;
     transform: translateY(0) !important;
   }
 
   #task-options .filters-content {
     flex-wrap: wrap !important;
-    gap: 0.5rem !important; /* Compact gap for neat grid alignment */
+    gap: 0.375rem !important; 
     justify-content: flex-start !important;
   }
 }

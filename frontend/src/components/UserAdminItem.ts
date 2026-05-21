@@ -79,7 +79,7 @@ export class UserAdminItem extends HTMLElement {
                     console.error('Error al cambiar rol del usuario:', error);
                     this._user.role = originalRole;
                     
-                    // Re-render component to completely restore original DOM state
+                    
                     this.render();
                     
                     updateCachedData<UsuarioDTO>('/api/admin/users', oldUsers =>
