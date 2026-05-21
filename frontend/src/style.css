@@ -39,7 +39,13 @@ input:-webkit-autofill:active {
     scrollbar-width: thin;
     scrollbar-color: rgba(156, 163, 175, 0.25) transparent;
     overflow-y: auto;
-    scrollbar-gutter: stable;
+    overflow-y: overlay;
+  }
+
+  html:has(login-view),
+  html:has(register-view),
+  html:has(forgot-password-view) {
+    overflow-y: hidden;
   }
 
   
