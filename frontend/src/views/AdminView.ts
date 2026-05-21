@@ -424,6 +424,16 @@ export class AdminView extends HTMLElement {
 
         title.textContent = task.title ?? '';
         desc.textContent = task.description ?? '';
+
+        const importantIcon = this.shadowRoot!.getElementById('task-info-important');
+        if (importantIcon) {
+            if (task.important) {
+                importantIcon.classList.remove('hidden');
+            } else {
+                importantIcon.classList.add('hidden');
+            }
+        }
+
         deadline.textContent = task.deadline
             ? new Date(task.deadline).toLocaleString('es-ES', dateConfig)
             : 'No establecida';

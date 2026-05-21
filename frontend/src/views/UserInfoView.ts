@@ -281,6 +281,42 @@ export default class UserInfoView extends HTMLElement {
                 usernameSub.textContent = `@${this.user.username}`;
             }
         });
+
+        const resetPassBtn = root.getElementById('reset-pass-btn') as HTMLButtonElement;
+        resetPassBtn?.addEventListener('click', async () => {
+            const email = this.user.email;
+            if (!email) return;
+
+            const originalTitle = resetPassBtn.getAttribute('title') ?? 'Regenerar contraseña del usuario';
+            resetPassBtn.disabled = true;
+            resetPassBtn.setAttribute('title', 'Enviando...');
+            resetPassBtn.classList.add('opacity-60', 'cursor-wait');
+
+            try {
+                const res = await fetch(`/api/auth/forgot-password?email=${encodeURIComponent(email)}`, {
+                    method: 'POST'
+                });
+                if (!res.ok) throw new Error('Error al enviar');
+
+                resetPassBtn.setAttribute('title', '¡Correo enviado!');
+                resetPassBtn.classList.remove('opacity-60', 'cursor-wait');
+                resetPassBtn.classList.add('bg-green-500/30', 'border-green-400/50');
+                setTimeout(() => {
+                    resetPassBtn.setAttribute('title', originalTitle);
+                    resetPassBtn.classList.remove('bg-green-500/30', 'border-green-400/50');
+                    resetPassBtn.disabled = false;
+                }, 3000);
+            } catch {
+                resetPassBtn.setAttribute('title', 'Error al enviar');
+                resetPassBtn.classList.remove('opacity-60', 'cursor-wait');
+                resetPassBtn.classList.add('bg-red-500/30', 'border-red-400/50');
+                setTimeout(() => {
+                    resetPassBtn.setAttribute('title', originalTitle);
+                    resetPassBtn.classList.remove('bg-red-500/30', 'border-red-400/50');
+                    resetPassBtn.disabled = false;
+                }, 3000);
+            }
+        });
     }
 
 

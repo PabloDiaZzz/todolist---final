@@ -119,11 +119,16 @@
         class="bg-white dark:bg-slate-800 shadow-xl m-auto p-6 border-none rounded-2xl outline-none w-[90%] max-w-md">
         <div id="task-info-content" class="flex flex-col items-stretch gap-4">
             <div class="flex justify-between items-center">
-                <h2 id="task-info-title"
-                    class="self-center font-bold text-blue-500 dark:text-indigo-500 text-xl text-center whitespace-break-spaces">
-                </h2>
+                <div class="flex items-center gap-2 min-w-0">
+                    <h2 id="task-info-title"
+                        class="font-bold text-blue-500 dark:text-indigo-500 text-xl whitespace-break-spaces">
+                    </h2>
+                    <svg id="task-info-important" class="hidden size-5 shrink-0 text-amber-500 fill-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linejoin="round" stroke-linecap="round" stroke-width="2" d="M12 17.75l-6.172 3.245 1.179-6.873-4.993-4.867 6.9-1.002L12 2l3.086 6.253 6.9 1.002-4.993 4.867 1.179 6.873z"/>
+                    </svg>
+                </div>
                 <svg
-                    class="self-center bg-blue-200 dark:bg-indigo-900 fill-blue-500 dark:fill-indigo-500 -my-2 p-2 rounded-full size-12">
+                    class="self-center bg-blue-200 dark:bg-indigo-900 fill-blue-500 dark:fill-indigo-500 -my-2 p-2 rounded-full size-12 shrink-0">
                     <use href="/main.svg#info"></use>
                 </svg>
 
