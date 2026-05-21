@@ -52,6 +52,20 @@ export class TaskInfo extends HTMLElement {
         const categoryContainer = this.querySelector('.category-container');
         const infoBtn = this.querySelector('.info-btn');
 
+        const starIcon = this.querySelector('.star-icon');
+        const starBtn = this.querySelector('.star-btn');
+        if (starIcon && starBtn) {
+            if (task.important) {
+                starIcon.classList.add('text-amber-500', 'fill-amber-500', 'drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]');
+                starIcon.classList.remove('text-gray-400', 'dark:text-slate-500', 'fill-none');
+                starBtn.classList.remove('hidden');
+            } else {
+                starIcon.classList.remove('text-amber-500', 'fill-amber-500', 'drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]');
+                starIcon.classList.add('text-gray-400', 'dark:text-slate-500', 'fill-none');
+                starBtn.classList.add('hidden');
+            }
+        }
+
         const toggleBtn = this.querySelector('.toggle-btn');
         toggleBtn?.addEventListener('click', async () => {
             const originalState = task.completed;

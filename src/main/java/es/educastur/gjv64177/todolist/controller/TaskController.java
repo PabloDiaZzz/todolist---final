@@ -38,6 +38,7 @@ public class TaskController {
 		Task task = new Task();
 		task.setTitle(dto.title());
 		task.setDescription(dto.description());
+		task.setImportant(dto.important());
 		taskService.save(task, user, dto.categoryIds(), dto.tagsInput(), dto.deadline());
 		return ResponseEntity.status(HttpStatus.CREATED).body(taskMapper.toDTO(task));
 	}
@@ -45,7 +46,7 @@ public class TaskController {
 	@PutMapping("/{id}")
 	public ResponseEntity<TaskResponseDTO> editTask(@PathVariable Long id, @RequestBody TaskRequestDTO dto, Authentication authentication) {
 		Usuario user = usuarioService.findByUsername(authentication.getName());
-		Task finalTask = taskService.editTask(id, user, dto.title(), dto.description(), dto.categoryIds(), dto.tagsInput(), dto.deadline());
+		Task finalTask = taskService.editTask(id, user, dto.title(), dto.description(), dto.categoryIds(), dto.tagsInput(), dto.deadline(), dto.important());
 		return ResponseEntity.ok(taskMapper.toDTO(finalTask));
 	}
 
@@ -56,10 +57,24 @@ public class TaskController {
 		return ResponseEntity.ok().build();
 	}
 
+	@PatchMapping("/{id}/important")
+	public ResponseEntity<TaskResponseDTO> toggleImportant(@PathVariable Long id, Authentication authentication) {
+		Usuario user = usuarioService.findByUsername(authentication.getName());
+		Task finalTask = taskService.toggleImportant(id, user);
+		return ResponseEntity.ok(taskMapper.toDTO(finalTask));
+	}
+
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> deleteTask(@PathVariable Long id, Authentication authentication) {
 		Usuario user = usuarioService.findByUsername(authentication.getName());
 		taskService.delete(id, user);
+		return ResponseEntity.noContent().build();
+	}
+
+	@DeleteMapping("/completed")
+	public ResponseEntity<Void> deleteCompletedTasks(Authentication authentication) {
+		Usuario user = usuarioService.findByUsername(authentication.getName());
+		taskService.deleteCompletedTasksByAuthor(user);
 		return ResponseEntity.noContent().build();
 	}
 }

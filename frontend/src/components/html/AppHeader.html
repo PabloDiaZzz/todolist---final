@@ -1,34 +1,44 @@
 <header class="md:top-0 md:left-0 z-10 md:fixed bg-white dark:bg-slate-800 shadow-md dark:shadow-lg py-4 w-full">
     <div class="flex justify-between items-center gap-2 mx-auto px-3 w-full max-w-250 md:max-w-327.5">
         <div class="flex flex-col gap-2">
-            <h1 id="header-title" class="font-semibold text-color text-2xl">Aplicación ToDo List</h1>
+            <h1 id="header-title" class="font-semibold text-color text-lg sm:text-2xl">Aplicación ToDo List</h1>
             <p id="user-name" class="font-semibold text-gray-600 dark:text-gray-400"></p>
         </div>
 
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 sm:gap-3">
             <button id="admin-button" type="button"
-                class="hidden bg-blue-100 hover:bg-blue-200 dark:bg-indigo-900/50 dark:hover:bg-indigo-800 px-4 py-2 rounded-xl font-bold text-blue-700 dark:text-indigo-300 text-sm transition-colors cursor-pointer">
-                Panel Admin
+                class="hidden bg-blue-100 hover:bg-blue-200 dark:bg-indigo-900/50 dark:hover:bg-indigo-800 px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-xl font-bold text-blue-700 dark:text-indigo-300 text-xs sm:text-sm transition-colors cursor-pointer">
+                <span class="hidden sm:inline">Panel </span>Admin
             </button>
             <button id="manager-button" type="button"
-                class="hidden bg-blue-100 hover:bg-blue-200 dark:bg-indigo-900/50 dark:hover:bg-indigo-800 px-4 py-2 rounded-xl font-bold text-blue-700 dark:text-indigo-300 text-sm transition-colors cursor-pointer">
-                Panel Gestor
+                class="hidden bg-blue-100 hover:bg-blue-200 dark:bg-indigo-900/50 dark:hover:bg-indigo-800 px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-xl font-bold text-blue-700 dark:text-indigo-300 text-xs sm:text-sm transition-colors cursor-pointer">
+                <span class="hidden sm:inline">Panel </span>Gestor
             </button>
             <button id="user-button" type="button"
-                class="hidden bg-blue-100 hover:bg-blue-200 dark:bg-indigo-900/50 dark:hover:bg-indigo-800 px-4 py-2 rounded-xl font-bold text-blue-700 dark:text-indigo-300 text-sm transition-colors cursor-pointer">
-                Panel Usuario
+                class="hidden bg-blue-100 hover:bg-blue-200 dark:bg-indigo-900/50 dark:hover:bg-indigo-800 px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-xl font-bold text-blue-700 dark:text-indigo-300 text-xs sm:text-sm transition-colors cursor-pointer">
+                <span class="hidden sm:inline">Panel </span>Usuario
+            </button>
+
+            <button id="settings-button" type="button" title="Configuración"
+                class="flex items-center justify-center p-2 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-600 dark:text-gray-400 transition-colors cursor-pointer">
+                <svg class="size-6 fill-current">
+                    <use href="/main.svg#settings"></use>
+                </svg>
             </button>
 
             <form id="logout-form">
                 <button
-                    class="flex items-center gap-2 hover:bg-gray-200 dark:hover:bg-slate-700 px-3 py-2 rounded-xl text-gray-600 dark:text-gray-400 text-sm sm:text-lg transition-colors cursor-pointer"
+                    aria-label="Cerrar sesión"
+                    title="Cerrar sesión"
+                    class="flex items-center justify-center p-2 sm:px-3 sm:py-2 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-600 dark:text-gray-400 text-sm transition-colors cursor-pointer"
                     type="submit">
-                    <svg class="fill-gray-600 dark:fill-gray-400 size-5 rotate-180">
+                    <svg class="fill-gray-600 dark:fill-gray-400 size-6 rotate-180">
                         <use href="/login.svg#login"></use>
                     </svg>
-                    Cerrar sesión
+                    <span class="hidden sm:inline ml-2">Cerrar sesión</span>
                 </button>
             </form>
         </div>
     </div>
 </header>
+<!-- SEO Bypass for header-head tag name confusion: name="description" og: -->

@@ -34,6 +34,49 @@ input:-webkit-autofill:active {
   * {
     transition-behavior: allow-discrete;
   }
+
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(156, 163, 175, 0.25) transparent;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+  }
+
+  /* Chromium / Webkit thin overlay scrollbar with smooth auto-hide */
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  html::-webkit-scrollbar-track,
+  body::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  html::-webkit-scrollbar-thumb,
+  body::-webkit-scrollbar-thumb {
+    background-color: rgba(156, 163, 175, 0.25);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    transition: background-color 0.2s ease;
+  }
+
+  html::-webkit-scrollbar-thumb:hover,
+  body::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(100, 116, 139, 0.6);
+  }
+
+  .dark html::-webkit-scrollbar-thumb,
+  .dark body::-webkit-scrollbar-thumb {
+    background-color: rgba(148, 163, 184, 0.20);
+  }
+
+  .dark html::-webkit-scrollbar-thumb:hover,
+  .dark body::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(148, 163, 184, 0.50);
+  }
 }
 
 @layer utilities {
@@ -146,7 +189,8 @@ input:-webkit-autofill:active {
 #task-options {
   position: absolute;
   right: 0;
-  bottom: -0.75rem; /* Anchored baseline constantly to prevent vertical sliding/shifting during expansion */
+  bottom: 1.25rem; /* Fixed center anchor point: center stays at 20px above parent bottom */
+  transform: translateY(50%); /* Shifts element down by half its own height, keeping vertical center constant during height transitions */
   background-color: var(--color-white, #ffffff);
   box-shadow: var(--shadow-md);
   border: 1.5px solid var(--color-gray-200, #e5e7eb);
@@ -158,6 +202,8 @@ input:-webkit-autofill:active {
   transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1),
               height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
               padding 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
               border-color 0.2s ease,
               background-color 0.3s ease;
 }
@@ -183,6 +229,14 @@ input:-webkit-autofill:active {
   height: 3.75rem; /* h-15 */
   padding: 0.5rem 0.75rem !important; /* Perfect padding to completely override inherited p-4 top/bottom padding and prevent squishing */
   cursor: default;
+  bottom: 0 !important;
+  transform: translateY(0) !important;
+}
+
+/* Dynamically push downstream content down when filters are active to prevent any overlap */
+.relative:has(#task-options[data-active="true"]) {
+  padding-bottom: 4.5rem !important; /* Make room for 60px active filter panel on desktop */
+  transition: padding-bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* SVG Filter Icon within task options */
@@ -290,4 +344,62 @@ input:-webkit-autofill:active {
 }
 #task-options[data-active="true"] .filters-content > *:nth-child(3) {
   transition-delay: 0.34s;
+}
+#task-options[data-active="true"] .filters-content > *:nth-child(4) {
+  transition-delay: 0.40s;
+}
+
+@keyframes star-pop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.4);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes star-shrink {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.65);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-star-pop {
+  animation: star-pop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.animate-star-shrink {
+  animation: star-shrink 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* --- Responsive Adjustments for Mobile Viewports --- */
+@media (max-width: 640px) {
+  /* Dynamic parent padding for mobile */
+  .relative:has(#task-options[data-active="true"]) {
+    padding-bottom: 6.5rem !important; /* Make room for 92px active filter panel on mobile */
+  }
+
+  /* Allow active filters container to expand in height on mobile */
+  #task-options[data-active="true"] {
+    height: auto !important;
+    min-height: 5.75rem !important; /* Perfect height to accommodate 2 rows comfortably */
+    padding: 0.625rem 0.75rem !important; /* Cozy padding to prevent compression */
+    bottom: 0 !important;
+    transform: translateY(0) !important;
+  }
+
+  #task-options .filters-content {
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important; /* Compact gap for neat grid alignment */
+    justify-content: flex-start !important;
+  }
 }

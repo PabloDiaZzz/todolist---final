@@ -32,6 +32,8 @@ public class Task {
 
 	private boolean completed = false;
 
+	private boolean important = false;
+
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "author_id", nullable = false)

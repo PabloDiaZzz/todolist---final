@@ -1,0 +1,224 @@
+<div id="theme-wrapper" class="flex flex-col items-center bg-gray-100 dark:bg-slate-900 m-0 w-full min-h-screen font-sans antialiased overflow-x-hidden transition-colors duration-300">
+    <app-header class="block w-full" current-view="settings"></app-header>
+
+    <main class="flex flex-col gap-6 mx-auto mt-8 px-4 md:pt-20 pb-16 w-full max-w-4xl">
+        <div class="flex flex-col gap-2">
+            <h2 class="text-3xl font-extrabold text-slate-800 dark:text-white tracking-tight flex items-center gap-2">
+                <svg class="size-8 fill-current text-blue-500 dark:text-indigo-400 animate-[spin_8s_linear_infinite]" viewBox="0 0 24 24">
+                    <path d="M12 4a1 1 0 0 0-1 1c0 1.692-2.046 2.54-3.243 1.343a1 1 0 1 0-1.414 1.414C7.54 8.954 6.693 11 5 11a1 1 0 1 0 0 2c1.692 0 2.54 2.046 1.343 3.243a1 1 0 0 0 1.414 1.414C8.954 16.46 11 17.307 11 19a1 1 0 1 0 2 0c0-1.692 2.046-2.54 3.243-1.343a1 1 0 1 0 1.414-1.414C16.46 15.046 17.307 13 19 13a1 1 0 1 0 0-2c-1.692 0-2.54-2.046-1.343-3.243a1 1 0 0 0-1.414-1.414C15.046 7.54 13 6.693 13 5a1 1 0 0 0-1-1m-2.992.777a3 3 0 0 1 5.984 0 3 3 0 0 1 4.23 4.231 3 3 0 0 1 .001 5.984 3 3 0 0 1-4.231 4.23 3 3 0 0 1-5.984 0 3 3 0 0 1-4.231-4.23 3 3 0 0 1 0-5.984 3 3 0 0 1 4.231-4.231"/>
+                    <path d="M12 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-2.828-.828a4 4 0 1 1 5.656 5.656 4 4 0 0 1-5.656-5.656"/>
+                </svg>
+                Configuración
+            </h2>
+            <p class="text-gray-500 dark:text-gray-400 text-sm">Gestiona tu perfil, preferencias visuales y utilidades de cuenta.</p>
+        </div>
+
+        <!-- Layout de Configuración -->
+        <div class="flex flex-col md:flex-row gap-6 bg-white/75 dark:bg-slate-800/75 border border-gray-200 dark:border-slate-700/60 rounded-3xl p-4 md:p-6 shadow-xl backdrop-blur-md">
+            
+            <!-- Barra Lateral / Tabuladores -->
+            <aside class="flex flex-col gap-1 pb-4 md:pb-0 border-b md:border-b-0 md:border-r border-gray-200 dark:border-slate-700 md:pr-6 shrink-0 md:w-56">
+                <button type="button" data-tab="profile"
+                    class="tab-btn active flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all duration-300 cursor-pointer select-none">
+                    <svg class="size-5 fill-current" viewBox="0 0 24 24">
+                        <path d="M12.84 12.84a5.75 5.75 0 1 1 5.75-5.75 5.76 5.76 0 0 1-5.75 5.75m0-10a4.25 4.25 0 1 0 0 8.5 4.25 4.25 0 0 0 0-8.5"/>
+                        <path d="M3.84 20.84a.75.75 0 0 1-.75-.75 8.75 8.75 0 0 1 8.75-8.75h2a.75.75 0 1 1 0 1.5h-2a7.26 7.26 0 0 0-7.25 7.25.76.76 0 0 1-.75.75m10.67 1.82a.7.7 0 0 1-.53-.22.74.74 0 0 1 0-1.06l5.65-5.65a.752.752 0 0 1 1.244.23.75.75 0 0 1-.184.83L15 22.44a.74.74 0 0 1-.49.22"/>
+                        <path d="M20.16 22.66a.74.74 0 0 1-.53-.22L14 16.79a.75.75 0 1 1 1-1.06l5.65 5.65a.74.74 0 0 1 0 1.06.7.7 0 0 1-.49.22"/>
+                    </svg>
+                    Mi Perfil
+                </button>
+                <button type="button" data-tab="security"
+                    class="tab-btn flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all duration-300 cursor-pointer select-none">
+                    <svg class="size-5 fill-current" viewBox="-2 0 20 20">
+                        <path d="M2 4.386V8a9.02 9.02 0 0 0 3.08 6.787L8 17.342l2.92-2.555A9.02 9.02 0 0 0 14 8V4.386l-6-2.25zM.649 2.756 8 0l7.351 2.757a1 1 0 0 1 .649.936V8c0 3.177-1.372 6.2-3.763 8.293L8 20l-4.237-3.707A11.02 11.02 0 0 1 0 8V3.693a1 1 0 0 1 .649-.936z"/>
+                    </svg>
+                    Seguridad
+                </button>
+                <button type="button" data-tab="preferences"
+                    class="tab-btn flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all duration-300 cursor-pointer select-none">
+                    <svg class="size-5 fill-current" viewBox="-2 -2 24 24">
+                        <path d="M10 20C4.477 20 0 15.523 0 10S4.477 0 10 0s10 4.477 10 10-4.477 10-10 10m0-2a8 8 0 1 0 0-16 8 8 0 0 0 0 16m0-10a1 1 0 0 1 1 1v5a1 1 0 0 1-2 0V9a1 1 0 0 1 1-1m0-1a1 1 0 1 1 0-2 1 1 0 0 1 0 2"/>
+                    </svg>
+                    Aspecto / Tema
+                </button>
+                <button type="button" data-tab="data"
+                    class="tab-btn flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all duration-300 cursor-pointer select-none">
+                    <svg class="size-5 fill-current" viewBox="5 2 22 28">
+                        <path d="M23.93 2H8.07a2.8 2.8 0 0 0-2.8 2.8v22.4a2.8 2.8 0 0 0 2.8 2.8h15.86a2.8 2.8 0 0 0 2.8-2.8V4.8a2.8 2.8 0 0 0-2.8-2.8m.94 25.2a.94.94 0 0 1-.94.93H8.07a.94.94 0 0 1-.94-.93V4.8a.94.94 0 0 1 .94-.93h15.86a.94.94 0 0 1 .94.93Z"/>
+                        <path d="M21.83 10.4H10.17a.94.94 0 1 0 0 1.87h11.66a.94.94 0 1 0 0-1.87m0 4.67H10.17a.93.93 0 1 0 0 1.86h11.66a.93.93 0 1 0 0-1.86m0 4.66H10.17a.94.94 0 1 0 0 1.87h11.66a.94.94 0 1 0 0-1.87"/>
+                    </svg>
+                    Datos y Limpieza
+                </button>
+                <button type="button" data-tab="danger"
+                    class="tab-btn flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all duration-300 cursor-pointer select-none">
+                    <svg class="size-5 fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                    Zona Crítica
+                </button>
+            </aside>
+
+            <!-- Contenido de las Pestañas -->
+            <div class="flex-1 min-h-[360px] md:pl-4 transition-all duration-300">
+                
+                <!-- Pestaña: Perfil -->
+                <section id="tab-content-profile" class="tab-content block">
+                    <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-4">Información de Perfil</h3>
+                    <form id="profile-form" class="flex flex-col gap-4 max-w-lg">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nombre Completo</label>
+                            <input type="text" id="profile-fullname" required
+                                class="bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 transition-all dark:text-white">
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nombre de Usuario</label>
+                            <input type="text" id="profile-username" required
+                                class="bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 transition-all dark:text-white">
+                            <p id="username-feedback" class="hidden text-xs font-semibold"></p>
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Correo Electrónico</label>
+                            <input type="email" id="profile-email" required
+                                class="bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 transition-all dark:text-white">
+                            <p id="email-feedback" class="hidden text-xs font-semibold"></p>
+                        </div>
+                        <button type="submit" id="save-profile-btn"
+                            class="bg-blue-600 hover:bg-blue-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white font-bold text-sm px-6 py-3 rounded-xl mt-2 w-full sm:w-fit transition-all duration-300 cursor-pointer self-start flex items-center justify-center gap-2">
+                            Guardar Cambios
+                        </button>
+                    </form>
+                </section>
+
+                <!-- Pestaña: Seguridad (Contraseña) -->
+                <section id="tab-content-security" class="tab-content hidden">
+                    <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-4">Actualizar Contraseña</h3>
+                    <form id="password-form" class="flex flex-col gap-4 max-w-lg">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Contraseña Actual</label>
+                            <input type="password" id="pass-current" required minlength="4" placeholder="••••••••"
+                                class="bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 transition-all dark:text-white">
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nueva Contraseña</label>
+                            <input type="password" id="pass-new" required minlength="4" placeholder="Mínimo 4 caracteres"
+                                class="bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 transition-all dark:text-white">
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Confirmar Nueva Contraseña</label>
+                            <input type="password" id="pass-confirm" required minlength="4" placeholder="Repite la contraseña"
+                                class="bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-slate-600 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-500 transition-all dark:text-white">
+                        </div>
+                        <p id="password-feedback" class="hidden text-xs font-semibold mt-1"></p>
+                        <button type="submit" id="save-password-btn"
+                            class="bg-blue-600 hover:bg-blue-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white font-bold text-sm px-6 py-3 rounded-xl mt-2 w-full sm:w-fit transition-all duration-300 cursor-pointer self-start">
+                            Actualizar Contraseña
+                        </button>
+                    </form>
+                </section>
+
+                <!-- Pestaña: Preferencias de Aspecto (Tema) -->
+                <section id="tab-content-preferences" class="tab-content hidden">
+                    <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2">Tema y Aspecto</h3>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm mb-6">Elige el estilo visual que mejor se adapte a tu entorno de trabajo. El tema se sincronizará en todos tus dispositivos.</p>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl">
+                        <!-- Tarjeta Tema Claro -->
+                        <div data-theme-val="LIGHT" class="theme-card border-2 border-gray-200 dark:border-slate-700/60 bg-gray-50 dark:bg-slate-900/40 hover:border-blue-400 rounded-2xl p-4 flex flex-col items-center gap-3 cursor-pointer transition-all duration-300 select-none">
+                            <div class="size-10 rounded-full bg-amber-100 dark:bg-amber-950/30 flex items-center justify-center text-amber-500">
+                                <svg class="size-6 fill-none stroke-current" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path>
+                                </svg>
+                            </div>
+                            <span class="font-bold text-sm text-slate-800 dark:text-slate-200">Tema Claro</span>
+                        </div>
+
+                        <!-- Tarjeta Tema Oscuro -->
+                        <div data-theme-val="DARK" class="theme-card border-2 border-gray-200 dark:border-slate-700/60 bg-gray-50 dark:bg-slate-900/40 hover:border-indigo-400 rounded-2xl p-4 flex flex-col items-center gap-3 cursor-pointer transition-all duration-300 select-none">
+                            <div class="size-10 rounded-full bg-indigo-100 dark:bg-indigo-950/30 flex items-center justify-center text-indigo-500">
+                                <svg class="size-6 fill-none stroke-current" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                                </svg>
+                            </div>
+                            <span class="font-bold text-sm text-slate-800 dark:text-slate-200">Tema Oscuro</span>
+                        </div>
+
+                        <!-- Tarjeta Tema Sistema -->
+                        <div data-theme-val="SYSTEM" class="theme-card border-2 border-gray-200 dark:border-slate-700/60 bg-gray-50 dark:bg-slate-900/40 hover:border-slate-400 rounded-2xl p-4 flex flex-col items-center gap-3 cursor-pointer transition-all duration-300 select-none">
+                            <div class="size-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400">
+                                <svg class="size-6 fill-none stroke-current" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                            <span class="font-bold text-sm text-slate-800 dark:text-slate-200">Automático</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Pestaña: Datos y Limpieza -->
+                <section id="tab-content-data" class="tab-content hidden">
+                    <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2">Datos y Limpieza</h3>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm mb-6">Herramientas útiles para exportar tu información o limpiar las tareas que ya has completado.</p>
+                    
+                    <div class="flex flex-col gap-6 max-w-2xl">
+                        <!-- Limpieza -->
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-900/20 rounded-2xl">
+                            <div class="flex flex-col gap-1">
+                                <h4 class="text-sm font-bold text-slate-800 dark:text-slate-200">Vaciar Tareas Completadas</h4>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Elimina permanentemente todas las tareas que ya han sido marcadas como hechas.</p>
+                            </div>
+                            <button type="button" id="clear-completed-btn"
+                                class="bg-amber-500 hover:bg-amber-600 dark:bg-amber-600 dark:hover:bg-amber-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl cursor-pointer self-start sm:self-center transition-colors">
+                                Limpiar Completadas
+                            </button>
+                        </div>
+
+                        <!-- Exportar -->
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-900/20 rounded-2xl">
+                            <div class="flex flex-col gap-1">
+                                <h4 class="text-sm font-bold text-slate-800 dark:text-slate-200">Copia de Seguridad (JSON)</h4>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Descarga un archivo con todas tus tareas, fechas límites y categorías para guardarlas.</p>
+                            </div>
+                            <button type="button" id="export-json-btn"
+                                class="bg-blue-600 hover:bg-blue-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl cursor-pointer self-start sm:self-center transition-colors">
+                                Exportar JSON
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Pestaña: Zona de Peligro (Eliminar Cuenta) -->
+                <section id="tab-content-danger" class="tab-content hidden">
+                    <h3 class="text-xl font-bold text-red-500 mb-2">Zona Crítica</h3>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm mb-6">Las siguientes acciones son irreversibles y afectarán tu cuenta de forma definitiva. Por favor, procede con cautela.</p>
+                    
+                    <div class="border border-red-200 dark:border-red-950/40 bg-red-50/30 dark:bg-red-950/5 rounded-2xl p-5 max-w-2xl">
+                        <div class="flex flex-col gap-4">
+                            <div class="flex flex-col gap-1">
+                                <h4 class="text-sm font-bold text-slate-800 dark:text-slate-200">Eliminar cuenta permanentemente</h4>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Esto borrará tu cuenta de usuario, tus tareas y todas las configuraciones asociadas de forma irreversible.</p>
+                            </div>
+                            
+                            <!-- Input de seguridad -->
+                            <div class="flex flex-col gap-2 max-w-md bg-white dark:bg-slate-900 border border-red-200 dark:border-red-950/40 p-3.5 rounded-xl">
+                                <span class="text-[11px] font-bold text-red-500 uppercase tracking-wide">Para confirmar, escribe tu nombre de usuario:</span>
+                                <input type="text" id="delete-confirm-input" placeholder="Nombre de usuario" autocomplete="off"
+                                    class="bg-gray-50 dark:bg-slate-950 border border-red-200 dark:border-red-950/40 rounded-lg px-3 py-2 text-xs outline-none focus:ring-1 focus:ring-red-500 text-red-600 dark:text-red-400">
+                            </div>
+
+                            <button type="button" id="delete-account-btn" disabled
+                                class="bg-red-500 hover:bg-red-600 disabled:bg-gray-300 dark:disabled:bg-slate-700/60 disabled:cursor-not-allowed text-white text-xs font-bold px-4 py-3 rounded-xl transition-all w-full sm:w-fit cursor-pointer self-start">
+                                Eliminar mi cuenta permanentemente
+                            </button>
+                        </div>
+                    </div>
+                </section>
+                
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal / Toast de Notificaciones Flotante -->
+    <div id="toast" class="hidden fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-white/90 dark:bg-slate-800/90 border border-gray-200/80 dark:border-slate-700/60 text-slate-800 dark:text-white shadow-2xl px-5 py-4 rounded-2xl backdrop-blur-md transform translate-y-2 opacity-0 transition-all duration-300">
+        <span id="toast-message" class="text-xs font-bold"></span>
+    </div>
+</div>

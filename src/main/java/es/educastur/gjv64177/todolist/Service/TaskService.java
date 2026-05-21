@@ -60,10 +60,11 @@ public class TaskService {
 		taskRepository.save(task);
 	}
 
-	public Task editTask(Long id, Usuario autor, String title, String description, Set<Long> categoryIds, String tagsInput, LocalDateTime deadline) {
+	public Task editTask(Long id, Usuario autor, String title, String description, Set<Long> categoryIds, String tagsInput, LocalDateTime deadline, boolean important) {
 		Task task = findByIdAndAuthor(id, autor);
 		task.setTitle(title);
 		task.setDescription(description);
+		task.setImportant(important);
 
 		if (categoryIds != null && !categoryIds.isEmpty()) {
 			task.setCategories(new HashSet<>(categoryRepository.findAllById(categoryIds)));
@@ -106,5 +107,41 @@ public class TaskService {
 
 	public void deleteFromAny(Long id) {
 		taskRepository.deleteById(id);
+	}
+
+	@Transactional
+	public void deleteCompletedTasksByAuthor(Usuario autor) {
+		List<Task> completedTasks = taskRepository.findByAuthor(autor).stream()
+				.filter(Task::isCompleted)
+				.toList();
+		for (Task task : completedTasks) {
+			Set<Tag> tags = new HashSet<>(task.getTags());
+			taskRepository.delete(task);
+			for (Tag tag : tags) {
+				if (!taskRepository.existsByTags(tag)) {
+					tagRepository.delete(tag);
+				}
+			}
+		}
+	}
+
+	@Transactional
+	public void deleteAllTasksByAuthor(Usuario autor) {
+		List<Task> allTasks = taskRepository.findByAuthor(autor);
+		for (Task task : allTasks) {
+			Set<Tag> tags = new HashSet<>(task.getTags());
+			taskRepository.delete(task);
+			for (Tag tag : tags) {
+				if (!taskRepository.existsByTags(tag)) {
+					tagRepository.delete(tag);
+				}
+			}
+		}
+	}
+
+	public Task toggleImportant(Long id, Usuario author) {
+		Task task = findByIdAndAuthor(id, author);
+		task.setImportant(!task.isImportant());
+		return taskRepository.save(task);
 	}
 }

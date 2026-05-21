@@ -96,6 +96,63 @@ export class TaskItem extends HTMLElement {
         infoBtn?.addEventListener('click', () => {
             this.dispatchEvent(new CustomEvent('task-info', { bubbles: true, composed: true, detail: this._task }));
         });
+
+        const starBtn = this.querySelector('.star-btn') as HTMLButtonElement;
+        starBtn?.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            if (this._isSyncing) return;
+            const task = this._task;
+            const originalState = !!task.important;
+            const nextState = !originalState;
+            task.important = nextState;
+
+            // Trigger animation locally first
+            const starIcon = starBtn.querySelector('.star-icon');
+            if (starIcon) {
+                starIcon.classList.remove('animate-star-pop', 'animate-star-shrink');
+                void (starIcon as HTMLElement).offsetWidth; // force reflow
+                if (nextState) {
+                    starIcon.classList.add('animate-star-pop');
+                } else {
+                    starIcon.classList.add('animate-star-shrink');
+                }
+            }
+
+            // Start API request immediately in background
+            const apiPromise = (async () => {
+                try {
+                    const response = await fetch(`/api/tasks/${task.id}/important`, { method: 'PATCH' });
+                    if (!response.ok) throw new Error('Error al actualizar la prioridad');
+                    const updatedTask: TaskResponseDTO = await response.json();
+                    return updatedTask.important;
+                } catch (error) {
+                    console.error("Failed to toggle priority", error);
+                    return null;
+                }
+            })();
+
+            // Wait 350ms (animation duration) for animation to complete before rendering the list
+            setTimeout(async () => {
+                const apiResult = await apiPromise;
+                if (apiResult !== null) {
+                    task.important = apiResult;
+                } else {
+                    task.important = originalState; // rollback on error
+                }
+
+                this.render();
+
+                updateCachedData<TaskResponseDTO>('/api/tasks', oldTasks =>
+                    oldTasks.map(t => t.id === task.id ? { ...t, important: task.important } : t)
+                );
+
+                this.dispatchEvent(new CustomEvent('task-priority-changed', {
+                    bubbles: true,
+                    composed: true,
+                    detail: { task: this._task }
+                }));
+            }, 350);
+        });
     }
 
     private render() {
@@ -138,6 +195,25 @@ export class TaskItem extends HTMLElement {
                     hour: '2-digit',
                     minute: '2-digit'
                 }));
+            }
+        }
+
+        const starIcon = this.querySelector('.star-icon');
+        const starBtn = this.querySelector('.star-btn') as HTMLButtonElement;
+        if (starIcon && starBtn) {
+            starIcon.classList.remove('animate-star-pop', 'animate-star-shrink');
+            if (task.important) {
+                starIcon.classList.add('text-amber-500', 'fill-amber-500', 'drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]');
+                starIcon.classList.remove('text-gray-400', 'dark:text-slate-500', 'fill-none');
+                
+                // Show the star button
+                starBtn.classList.remove('hidden');
+            } else {
+                starIcon.classList.remove('text-amber-500', 'fill-amber-500', 'drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]');
+                starIcon.classList.add('text-gray-400', 'dark:text-slate-500', 'fill-none');
+                
+                // Hide the star button completely so it doesn't take up space or show up at all
+                starBtn.classList.add('hidden');
             }
         }
 

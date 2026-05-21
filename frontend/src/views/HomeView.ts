@@ -35,6 +35,7 @@ export class HomeView extends HTMLElement {
   private tasks: TaskResponseDTO[] = [];
   private cats: Category[] = [];
   private themeObserver: MutationObserver | null = null;
+  private _globalClickListener: ((e: MouseEvent) => void) | null = null;
 
   constructor() {
     super()
@@ -58,6 +59,9 @@ export class HomeView extends HTMLElement {
   disconnectedCallback() {
     if (this.themeObserver) {
       this.themeObserver.disconnect();
+    }
+    if (this._globalClickListener) {
+      document.removeEventListener('click', this._globalClickListener);
     }
   }
   private async setupEvents() {
@@ -164,6 +168,38 @@ export class HomeView extends HTMLElement {
     const dateInput = root.getElementById('date-input') as HTMLInputElement
     const timeInput = root.getElementById('time-input') as HTMLInputElement
 
+    // Creation Star Binding
+    const createImportantBtn = root.getElementById('create-important-btn') as HTMLButtonElement
+    const createImportantHidden = root.getElementById('create-important-hidden') as HTMLInputElement
+    createImportantBtn?.addEventListener('click', () => {
+      const isImportant = createImportantHidden.value === 'true'
+      const nextImportant = !isImportant
+      createImportantHidden.value = String(nextImportant)
+      const starIcon = createImportantBtn.querySelector('.star-icon')
+      if (starIcon) {
+        starIcon.classList.remove('animate-star-pop', 'animate-star-shrink')
+        void (starIcon as HTMLElement).offsetWidth // force reflow
+        
+        if (nextImportant) {
+          starIcon.classList.add('animate-star-pop', 'text-amber-500', 'fill-amber-500', 'drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]')
+          starIcon.classList.remove('text-gray-400', 'dark:text-slate-500', 'fill-none')
+        } else {
+          starIcon.classList.add('animate-star-shrink')
+          starIcon.classList.remove('text-amber-500', 'fill-amber-500', 'drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]')
+          starIcon.classList.add('text-gray-400', 'dark:text-slate-500', 'fill-none')
+        }
+      }
+    })
+
+    // Custom Event Listener for priority toggle inside cards
+    root.addEventListener('task-priority-changed', () => {
+      if ((document as any).startViewTransition) {
+        (document as any).startViewTransition(() => this.renderTasks());
+      } else {
+        this.renderTasks();
+      }
+    });
+
     const dp = new Datepicker(dateInput, {
       autohide: true,
       format: 'dd/mm/yyyy',
@@ -199,9 +235,35 @@ export class HomeView extends HTMLElement {
       select.addEventListener('change', () => this.renderTasks());
     });
 
+    const importantFilterBtn = root.getElementById('important-filter-btn') as HTMLButtonElement;
+    importantFilterBtn?.addEventListener('click', () => {
+      const isActive = importantFilterBtn.getAttribute('data-active') === 'true';
+      const nextActive = !isActive;
+      importantFilterBtn.setAttribute('data-active', String(nextActive));
+      
+      const starIcon = importantFilterBtn.querySelector('.filter-star-icon');
+      
+      if (nextActive) {
+        if (starIcon) {
+          starIcon.classList.add('text-amber-500', 'fill-amber-500', 'drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]');
+          starIcon.classList.remove('fill-none');
+        }
+      } else {
+        if (starIcon) {
+          starIcon.classList.remove('text-amber-500', 'fill-amber-500', 'drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]');
+          starIcon.classList.add('fill-none');
+        }
+      }
+      
+      if ((document as any).startViewTransition) {
+        (document as any).startViewTransition(() => this.renderTasks());
+      } else {
+        this.renderTasks();
+      }
+    });
+
     root.addEventListener('click', e => {
       const target = e.target as Node
-      const pickerEl = document.querySelector('.datepicker-picker')
       if (
         target !== taskOptions &&
         !taskOptions.contains(target) &&
@@ -209,11 +271,16 @@ export class HomeView extends HTMLElement {
       ) {
         taskOptions.setAttribute('data-active', 'false')
       }
+    })
 
-      if (target !== dateInput && pickerEl && !pickerEl.contains(target)) {
+    this._globalClickListener = (e: MouseEvent) => {
+      const path = e.composedPath()
+      const pickerEl = document.querySelector('.datepicker')
+      if (!path.includes(dateInput) && pickerEl && !path.includes(pickerEl)) {
         dp.hide()
       }
-    })
+    }
+    document.addEventListener('click', this._globalClickListener)
 
     root.addEventListener('click', e => {
       const allCategoryMenus = root.querySelectorAll('.category-dropdown-menu:not(.hidden)');
@@ -255,7 +322,8 @@ export class HomeView extends HTMLElement {
         description: formData.get('description') as string,
         categoryIds: categoryIds,
         tagsInput: formData.get('tagsInput') as string,
-        deadline: finalDeadline
+        deadline: finalDeadline,
+        important: createImportantHidden.value === 'true'
       }
 
       const fakeId = Date.now();
@@ -269,6 +337,7 @@ export class HomeView extends HTMLElement {
         tags: taskRequest.tagsInput ? taskRequest.tagsInput.split(',').map(name => ({ name: name.trim() })) : [],
         createdAt: new Date().toISOString(),
         lastEdit: new Date().toISOString(),
+        important: taskRequest.important,
         isSyncing: true
       } as TaskResponseDTO & { isSyncing?: boolean };
 
@@ -279,6 +348,12 @@ export class HomeView extends HTMLElement {
       taskForm.reset();
       this.loadCatsDropdown('category-dropdown-container', []);
       timeInput.value = '00:00';
+      createImportantHidden.value = 'false';
+      const createStarIcon = createImportantBtn?.querySelector('.star-icon');
+      if (createStarIcon) {
+        createStarIcon.classList.remove('text-amber-500', 'fill-amber-500', 'drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]');
+        createStarIcon.classList.add('text-gray-400', 'dark:text-slate-500', 'fill-none');
+      }
 
       try {
         const response = await fetch('/api/tasks', {
@@ -518,6 +593,18 @@ export class HomeView extends HTMLElement {
     updatedAt.textContent = task.lastEdit
       ? new Date(task.lastEdit).toLocaleString('es-ES', dateConfig)
       : ''
+
+    const importantBadge = this.shadowRoot!.getElementById('task-info-important-badge')
+    if (importantBadge) {
+      if (task.important) {
+        importantBadge.classList.remove('hidden')
+        importantBadge.classList.add('flex')
+      } else {
+        importantBadge.classList.remove('flex')
+        importantBadge.classList.add('hidden')
+      }
+    }
+
     dialog.showModal()
   }
 
@@ -531,6 +618,10 @@ export class HomeView extends HTMLElement {
     const timeDeadline = this.shadowRoot!.getElementById('time-deadline-edit') as HTMLInputElement
     const tags = this.shadowRoot!.getElementById('edit-tags') as HTMLInputElement
     const cancel = this.shadowRoot!.getElementById('cancel-edit-task') as HTMLButtonElement
+
+    const editImportantBtn = this.shadowRoot!.getElementById('edit-important-btn') as HTMLButtonElement
+    const editImportantHidden = this.shadowRoot!.getElementById('edit-important-hidden') as HTMLInputElement
+    const editStarIcon = editImportantBtn?.querySelector('.star-icon')
     const dateConfig: Intl.DateTimeFormatOptions = {
       year: 'numeric',
       month: '2-digit',
@@ -560,6 +651,38 @@ export class HomeView extends HTMLElement {
     }
     this.loadCatsDropdown('category-edit-dropdown-container', task.categories ?? []);
     tags.value = task.tags?.map(t => t.name).join(', ') || '';
+
+    const initialImportant = !!task.important;
+    editImportantHidden.value = String(initialImportant);
+    if (editStarIcon) {
+      if (initialImportant) {
+        editStarIcon.classList.add('text-amber-500', 'fill-amber-500', 'drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]');
+        editStarIcon.classList.remove('text-gray-400', 'dark:text-slate-500', 'fill-none');
+      } else {
+        editStarIcon.classList.remove('text-amber-500', 'fill-amber-500', 'drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]');
+        editStarIcon.classList.add('text-gray-400', 'dark:text-slate-500', 'fill-none');
+      }
+    }
+
+    editImportantBtn.onclick = () => {
+      const isImportant = editImportantHidden.value === 'true';
+      const nextImportant = !isImportant;
+      editImportantHidden.value = String(nextImportant);
+      if (editStarIcon) {
+        editStarIcon.classList.remove('animate-star-pop', 'animate-star-shrink');
+        void (editStarIcon as HTMLElement).offsetWidth; // force reflow
+        
+        if (nextImportant) {
+          editStarIcon.classList.add('animate-star-pop', 'text-amber-500', 'fill-amber-500', 'drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]');
+          editStarIcon.classList.remove('text-gray-400', 'dark:text-slate-500', 'fill-none');
+        } else {
+          editStarIcon.classList.add('animate-star-shrink');
+          editStarIcon.classList.remove('text-amber-500', 'fill-amber-500', 'drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]');
+          editStarIcon.classList.add('text-gray-400', 'dark:text-slate-500', 'fill-none');
+        }
+      }
+    };
+
     cancel.onclick = () => {
       dp.destroy()
       dialog.close()
@@ -591,7 +714,8 @@ export class HomeView extends HTMLElement {
         description: formData.get('description') as string,
         deadline: finalDeadline,
         categoryIds: categoryIds,
-        tagsInput: formData.get('tagsInput') as string
+        tagsInput: formData.get('tagsInput') as string,
+        important: editImportantHidden.value === 'true'
       };
       const originalTask = { ...task };
 
@@ -602,6 +726,7 @@ export class HomeView extends HTMLElement {
         deadline: taskSubmit.deadline,
         categories: this.cats.filter(c => taskSubmit.categoryIds?.includes(c.id!)),
         tags: taskSubmit.tagsInput ? taskSubmit.tagsInput.split(',').map(name => ({ name: name.trim() })) : [],
+        important: taskSubmit.important,
         lastEdit: new Date().toISOString()
       };
 
@@ -610,6 +735,12 @@ export class HomeView extends HTMLElement {
       );
 
       _taskElement.task = localTask;
+
+      if ((document as any).startViewTransition) {
+        (document as any).startViewTransition(() => this.renderTasks());
+      } else {
+        this.renderTasks();
+      }
 
       dp.destroy();
       dialog.close();
@@ -633,6 +764,12 @@ export class HomeView extends HTMLElement {
         );
         _taskElement.task = realTask;
 
+        if ((document as any).startViewTransition) {
+          (document as any).startViewTransition(() => this.renderTasks());
+        } else {
+          this.renderTasks();
+        }
+
       } catch (err) {
         console.error('Error al editar la tarea:', err);
 
@@ -640,6 +777,12 @@ export class HomeView extends HTMLElement {
           oldTasks.map(t => t.id === task.id ? originalTask : t)
         );
         _taskElement.task = originalTask;
+
+        if ((document as any).startViewTransition) {
+          (document as any).startViewTransition(() => this.renderTasks());
+        } else {
+          this.renderTasks();
+        }
 
         alert("Error de conexión: No se pudieron guardar los cambios.");
       }
@@ -762,34 +905,62 @@ export class HomeView extends HTMLElement {
       const catId = Number(categoryFilter);
       processed = processed.filter(t => t.categories?.some(c => c.id === catId));
     }
-    if (sortFilter !== '') {
-      processed.sort((a, b) => {
-        if (sortFilter === 'title') {
-          return (a.title || '').localeCompare(b.title || '');
-        }
-        if (sortFilter === 'description') {
-          return (a.description || '').localeCompare(b.description || '');
-        }
-        if (sortFilter === 'category') {
-          const catA = a.categories?.[0]?.title || 'z';
-          const catB = b.categories?.[0]?.title || 'z';
-          return catA.localeCompare(catB);
-        }
-        if (sortFilter === 'complete') {
-          return (a.completed === b.completed) ? 0 : (a.completed ? 1 : -1);
-        }
-        if (sortFilter === 'deadline') {
-          return (new Date(b.deadline || '').getTime() - new Date(a.deadline || '').getTime());
-        }
-        if (sortFilter === 'created') {
-          return (new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime());
-        }
-        if (sortFilter === 'lastEdit') {
-          return (new Date(b.lastEdit || '').getTime() - new Date(a.lastEdit || '').getTime());
-        }
-        return 0;
-      });
+
+    const importantFilterBtn = root.getElementById('important-filter-btn') as HTMLButtonElement;
+    if (importantFilterBtn && importantFilterBtn.getAttribute('data-active') === 'true') {
+      processed = processed.filter(t => !!t.important);
     }
+
+    processed.sort((a, b) => {
+      // 1. Group by completion state: active tasks first, completed tasks last
+      if (a.completed !== b.completed) {
+        return a.completed ? 1 : -1;
+      }
+
+      // 2. Sort by importance within their completion groups
+      const aImp = a.important ? 1 : 0;
+      const bImp = b.important ? 1 : 0;
+      if (aImp !== bImp) {
+        return bImp - aImp;
+      }
+
+      // 2. Secondary sort: user chosen criteria
+      if (sortFilter === 'title') {
+        return (a.title || '').localeCompare(b.title || '');
+      }
+      if (sortFilter === 'description') {
+        return (a.description || '').localeCompare(b.description || '');
+      }
+      if (sortFilter === 'category') {
+        const catA = a.categories?.[0]?.title || 'z';
+        const catB = b.categories?.[0]?.title || 'z';
+        return catA.localeCompare(catB);
+      }
+      if (sortFilter === 'complete') {
+        return (a.completed === b.completed) ? 0 : (a.completed ? 1 : -1);
+      }
+      if (sortFilter === 'deadline') {
+        const timeA = a.deadline ? new Date(a.deadline).getTime() : 0;
+        const timeB = b.deadline ? new Date(b.deadline).getTime() : 0;
+        if (timeA === 0 && timeB === 0) return 0;
+        if (timeA === 0) return 1;
+        if (timeB === 0) return -1;
+        return timeA - timeB;
+      }
+      if (sortFilter === 'created') {
+        const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return timeB - timeA;
+      }
+      if (sortFilter === 'lastEdit') {
+        const timeA = a.lastEdit ? new Date(a.lastEdit).getTime() : 0;
+        const timeB = b.lastEdit ? new Date(b.lastEdit).getTime() : 0;
+        return timeB - timeA;
+      }
+
+      // Fallback: newer tasks first (ID descending)
+      return (b.id ?? 0) - (a.id ?? 0);
+    });
 
     return processed;
   }

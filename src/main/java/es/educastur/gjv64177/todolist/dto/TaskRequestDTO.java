@@ -8,5 +8,6 @@ public record TaskRequestDTO(
 		String description,
 		LocalDateTime deadline,
 		Set<Long> categoryIds,
-		String tagsInput
+		String tagsInput,
+		boolean important
 ) {}

@@ -69,7 +69,7 @@ public class AdminController {
 	public ResponseEntity<UsuarioDTO> updateUserProfile(@PathVariable String username,
 	                                                    @RequestBody UpdateProfileDTO dto) {
 		try {
-			Usuario updated = usuarioService.updateProfile(username, dto.username(), dto.fullName(), dto.email());
+			Usuario updated = usuarioService.updateProfile(username, dto.username(), dto.fullName(), dto.email(), dto.theme());
 			return ResponseEntity.ok(usuarioMapper.toDTO(updated));
 		} catch (org.springframework.web.server.ResponseStatusException ex) {
 			return ResponseEntity.status(ex.getStatusCode()).build();

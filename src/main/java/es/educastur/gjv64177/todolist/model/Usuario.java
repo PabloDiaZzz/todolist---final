@@ -30,4 +30,8 @@ public class Usuario {
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private Role role = Role.ROLE_USER;
+
+	@Column(nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'SYSTEM'")
+	@Builder.Default
+	private String theme = "SYSTEM";
 }

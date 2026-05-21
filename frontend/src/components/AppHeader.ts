@@ -39,7 +39,7 @@ export class AppHeader extends HTMLElement {
         // Configure layout and navigation based on the current view
         if (currentView === 'home') {
             headerTitle.textContent = 'Aplicación ToDo List';
-            headerTitle.className = 'font-semibold text-color text-2xl';
+            headerTitle.className = 'font-semibold text-color text-lg sm:text-2xl';
 
             if (authService.isAdmin()) {
                 adminBtn.classList.remove('hidden');
@@ -68,7 +68,7 @@ export class AppHeader extends HTMLElement {
                 title += ' (ADMIN)';
             }
             headerTitle.textContent = title;
-            headerTitle.className = 'text-2xl font-semibold text-blue-600 dark:text-indigo-400';
+            headerTitle.className = 'text-lg sm:text-2xl font-semibold text-blue-600 dark:text-indigo-400';
 
             userBtn.classList.remove('hidden');
             userBtn.onclick = () => (window as any).navigate('/');
@@ -79,7 +79,7 @@ export class AppHeader extends HTMLElement {
             });
         } else if (currentView === 'userinfo') {
             headerTitle.textContent = 'Panel de Control (ADMIN)';
-            headerTitle.className = 'font-semibold text-blue-600 dark:text-indigo-400 text-2xl';
+            headerTitle.className = 'font-semibold text-blue-600 dark:text-indigo-400 text-lg sm:text-2xl';
 
             adminBtn.classList.remove('hidden');
             adminBtn.onclick = () => (window as any).navigate('/admin');
@@ -88,6 +88,19 @@ export class AppHeader extends HTMLElement {
                 once: true,
                 checkNetwork: true,
             });
+        }
+
+        const settingsBtn = this.querySelector('#settings-button') as HTMLButtonElement;
+        if (settingsBtn) {
+            if (currentView === 'settings') {
+                settingsBtn.title = 'Inicio';
+                settingsBtn.innerHTML = `<svg class="size-6 fill-current"><use href="/main.svg#home"></use></svg>`;
+                settingsBtn.onclick = () => (window as any).navigate('/home');
+            } else {
+                settingsBtn.title = 'Configuración';
+                settingsBtn.innerHTML = `<svg class="size-6 fill-current"><use href="/main.svg#settings"></use></svg>`;
+                settingsBtn.onclick = () => (window as any).navigate('/settings');
+            }
         }
 
         // Setup logout submission handler

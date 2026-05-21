@@ -29,6 +29,8 @@ public class UsuarioService {
 	private PasswordEncoder passwordEncoder;
 	@Autowired
 	private JavaMailSender mailSender;
+	@Autowired
+	private TaskService taskService;
 
 	public void enviarEmailRecuperacion(String email) {
 		Usuario usuario = usuarioRepository.findByEmail(email)
@@ -112,7 +114,7 @@ public class UsuarioService {
 	}
 
 	@Transactional
-	public Usuario updateProfile(String currentUsername, String newUsername, String newFullName, String newEmail) {
+	public Usuario updateProfile(String currentUsername, String newUsername, String newFullName, String newEmail, String newTheme) {
 		Usuario user = usuarioRepository.findByUsername(currentUsername)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
 
@@ -134,6 +136,35 @@ public class UsuarioService {
 			user.setEmail(newEmail.trim());
 		}
 
+		if (newTheme != null && !newTheme.isBlank()) {
+			user.setTheme(newTheme.trim().toUpperCase());
+		}
+
 		return usuarioRepository.save(user);
+	}
+
+	@Transactional
+	public void updatePassword(String username, String currentPassword, String newPassword) {
+		Usuario user = usuarioRepository.findByUsername(username)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+
+		if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La contraseña actual es incorrecta");
+		}
+
+		if (newPassword == null || newPassword.isBlank() || newPassword.length() < 4) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La nueva contraseña debe tener al menos 4 caracteres");
+		}
+
+		user.setPassword(passwordEncoder.encode(newPassword));
+		usuarioRepository.save(user);
+	}
+
+	@Transactional
+	public void deleteUser(String username) {
+		Usuario user = usuarioRepository.findByUsername(username)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+		taskService.deleteAllTasksByAuthor(user);
+		usuarioRepository.delete(user);
 	}
 }

@@ -4,5 +4,6 @@ public record UsuarioDTO (
 		String username,
 		String role,
 		String fullName,
-		String email
+		String email,
+		String theme
 ) {};

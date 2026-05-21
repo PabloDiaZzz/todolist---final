@@ -1,29 +1,29 @@
 -- data.sql
 
 -- Insertar Usuarios si no existen (contraseñas son: <Usuario>.123 generadas con BCrypt)
-INSERT INTO usuario (full_name, username, email, password, role)
-SELECT data.full_name, data.username, data.email, data.password, data.role FROM (
-    SELECT 'Andrés Admin' as full_name, 'admin' as username, 'admin@example.com' as email, '$2a$10$DdtJkm5Xnuj04oE2WRRpAOmyFZWHZSJy994RXwF.sSeDO99NGK5mO' as password, 'ROLE_ADMIN' as role UNION ALL
-    SELECT 'Juan Pérez', 'user', 'user@example.com', '$2a$10$Yd6SxDErzdMhpB4uDIrah.ywCtCrvZcD82Omclpec1qiixMiZ8kE.', 'ROLE_USER' UNION ALL
-    SELECT 'Carlos Gestor', 'gestor', 'gestor@example.com', '$2a$10$409L8JBDzl1JcmuY6hIS.u1f0JUisCbjUb/Gg8HwUpc.zSfvhKyMu', 'ROLE_MANAGER'
+INSERT INTO usuario (full_name, username, email, password, role, theme)
+SELECT data.full_name, data.username, data.email, data.password, data.role, data.theme FROM (
+    SELECT 'Andrés Admin' as full_name, 'admin' as username, 'admin@example.com' as email, '$2a$10$DdtJkm5Xnuj04oE2WRRpAOmyFZWHZSJy994RXwF.sSeDO99NGK5mO' as password, 'ROLE_ADMIN' as role, 'SYSTEM' as theme UNION ALL
+    SELECT 'Juan Pérez', 'user', 'user@example.com', '$2a$10$Yd6SxDErzdMhpB4uDIrah.ywCtCrvZcD82Omclpec1qiixMiZ8kE.', 'ROLE_USER', 'SYSTEM' UNION ALL
+    SELECT 'Carlos Gestor', 'gestor', 'gestor@example.com', '$2a$10$409L8JBDzl1JcmuY6hIS.u1f0JUisCbjUb/Gg8HwUpc.zSfvhKyMu', 'ROLE_MANAGER', 'SYSTEM'
 ) data
 WHERE NOT EXISTS (SELECT 1 FROM usuario u WHERE u.username = data.username);
 
 -- Insertar Tareas de ejemplo para cada usuario solo si no existen previamente
-INSERT INTO task (created_at, last_edit, title, description, completed, author_id)
-SELECT CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Configurar sistema', 'Revisar la configuración inicial del sistema', false, id FROM usuario WHERE username = 'admin'
+INSERT INTO task (created_at, last_edit, title, description, completed, important, author_id)
+SELECT CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Configurar sistema', 'Revisar la configuración inicial del sistema', false, false, id FROM usuario WHERE username = 'admin'
 AND NOT EXISTS (SELECT 1 FROM task WHERE title = 'Configurar sistema' AND author_id IN (SELECT id FROM usuario WHERE username = 'admin')) LIMIT 1;
 
-INSERT INTO task (created_at, last_edit, title, description, completed, author_id)
-SELECT CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Aprobar usuarios', 'Revisar la lista de nuevos registros y aprobar accesos', true, id FROM usuario WHERE username = 'admin'
+INSERT INTO task (created_at, last_edit, title, description, completed, important, author_id)
+SELECT CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Aprobar usuarios', 'Revisar la lista de nuevos registros y aprobar accesos', true, false, id FROM usuario WHERE username = 'admin'
 AND NOT EXISTS (SELECT 1 FROM task WHERE title = 'Aprobar usuarios' AND author_id IN (SELECT id FROM usuario WHERE username = 'admin')) LIMIT 1;
 
-INSERT INTO task (created_at, last_edit, title, description, completed, author_id)
-SELECT CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Completar perfil', 'Añadir foto y actualizar datos personales', false, id FROM usuario WHERE username = 'user'
+INSERT INTO task (created_at, last_edit, title, description, completed, important, author_id)
+SELECT CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Completar perfil', 'Añadir foto y actualizar datos personales', false, false, id FROM usuario WHERE username = 'user'
 AND NOT EXISTS (SELECT 1 FROM task WHERE title = 'Completar perfil' AND author_id IN (SELECT id FROM usuario WHERE username = 'user')) LIMIT 1;
 
-INSERT INTO task (created_at, last_edit, title, description, completed, author_id)
-SELECT CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Revisar dashboard', 'Verificar que las estadísticas se muestran correctamente', false, id FROM usuario WHERE username = 'gestor'
+INSERT INTO task (created_at, last_edit, title, description, completed, important, author_id)
+SELECT CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Revisar dashboard', 'Verificar que las estadísticas se muestran correctamente', false, false, id FROM usuario WHERE username = 'gestor'
 AND NOT EXISTS (SELECT 1 FROM task WHERE title = 'Revisar dashboard' AND author_id IN (SELECT id FROM usuario WHERE username = 'gestor')) LIMIT 1;
 
 -- Insertar Categorías

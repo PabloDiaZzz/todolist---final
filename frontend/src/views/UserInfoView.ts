@@ -420,6 +420,18 @@ export default class UserInfoView extends HTMLElement {
         updatedAt.textContent = task.lastEdit
             ? new Date(task.lastEdit).toLocaleString('es-ES', dateConfig)
             : ''
+
+        const importantBadge = this.shadowRoot!.getElementById('task-info-important-badge');
+        if (importantBadge) {
+            if (task.important) {
+                importantBadge.classList.remove('hidden');
+                importantBadge.classList.add('flex');
+            } else {
+                importantBadge.classList.remove('flex');
+                importantBadge.classList.add('hidden');
+            }
+        }
+
         dialog.showModal()
     }
 }

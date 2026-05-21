@@ -18,6 +18,7 @@ export interface TaskRequestDTO {
   /** @uniqueItems true */
   categoryIds?: number[];
   tagsInput?: string;
+  important?: boolean;
 }
 
 export interface CategoryDTO {
@@ -47,6 +48,7 @@ export interface TaskResponseDTO {
   categories?: CategoryDTO[];
   /** @uniqueItems true */
   tags?: TagDTO[];
+  important?: boolean;
 }
 
 export interface Tag {
@@ -82,11 +84,24 @@ export interface Category {
   title?: string;
 }
 
+export interface UpdateProfileDTO {
+  username?: string;
+  fullName?: string;
+  email?: string;
+  theme?: string;
+}
+
 export interface UsuarioDTO {
   username?: string;
   role?: string;
   fullName?: string;
   email?: string;
+  theme?: string;
+}
+
+export interface UpdatePasswordRequest {
+  currentPassword?: string;
+  newPassword?: string;
 }
 
 export interface UserTasksDTO {
@@ -528,6 +543,38 @@ export class Api<
     /**
      * No description
      *
+     * @tags usuario-controller
+     * @name UpdateProfile
+     * @request PATCH:/api/user/profile
+     */
+    updateProfile: (data: UpdateProfileDTO, params: RequestParams = {}) =>
+      this.request<UsuarioDTO, any>({
+        path: `/api/user/profile`,
+        method: "PATCH",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags usuario-controller
+     * @name UpdatePassword
+     * @request PATCH:/api/user/password
+     */
+    updatePassword: (data: UpdatePasswordRequest, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/api/user/password`,
+        method: "PATCH",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
      * @tags task-controller
      * @name ToggleTask
      * @request PATCH:/api/tasks/{id}/toggle
@@ -542,14 +589,55 @@ export class Api<
     /**
      * No description
      *
+     * @tags task-controller
+     * @name ToggleImportant
+     * @request PATCH:/api/tasks/{id}/important
+     */
+    toggleImportant: (id: number, params: RequestParams = {}) =>
+      this.request<TaskResponseDTO, any>({
+        path: `/api/tasks/${id}/important`,
+        method: "PATCH",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags admin-controller
+     * @name UpdateUserProfile
+     * @request PATCH:/api/admin/users/{username}
+     */
+    updateUserProfile: (
+      username: string,
+      data: UpdateProfileDTO,
+      params: RequestParams = {},
+    ) =>
+      this.request<UsuarioDTO, any>({
+        path: `/api/admin/users/${username}`,
+        method: "PATCH",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
      * @tags admin-controller
      * @name MakeAdmin
-     * @request PATCH:/api/admin/users/{id}/promote
+     * @request PATCH:/api/admin/users/{username}/promote
      */
-    makeAdmin: (id: number, params: RequestParams = {}) =>
+    makeAdmin: (
+      username: string,
+      query?: {
+        role?: string;
+      },
+      params: RequestParams = {},
+    ) =>
       this.request<void, any>({
-        path: `/api/admin/users/${id}/promote`,
+        path: `/api/admin/users/${username}/promote`,
         method: "PATCH",
+        query: query,
         ...params,
       }),
 
@@ -564,6 +652,20 @@ export class Api<
       this.request<UsuarioDTO, any>({
         path: `/api/user/me`,
         method: "GET",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags usuario-controller
+     * @name DeleteAccount
+     * @request DELETE:/api/user/me
+     */
+    deleteAccount: (params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/api/user/me`,
+        method: "DELETE",
         ...params,
       }),
 
@@ -724,6 +826,34 @@ export class Api<
       this.request<TaskUserDTO[], any>({
         path: `/api/admin/tasks`,
         method: "GET",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags admin-controller
+     * @name CountTasksByCategory
+     * @request GET:/api/admin/categories/{id}/tasks/count
+     */
+    countTasksByCategory: (id: number, params: RequestParams = {}) =>
+      this.request<number, any>({
+        path: `/api/admin/categories/${id}/tasks/count`,
+        method: "GET",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags task-controller
+     * @name DeleteCompletedTasks
+     * @request DELETE:/api/tasks/completed
+     */
+    deleteCompletedTasks: (params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/api/tasks/completed`,
+        method: "DELETE",
         ...params,
       }),
 

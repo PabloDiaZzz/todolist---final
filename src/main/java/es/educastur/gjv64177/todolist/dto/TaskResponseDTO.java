@@ -12,5 +12,6 @@ public record TaskResponseDTO(
 		LocalDateTime deadline,
 		LocalDateTime lastEdit,
 		Set<CategoryDTO> categories,
-		Set<TagDTO> tags
+		Set<TagDTO> tags,
+		boolean important
 ) {}

@@ -6,6 +6,7 @@ import './views/RegisterView';
 import './views/ForgotPasswordView';
 import './views/AdminView';
 import './views/UserInfoView';
+import './views/SettingsView';
 import { authService } from './services/AuthService';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
@@ -29,6 +30,37 @@ async function router() {
 
   try {
     const isLoggedIn = await authService.checkSession();
+
+    // Apply user's custom persisted theme immediately on session load
+    if (isLoggedIn) {
+      const user = authService.getUser();
+      if (user) {
+        const localTheme = localStorage.getItem('app-theme');
+        if (user.theme === 'SYSTEM' && (localTheme === 'LIGHT' || localTheme === 'DARK')) {
+          // Keep and re-apply explicit local preference over server system default (e.g. after DB reset)
+          applyAppTheme(localTheme);
+          // Sync theme preference back to the server in the background
+          fetch('/api/user/profile', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username: user.username,
+              fullName: user.fullName,
+              email: user.email,
+              theme: localTheme
+            })
+          })
+          .then(async res => {
+            if (res.ok) {
+              await authService.checkSession();
+            }
+          })
+          .catch(err => console.error('Failed to sync theme preference to server:', err));
+        } else if (user.theme) {
+          applyAppTheme(user.theme);
+        }
+      }
+    }
 
     isFirstLoad = false;
 
@@ -89,6 +121,9 @@ async function router() {
           window.navigate('/admin');
         }
         break;
+      case '/settings':
+        app.innerHTML = '<settings-view></settings-view>';
+        break;
       default:
         app.innerHTML = isLoggedIn ? '<home-view></home-view>' : '<login-view></login-view>';
         window.history.replaceState({}, document.title, isLoggedIn ? '/home' : '/login');
@@ -117,23 +152,42 @@ window.navigate = (path: string, state: any = {}) => {
   router();
 };
 
-function initDarkMode() {
-  const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-
-  const applyTheme = (isDark: boolean) => {
-    if (isDark) {
+export function applyAppTheme(theme: string) {
+  localStorage.setItem('app-theme', theme);
+  if (theme === 'LIGHT') {
+    document.documentElement.classList.remove('dark');
+  } else if (theme === 'DARK') {
+    document.documentElement.classList.add('dark');
+  } else {
+    // SYSTEM
+    const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    if (darkQuery.matches) {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
-  };
+  }
+}
 
-  applyTheme(darkModeMediaQuery.matches);
+function initDarkMode() {
+  const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
   darkModeMediaQuery.addEventListener('change', (e) => {
-    applyTheme(e.matches);
+    const cachedTheme = localStorage.getItem('app-theme') || 'SYSTEM';
+    if (cachedTheme !== 'SYSTEM') {
+      return; // Persisted custom preference takes precedence
+    }
+    if (e.matches) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
   });
 }
+
+// Set dynamic baseline OS or cached user preference prior to routing to prevent FOUC (flash of unstyled content)
+const cachedTheme = localStorage.getItem('app-theme') || 'SYSTEM';
+applyAppTheme(cachedTheme);
 
 router();
 initDarkMode();

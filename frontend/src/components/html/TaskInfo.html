@@ -7,7 +7,7 @@
                     class="flex justify-center items-center border-2 border-gray-400 dark:border-gray-500 rounded-full size-6 status-icon">
                 </div>
             </button>
-            <svg class="bottom-5 left-5 opacity-0 group-hover:opacity-100 size-5 text-gray-400 hover:text-blue-500 dark:hover:text-indigo-400 transition-all cursor-pointer info-btn"
+            <svg class="bottom-5 left-5 opacity-100 sm:opacity-0 group-hover:opacity-100 size-5 text-gray-400 hover:text-blue-500 dark:hover:text-indigo-400 transition-all cursor-pointer info-btn"
                 fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
                 viewBox="0 0 24 24" id="info-icon">
                 <circle cx="12" cy="12" r="10"></circle>
@@ -17,11 +17,16 @@
         </div>
 
         <div class="flex flex-col flex-1 text-gray-800 dark:text-gray-200 task-content">
-            <div class="flex items-center gap-2 task-info-text">
-                <h3 class="font-bold text-lg leading-tight tittle-text">{{title}}</h3>
-                <status-info class="date-text" type="custom" color="yellow" text="{{date}}"></status-info>
+            <div class="flex items-center gap-2 task-info-text min-w-0">
+                <h3 class="font-bold text-lg leading-tight tittle-text truncate">{{title}}</h3>
+                <div class="star-btn select-none shrink-0 flex items-center justify-center p-0.5 rounded-lg transition-colors hidden" title="Tarea importante">
+                    <svg class="size-5 transition-all duration-300 star-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linejoin="round" stroke-linecap="round" stroke-width="2" d="M12 17.75l-6.172 3.245 1.179-6.873-4.993-4.867 6.9-1.002L12 2l3.086 6.253 6.9 1.002-4.993 4.867 1.179 6.873z"/>
+                    </svg>
+                </div>
+                <status-info class="date-text shrink-0" type="custom" color="yellow" text="{{date}}"></status-info>
             </div>
-            <pre class="mt-1 font-sans text-sm description-text">{{description}}</pre>
+            <pre class="mt-1 font-sans text-sm description-text line-clamp-3 whitespace-pre-wrap break-words">{{description}}</pre>
 
             <div class="flex flex-wrap gap-2 mt-2 category-container">
             </div>
