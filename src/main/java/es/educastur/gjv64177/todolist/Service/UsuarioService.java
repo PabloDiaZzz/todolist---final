@@ -15,6 +15,8 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.UUID;
@@ -32,20 +34,7 @@ public class UsuarioService {
 	@Autowired
 	private TaskService taskService;
 
-	public void enviarEmailRecuperacion(String email) {
-		Usuario usuario = usuarioRepository.findByEmail(email)
-				.orElseThrow(() -> new RuntimeException("Email no encontrado"));
-
-		SimpleMailMessage message = new SimpleMailMessage();
-		message.setTo(email);
-		message.setSubject("Recuperación de Contraseña - ToDo List");
-		message.setText("Hola " + usuario.getFullName() + ",\n\n" +
-				                "Has solicitado restablecer tu contraseña.\n" +
-				                "Este es un correo de prueba para confirmar que el sistema funciona.\n\n" +
-				                "Saludos,\nEl equipo de ToDo List.");
-
-		mailSender.send(message);
-	}
+	private static final Logger log = LoggerFactory.getLogger(UsuarioService.class);
 
 	public Usuario findByUsername(String username) {
 		return usuarioRepository.findByUsername(username).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "El usuario " + username + " no fue encontrado"));
@@ -76,24 +65,63 @@ public class UsuarioService {
 	}
 
 	public void enviarNuevaPassword(String email) {
+		log.info("[FORGOT-PASSWORD] Iniciando proceso de recuperación para el email: {}", email);
+
+		// 1. Buscar usuario
 		Usuario usuario = usuarioRepository.findByEmail(email)
-				.orElseThrow(() -> new RuntimeException("Email no encontrado"));
+				.orElseThrow(() -> {
+					log.error("[FORGOT-PASSWORD] Error: El email {} no existe en la base de datos.", email);
+					return new RuntimeException("Email no encontrado en el sistema: " + email);
+				});
+
+		log.info("[FORGOT-PASSWORD] Usuario encontrado: {}. Generando clave temporal...", usuario.getUsername());
 		String tempPassword = UUID.randomUUID().toString().substring(0, 8);
 
 		try {
+			log.info("[FORGOT-PASSWORD] Creando MimeMessage y configurando helper...");
 			MimeMessage message = mailSender.createMimeMessage();
 			MimeMessageHelper helper = new MimeMessageHelper(message, "UTF-8");
 
+			log.info("[FORGOT-PASSWORD] Configurando parámetros del correo. From: {}, To: {}", remitentePersonalizado, email);
 			helper.setFrom(remitentePersonalizado);
 			helper.setTo(email);
 			helper.setSubject("Nueva Contraseña Temporal");
 			helper.setText("Tu nueva contraseña es: " + tempPassword);
 
+			log.info("[FORGOT-PASSWORD] Intentando enviar correo a través de SMTP de Gmail...");
 			mailSender.send(message);
+			log.info("[FORGOT-PASSWORD] ¡Correo enviado con éxito! Procediendo a encriptar y guardar la nueva clave...");
+
 			usuario.setPassword(passwordEncoder.encode(tempPassword));
 			usuarioRepository.save(usuario);
+			log.info("[FORGOT-PASSWORD] Proceso completado con éxito. Contraseña actualizada en BBDD para: {}", usuario.getUsername());
+
+		} catch (org.springframework.mail.MailAuthenticationException e) {
+			log.error("[FORGOT-PASSWORD] ❌ ERROR DE AUTENTICACIÓN: La contraseña de aplicación de Google o el usuario de correo son incorrectos en Render.");
+			log.error("[FORGOT-PASSWORD] Detalle del fallo: {}", e.getMessage());
+			throw new RuntimeException("Fallo de autenticación SMTP: Revisa MAIL_USERNAME y MAIL_PASSWORD en Render.", e);
+
+		} catch (org.springframework.mail.MailSendException e) {
+			log.error("[FORGOT-PASSWORD] ❌ ERROR DE CONEXIÓN/RED: No se pudo establecer conexión con smtp.gmail.com.");
+
+			// Evaluamos la causa de forma segura sin imports raros
+			if (e.getMessage() != null && (e.getMessage().contains("Connection timed out") || e.getMessage().contains("refused"))) {
+				log.error("[FORGOT-PASSWORD] Diagnóstico: El Firewall de Render o las restricciones de red están bloqueando el puerto.");
+			} else if (e.getCause() != null) {
+				log.error("[FORGOT-PASSWORD] Causa subyacente: {}", e.getCause().getMessage());
+			}
+
+			log.error("[FORGOT-PASSWORD] Detalle completo del fallo: {}", e.getMessage());
+			throw new RuntimeException("Fallo de red al conectar al servidor de correo SMTP.", e);
+
 		} catch (Exception e) {
-			throw new RuntimeException("Error al crear el mensaje de correo", e);
+			log.error("[FORGOT-PASSWORD] ❌ ERROR INESPERADO al procesar el envío de correo.");
+			log.error("[FORGOT-PASSWORD] Clase de la excepción: {}", e.getClass().getName());
+			log.error("[FORGOT-PASSWORD] Mensaje de error: {}", e.getMessage());
+			if (e.getCause() != null) {
+				log.error("[FORGOT-PASSWORD] Causa original: {}", e.getCause().getMessage());
+			}
+			throw new RuntimeException("Error interno en el servicio de correo: " + e.getMessage(), e);
 		}
 	}
 
