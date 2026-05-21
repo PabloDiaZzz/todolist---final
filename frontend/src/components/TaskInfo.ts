@@ -1,6 +1,7 @@
 import html from './html/TaskInfo.html?raw';
 import type { TaskResponseDTO } from '../types/api-types';
 import { updateCachedData } from '../utils/store';
+import { authService } from '../services/AuthService';
 
 export class TaskInfo extends HTMLElement {
     private _task!: TaskResponseDTO;
@@ -76,7 +77,7 @@ export class TaskInfo extends HTMLElement {
             );
             
             try {
-                const response = await fetch(`/api/tasks/${task.id}/toggle`, { method: 'PATCH' });
+                const response = await fetch(`/api/tasks/${task.id}/toggle`, { method: 'PATCH', headers: authService.getAuthHeaders() });
                 if (!response.ok) throw new Error('Error al actualizar');
             } catch (error) {
                 task.completed = originalState;

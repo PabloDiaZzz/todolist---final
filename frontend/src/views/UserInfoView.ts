@@ -7,6 +7,7 @@ import "../components/AppHeader";
 import { prefetchCache, updateCachedData } from "../utils/store";
 import { isEqual } from "lodash";
 import type { TaskInfo } from "../components/TaskInfo";
+import { authService } from "../services/AuthService";
 
 export default class UserInfoView extends HTMLElement {
     private themeObserver: MutationObserver | null = null;
@@ -55,7 +56,7 @@ export default class UserInfoView extends HTMLElement {
         }
 
         try {
-            const res = await fetch('/api/cats');
+            const res = await fetch('/api/cats', { headers: authService.getAuthHeaders() });
             if (res.ok) {
                 const freshCats = await res.json();
                 if (!isEqual(this.cats, freshCats)) {
@@ -143,7 +144,7 @@ export default class UserInfoView extends HTMLElement {
             feedback.textContent = 'Comprobando...';
             feedback.className = 'text-xs font-medium text-gray-400 dark:text-gray-500';
             try {
-                const res = await fetch(`${url}?${param}=${encodeURIComponent(value)}`);
+                const res = await fetch(`${url}?${param}=${encodeURIComponent(value)}`, { headers: authService.getAuthHeaders() });
                 const exists = await res.json();
                 if (exists) {
                     feedback.textContent = `${label} en uso`;
@@ -220,7 +221,7 @@ export default class UserInfoView extends HTMLElement {
                 try {
                     const res = await fetch(`/api/admin/users/${encodeURIComponent(originalUsername!)}`, {
                         method: 'PATCH',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: authService.getAuthHeaders(),
                         body: JSON.stringify({ username: newUsername, fullName: newFullName, email: newEmail })
                     });
 
@@ -294,7 +295,8 @@ export default class UserInfoView extends HTMLElement {
 
             try {
                 const res = await fetch(`/api/auth/forgot-password?email=${encodeURIComponent(email)}`, {
-                    method: 'POST'
+                    method: 'POST',
+                    headers: authService.getAuthHeaders()
                 });
                 if (!res.ok) throw new Error('Error al enviar');
 

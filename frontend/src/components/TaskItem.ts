@@ -2,6 +2,7 @@ import html from './html/TaskItem.html?raw';
 import type { TaskResponseDTO } from '../types/api-types';
 import { updateCachedData } from '../utils/store';
 import type { StatusInfo } from './StatusInfo';
+import { authService } from '../services/AuthService';
 
 export class TaskItem extends HTMLElement {
     private _task!: TaskResponseDTO;
@@ -38,7 +39,7 @@ export class TaskItem extends HTMLElement {
             );
             
             try {
-                const response = await fetch(`/api/tasks/${task.id}/toggle`, { method: 'PATCH' });
+                const response = await fetch(`/api/tasks/${task.id}/toggle`, { method: 'PATCH', headers: authService.getAuthHeaders() });
                 if (!response.ok) throw new Error('Error al actualizar');
             } catch (error) {
                 task.completed = originalState;
@@ -68,7 +69,7 @@ export class TaskItem extends HTMLElement {
                 updateCachedData<TaskResponseDTO>('/api/tasks', oldTasks => oldTasks.filter(t => t.id !== task.id));
                 const container = this.parentElement;
                 try {
-                    const response = await fetch(`/api/tasks/${task.id}`, { method: 'DELETE' });
+                    const response = await fetch(`/api/tasks/${task.id}`, { method: 'DELETE', headers: authService.getAuthHeaders() });
                     if (!response.ok) throw new Error('Error al borrar');
 
                     this.remove();
@@ -121,7 +122,7 @@ export class TaskItem extends HTMLElement {
             
             const apiPromise = (async () => {
                 try {
-                    const response = await fetch(`/api/tasks/${task.id}/important`, { method: 'PATCH' });
+                    const response = await fetch(`/api/tasks/${task.id}/important`, { method: 'PATCH', headers: authService.getAuthHeaders(), });
                     if (!response.ok) throw new Error('Error al actualizar la prioridad');
                     const updatedTask: TaskResponseDTO = await response.json();
                     return updatedTask.important;

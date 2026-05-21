@@ -1,3 +1,4 @@
+import { authService } from "../services/AuthService";
 import { prefetchCache } from "./store";
 
 interface PrefetchOptions {
@@ -38,7 +39,7 @@ export function setupPrefetch(
             const urlList = Array.isArray(urls) ? urls : [urls];
             urlList.forEach(async (url) => {
                 try {
-                    const response = await fetch(url);
+                    const response = await fetch(url, { headers: authService.getAuthHeaders() });
                     if (response.ok) {
                         const data = await response.json().catch(() => ({}));
                         prefetchCache.set(url, data);

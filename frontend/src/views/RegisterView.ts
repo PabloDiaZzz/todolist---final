@@ -2,6 +2,7 @@ import html from './html/RegisterView.html?raw';
 import styles from '../style.css?inline';
 import { syncThemeWithObserver } from '../utils/theme';
 import { prefetchCache } from '../utils/store';
+import { authService } from '../services/AuthService';
 
 export class RegisterView extends HTMLElement {
     private root: ShadowRoot;
@@ -200,25 +201,18 @@ export class RegisterView extends HTMLElement {
                 });
 
                 if (resRegister.ok) {
-                    const paramsLogin = new URLSearchParams();
-                    paramsLogin.append('username', formData.get('username') as string);
-                    paramsLogin.append('password', password);
-
                     submitBtn.textContent = 'Iniciando sesión...';
                     submitBtn.disabled = true;
                     submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
 
-                    const resLogin = await fetch('/api/login', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        },
-                        body: paramsLogin.toString()
-                    });
+                    const loginSuccess = await authService.login(
+                        formData.get('username') as string, 
+                        password
+                    );
 
-                    if (resLogin.ok) {
-                        const tasks = await fetch('/api/tasks').then(r => r.json()).catch(() => null);
-                        const cats = await fetch('/api/cats').then(r => r.json()).catch(() => null);
+                    if (loginSuccess) {
+                        const tasks = await fetch('/api/tasks', { headers: authService.getAuthHeaders() }).then(r => r.json()).catch(() => null);
+                        const cats = await fetch('/api/cats', { headers: authService.getAuthHeaders() }).then(r => r.json()).catch(() => null);
                         if (tasks) prefetchCache.set('/api/tasks', tasks);
                         if (cats) prefetchCache.set('/api/cats', cats);
 
@@ -234,12 +228,20 @@ export class RegisterView extends HTMLElement {
                     const errorMsg = await resRegister.text();
                     errorAlert.textContent = errorMsg || "Error al registrar. Revisa los datos o prueba otro usuario.";
                     errorAlert.classList.remove('hidden');
+                    
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
                 }
 
             } catch (err) {
                 console.error("Error conectando con el servidor:", err);
                 errorAlert.textContent = "Error de conexión con el servidor.";
                 errorAlert.classList.remove('hidden');
+                
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
             }
         });
 
@@ -274,4 +276,3 @@ export class RegisterView extends HTMLElement {
 }
 
 customElements.define('register-view', RegisterView);
-

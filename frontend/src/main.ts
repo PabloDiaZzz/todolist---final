@@ -42,7 +42,7 @@ async function router() {
           
           fetch('/api/user/profile', {
             method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
+            headers: authService.getAuthHeaders(),
             body: JSON.stringify({
               username: user.username,
               fullName: user.fullName,

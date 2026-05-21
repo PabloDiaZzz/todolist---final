@@ -1,6 +1,7 @@
 import html from './html/UserAdminItem.html?raw';
 import type { UserTasksDTO, UsuarioDTO } from '../types/api-types';
 import { updateCachedData } from '../utils/store';
+import { authService } from '../services/AuthService';
 
 export class UserAdminItem extends HTMLElement {
     private _user!: UsuarioDTO;
@@ -70,7 +71,8 @@ export class UserAdminItem extends HTMLElement {
 
                 try {
                     const response = await fetch(`/api/admin/users/${this._user.username}/promote?role=${selectedRole}`, {
-                        method: 'PATCH'
+                        method: 'PATCH',
+                        headers: authService.getAuthHeaders()
                     });
 
                     if (!response.ok) throw new Error('Error al cambiar de rol');
@@ -97,7 +99,7 @@ export class UserAdminItem extends HTMLElement {
     private setupEvents() {
         const nameBtn = this.querySelector('.user-name-btn') as HTMLButtonElement;
         nameBtn.addEventListener('click', async () => {
-            const userTasks: UserTasksDTO = await fetch(`/api/admin/users/${this._user.username}/full-profile`).then(res => res.json())
+            const userTasks: UserTasksDTO = await fetch(`/api/admin/users/${this._user.username}/full-profile`, { headers: authService.getAuthHeaders() }).then(res => res.json())
             window.navigate(`/userinfo`, userTasks);
         });
     }

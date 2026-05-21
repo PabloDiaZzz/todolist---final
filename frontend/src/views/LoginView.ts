@@ -2,6 +2,7 @@ import html from './html/LoginView.html?raw';
 import styles from '../style.css?inline';
 import { syncThemeWithObserver } from '../utils/theme';
 import { prefetchCache } from '../utils/store';
+import { authService } from '../services/AuthService';
 
 export class LoginView extends HTMLElement {
     private themeObserver: MutationObserver | null = null;
@@ -75,23 +76,23 @@ export class LoginView extends HTMLElement {
 
             try {
                 const formData = new FormData(form);
-                const res = await fetch('/api/login', { method: 'POST', body: formData });
+                const username = formData.get('username') as string;
+                const password = formData.get('password') as string;
 
-                if (res.ok) {
-                    const tasks = await fetch('/api/tasks').then(r => r.json()).catch(() => null);
-                    const cats = await fetch('/api/cats').then(r => r.json()).catch(() => null);
+                const success = await authService.login(username, password);
+
+                if (success) {
+                    const tasks = await fetch('/api/tasks', { headers: authService.getAuthHeaders() }).then(r => r.json()).catch(() => null);
+                    const cats = await fetch('/api/cats', { headers: authService.getAuthHeaders() }).then(r => r.json()).catch(() => null);
                     if (tasks) prefetchCache.set('/api/tasks', tasks);
                     if (cats) prefetchCache.set('/api/cats', cats);
 
-                    window.navigate('/home');
+                    (window as any).navigate('/home');
                 } else {
                     submitBtn.textContent = originalText;
                     submitBtn.disabled = false;
                     submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
-
-                    if (res.status === 401) root.querySelector('#login-error')?.classList.remove('hidden');
-                    else if (res.status === 404 || res.status === 403) root.querySelector('#login-required')?.classList.remove('hidden');
-                    else root.querySelector('#login-error')?.classList.remove('hidden');
+                    root.querySelector('#login-error')?.classList.remove('hidden');
                 }
             } catch (error) {
                 submitBtn.textContent = originalText;

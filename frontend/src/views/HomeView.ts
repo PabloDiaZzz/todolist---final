@@ -9,6 +9,7 @@ import type { TaskItem } from '../components/TaskItem'
 import { syncThemeWithObserver } from '../utils/theme'
 import { prefetchCache, updateCachedData } from '../utils/store'
 import { isEqual } from 'lodash'
+import { authService } from '../services/AuthService'
 
 declare module 'flowbite' {
   interface DatepickerOptions {
@@ -358,7 +359,7 @@ export class HomeView extends HTMLElement {
       try {
         const response = await fetch('/api/tasks', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: authService.getAuthHeaders(),
           body: JSON.stringify(taskRequest)
         });
 
@@ -412,7 +413,7 @@ export class HomeView extends HTMLElement {
     }
 
     try {
-      const response = await fetch('/api/cats');
+      const response = await fetch('/api/cats', { headers: authService.getAuthHeaders() });
       if (!response.ok) throw new Error('Error al obtener categorías');
 
       const freshCats: Category[] = (await response.json()).sort((a: Category, b: Category) => a.title!.localeCompare(b.title!));
@@ -440,7 +441,7 @@ export class HomeView extends HTMLElement {
     }
 
     try {
-      const response = await fetch('/api/tasks');
+      const response = await fetch('/api/tasks', {headers: authService.getAuthHeaders()});
       if (!response.ok) throw new Error('Error al obtener tareas');
 
       const freshTasks: TaskResponseDTO[] = await response.json();
@@ -749,9 +750,7 @@ export class HomeView extends HTMLElement {
       try {
         const response = await fetch('/api/tasks/' + task.id, {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: authService.getAuthHeaders(),
           body: JSON.stringify(taskSubmit)
         });
 

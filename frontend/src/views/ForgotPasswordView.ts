@@ -1,6 +1,7 @@
 import html from './html/ForgotPasswordView.html?raw';
 import styles from '../style.css?inline';
 import { syncThemeWithObserver } from '../utils/theme';
+import { authService } from '../services/AuthService';
 
 export class ForgotPasswordView extends HTMLElement {
     private themeObserver: MutationObserver | null = null;
@@ -53,7 +54,7 @@ export class ForgotPasswordView extends HTMLElement {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(form);
-            const res = await fetch('/api/auth/forgot-password', { method: 'POST', body: formData });
+            const res = await fetch('/api/auth/forgot-password', { method: 'POST', headers: authService.getAuthHeaders(),body: formData });
 
             if (res.ok) {
                 alertError.classList.remove('hidden');

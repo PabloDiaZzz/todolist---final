@@ -130,11 +130,11 @@ export class AdminView extends HTMLElement {
             this.cats = updateCachedData<Category>('/api/cats', oldCats => [...oldCats, localCat]);
             this.displayCats();
             createCatForm.reset();
-            
+
             try {
                 const response = await fetch('/api/admin/categories', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: authService.getAuthHeaders(),
                     body: JSON.stringify({ title })
                 })
 
@@ -207,11 +207,11 @@ export class AdminView extends HTMLElement {
 
         const otherUsersTasks = this.tasks.filter(task => {
             if (!task || !task.task || !task.author) return false;
-            
+
             if (this.me && task.author.username === this.me.username) return false;
-            
+
             if (!searchValue) return true;
-            
+
             const titleMatches = task.task.title?.toLowerCase().includes(searchValue);
             const authorUsernameMatches = task.author.username?.toLowerCase().includes(searchValue);
             const authorNameMatches = task.author.fullName?.toLowerCase().includes(searchValue);
@@ -275,17 +275,17 @@ export class AdminView extends HTMLElement {
 
     private async loadData() {
         this.me = authService.getUser()!;
-        
+
         const usersSection = this.shadowRoot!.getElementById('users-section')!;
         const tasksSection = this.shadowRoot!.getElementById('tasks-section')!;
         const adminMain = this.shadowRoot!.getElementById('admin-main')!;
-        
+
         if (authService.isManager()) {
             usersSection.classList.add('hidden');
             usersSection.classList.remove('flex');
             tasksSection.classList.add('hidden');
             tasksSection.classList.remove('flex');
-            
+
             if (adminMain) {
                 adminMain.classList.remove('md:grid-cols-3', 'max-w-6xl');
                 adminMain.classList.add('md:grid-cols-1', 'max-w-2xl');
@@ -306,12 +306,12 @@ export class AdminView extends HTMLElement {
         }
 
         const fetches: Promise<any>[] = [
-            fetch('/api/cats').then(res => res.ok ? res.json() : [])
+            fetch('/api/cats', { headers: authService.getAuthHeaders() }).then(res => res.ok ? res.json() : [])
         ];
 
         if (!authService.isManager()) {
-            fetches.push(fetch('/api/admin/tasks').then(res => res.ok ? res.json() : []));
-            fetches.push(fetch('/api/admin/users').then(res => res.ok ? res.json() : []));
+            fetches.push(fetch('/api/admin/tasks', { headers: authService.getAuthHeaders() }).then(res => res.ok ? res.json() : []));
+            fetches.push(fetch('/api/admin/users', { headers: authService.getAuthHeaders() }).then(res => res.ok ? res.json() : []));
         } else {
             fetches.push(Promise.resolve([]));
             fetches.push(Promise.resolve([]));
@@ -386,7 +386,7 @@ export class AdminView extends HTMLElement {
             minute: '2-digit'
         };
 
-        
+
         Array.from([createdAt, updatedAt, deadline]).forEach(el => {
             if (!el) return;
             el.parentElement!.onclick = async () => {
@@ -425,12 +425,14 @@ export class AdminView extends HTMLElement {
         title.textContent = task.title ?? '';
         desc.textContent = task.description ?? '';
 
-        const importantIcon = this.shadowRoot!.getElementById('task-info-important');
-        if (importantIcon) {
+        const importantBadge = this.shadowRoot!.getElementById('task-info-important-badge')
+        if (importantBadge) {
             if (task.important) {
-                importantIcon.classList.remove('hidden');
+                importantBadge.classList.remove('hidden')
+                importantBadge.classList.add('flex')
             } else {
-                importantIcon.classList.add('hidden');
+                importantBadge.classList.remove('flex')
+                importantBadge.classList.add('hidden')
             }
         }
 
@@ -438,7 +440,7 @@ export class AdminView extends HTMLElement {
             ? new Date(task.deadline).toLocaleString('es-ES', dateConfig)
             : 'No establecida';
 
-        
+
         categories.innerHTML = '';
         if (task.categories) {
             task.categories.forEach(cat => {
@@ -449,7 +451,7 @@ export class AdminView extends HTMLElement {
             });
         }
 
-        
+
         tags.innerHTML = '';
         if (task.tags) {
             task.tags.forEach(tag => {

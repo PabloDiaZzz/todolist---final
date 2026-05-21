@@ -220,7 +220,7 @@ export default class SettingsView extends HTMLElement {
             feedback.classList.remove('hidden');
 
             try {
-                const res = await fetch(`${url}?${param}=${encodeURIComponent(value)}`);
+                const res = await fetch(`${url}?${param}=${encodeURIComponent(value)}`, { headers: authService.getAuthHeaders() });
                 const exists = await res.json();
                 if (exists) {
                     feedback.textContent = `${label} ya en uso`;
@@ -286,7 +286,7 @@ export default class SettingsView extends HTMLElement {
             try {
                 const res = await fetch('/api/user/profile', {
                     method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: authService.getAuthHeaders(),
                     body: JSON.stringify({
                         username,
                         fullName,
@@ -357,7 +357,7 @@ export default class SettingsView extends HTMLElement {
 
                 const res = await fetch('/api/user/password', {
                     method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: authService.getAuthHeaders(),
                     body: JSON.stringify(reqBody)
                 });
 
@@ -398,7 +398,7 @@ export default class SettingsView extends HTMLElement {
                     try {
                         const res = await fetch('/api/user/profile', {
                             method: 'PATCH',
-                            headers: { 'Content-Type': 'application/json' },
+                            headers: authService.getAuthHeaders(),
                             body: JSON.stringify({
                                 username: this.user.username,
                                 fullName: this.user.fullName,
@@ -449,7 +449,8 @@ export default class SettingsView extends HTMLElement {
 
             try {
                 const res = await fetch('/api/tasks/completed', {
-                    method: 'DELETE'
+                    method: 'DELETE',
+                    headers: authService.getAuthHeaders(),
                 });
 
                 if (res.ok) {
@@ -464,7 +465,7 @@ export default class SettingsView extends HTMLElement {
 
         exportJsonBtn.addEventListener('click', async () => {
             try {
-                const res = await fetch('/api/tasks');
+                const res = await fetch('/api/tasks', {headers: authService.getAuthHeaders()});
                 if (!res.ok) {
                     this.showToast('No se pudieron obtener tus tareas.', true);
                     return;
@@ -534,7 +535,8 @@ export default class SettingsView extends HTMLElement {
 
             try {
                 const res = await fetch('/api/user/me', {
-                    method: 'DELETE'
+                    method: 'DELETE',
+                    headers: authService.getAuthHeaders(),
                 });
 
                 if (res.ok) {

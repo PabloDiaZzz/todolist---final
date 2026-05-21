@@ -1,6 +1,7 @@
 import html from './html/CatAdminItem.html?raw';
 import type { Category } from '../types/api-types';
 import { updateCachedData } from '../utils/store';
+import { authService } from '../services/AuthService';
 
 export class CatAdminItem extends HTMLElement {
     private _cat!: Category;
@@ -27,7 +28,7 @@ export class CatAdminItem extends HTMLElement {
 
             let count = 0;
             try {
-                const countRes = await fetch(`/api/admin/categories/${this._cat.id}/tasks/count`);
+                const countRes = await fetch(`/api/admin/categories/${this._cat.id}/tasks/count`, { headers: authService.getAuthHeaders() });
                 if (countRes.ok) {
                     count = await countRes.json();
                 }
@@ -54,7 +55,8 @@ export class CatAdminItem extends HTMLElement {
 
             try {
                 const response = await fetch(`/api/admin/categories/${this._cat.id}`, {
-                    method: 'DELETE'
+                    method: 'DELETE',
+                    headers: authService.getAuthHeaders()
                 });
 
                 if (!response.ok) throw new Error('Error al borrar');
