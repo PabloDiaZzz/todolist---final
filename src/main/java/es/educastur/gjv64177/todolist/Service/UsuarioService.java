@@ -4,20 +4,17 @@ import es.educastur.gjv64177.todolist.dto.UsuarioRegistroDTO;
 import es.educastur.gjv64177.todolist.model.Role;
 import es.educastur.gjv64177.todolist.model.Usuario;
 import es.educastur.gjv64177.todolist.repository.UsuarioRepository;
-import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.springframework.web.client.RestClient;
+import org.springframework.http.MediaType;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,14 +27,19 @@ public class UsuarioService {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	@Autowired
-	private JavaMailSender mailSender;
-	@Autowired
 	private TaskService taskService;
+
+	@Value("${spring.mail.password}")
+	private String brevoApiKey;
+
+	@Value("${spring.mail.username}")
+	private String brevoSenderEmail;
 
 	private static final Logger log = LoggerFactory.getLogger(UsuarioService.class);
 
 	public Usuario findByUsername(String username) {
-		return usuarioRepository.findByUsername(username).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "El usuario " + username + " no fue encontrado"));
+		return usuarioRepository.findByUsername(username)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "El usuario " + username + " no fue encontrado"));
 	}
 
 	public boolean existsByUsername(String username) {
@@ -49,11 +51,10 @@ public class UsuarioService {
 	}
 
 	public void registrarUsuario(UsuarioRegistroDTO dto) {
-		if (usuarioRepository.existsByUsername(dto.username()) ||
-				usuarioRepository.existsByEmail(dto.email())) {
+		if (usuarioRepository.existsByUsername(dto.username()) || usuarioRepository.existsByEmail(dto.email())) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuario o Email ya en uso");
 		}
-		
+
 		Usuario nuevoUsuario = new Usuario();
 		nuevoUsuario.setUsername(dto.username());
 		nuevoUsuario.setFullName(dto.fullName());
@@ -65,73 +66,62 @@ public class UsuarioService {
 	}
 
 	public void enviarNuevaPassword(String email) {
-		log.info("[FORGOT-PASSWORD] Iniciando proceso de recuperación para el email: {}", email);
+		log.info("[FORGOT-PASSWORD-API] Iniciando recuperación vía HTTP para: {}", email);
 
-		// 1. Buscar usuario
+		// Buscar el usuario en la base de datos
 		Usuario usuario = usuarioRepository.findByEmail(email)
-				.orElseThrow(() -> {
-					log.error("[FORGOT-PASSWORD] Error: El email {} no existe en la base de datos.", email);
-					return new RuntimeException("Email no encontrado en el sistema: " + email);
-				});
+				.orElseThrow(() -> new RuntimeException("Email no encontrado"));
 
-		log.info("[FORGOT-PASSWORD] Usuario encontrado: {}. Generando clave temporal...", usuario.getUsername());
-		String tempPassword = UUID.randomUUID().toString().substring(0, 8);
+		String tempPassword = UUID.randomUUID()
+				.toString()
+				.substring(0, 8);
+
+		// 2. Construimos el JSON exacto que pide la API v3 de Brevo
+		String jsonBody = """
+				{
+				  "sender": { "name": "ToDo List Support", "email": "%s" },
+				  "to": [{ "email": "%s" }],
+				  "subject": "Nueva Contraseña Temporal",
+				  "htmlContent": "<html><body><p>Tu nueva contraseña temporal es: <strong>%s</strong></p><p>Por seguridad, cámbiala en cuanto inicies sesión.</p></body></html>"
+				}
+				""".formatted(brevoSenderEmail, email, tempPassword);
 
 		try {
-			log.info("[FORGOT-PASSWORD] Creando MimeMessage y configurando helper...");
-			MimeMessage message = mailSender.createMimeMessage();
-			MimeMessageHelper helper = new MimeMessageHelper(message, "UTF-8");
+			log.info("[FORGOT-PASSWORD-API] Enviando petición POST a la API de Brevo...");
 
-			log.info("[FORGOT-PASSWORD] Configurando parámetros del correo. From: {}, To: {}", remitentePersonalizado, email);
-			helper.setFrom(remitentePersonalizado);
-			helper.setTo(email);
-			helper.setSubject("Nueva Contraseña Temporal");
-			helper.setText("Tu nueva contraseña es: " + tempPassword);
+			// Creamos el cliente HTTP de Spring
+			RestClient restClient = RestClient.create();
 
-			log.info("[FORGOT-PASSWORD] Intentando enviar correo a través de SMTP de Gmail...");
-			mailSender.send(message);
-			log.info("[FORGOT-PASSWORD] ¡Correo enviado con éxito! Procediendo a encriptar y guardar la nueva clave...");
+			// Ejecutamos la petición web por el puerto 443
+			restClient.post()
+					.uri("https://api.brevo.com/v3/smtp/email")
+					.header("api-key", brevoApiKey)
+					.contentType(MediaType.APPLICATION_JSON)
+					.body(jsonBody)
+					.retrieve()
+					.toBodilessEntity();
 
+			log.info("[FORGOT-PASSWORD-API] ¡API de Brevo respondió con éxito! Actualizando credenciales en base de datos...");
+
+			// 3. Si la llamada HTTP no dio error, guardamos la contraseña en la base de datos
 			usuario.setPassword(passwordEncoder.encode(tempPassword));
 			usuarioRepository.save(usuario);
-			log.info("[FORGOT-PASSWORD] Proceso completado con éxito. Contraseña actualizada en BBDD para: {}", usuario.getUsername());
-
-		} catch (org.springframework.mail.MailAuthenticationException e) {
-			log.error("[FORGOT-PASSWORD] ❌ ERROR DE AUTENTICACIÓN: La contraseña de aplicación de Google o el usuario de correo son incorrectos en Render.");
-			log.error("[FORGOT-PASSWORD] Detalle del fallo: {}", e.getMessage());
-			throw new RuntimeException("Fallo de autenticación SMTP: Revisa MAIL_USERNAME y MAIL_PASSWORD en Render.", e);
-
-		} catch (org.springframework.mail.MailSendException e) {
-			log.error("[FORGOT-PASSWORD] ❌ ERROR DE CONEXIÓN/RED: No se pudo establecer conexión con smtp.gmail.com.");
-
-			// Evaluamos la causa de forma segura sin imports raros
-			if (e.getMessage() != null && (e.getMessage().contains("Connection timed out") || e.getMessage().contains("refused"))) {
-				log.error("[FORGOT-PASSWORD] Diagnóstico: El Firewall de Render o las restricciones de red están bloqueando el puerto.");
-			} else if (e.getCause() != null) {
-				log.error("[FORGOT-PASSWORD] Causa subyacente: {}", e.getCause().getMessage());
-			}
-
-			log.error("[FORGOT-PASSWORD] Detalle completo del fallo: {}", e.getMessage());
-			throw new RuntimeException("Fallo de red al conectar al servidor de correo SMTP.", e);
+			log.info("[FORGOT-PASSWORD-API] Proceso completado. Nueva clave guardada para el usuario.");
 
 		} catch (Exception e) {
-			log.error("[FORGOT-PASSWORD] ❌ ERROR INESPERADO al procesar el envío de correo.");
-			log.error("[FORGOT-PASSWORD] Clase de la excepción: {}", e.getClass().getName());
-			log.error("[FORGOT-PASSWORD] Mensaje de error: {}", e.getMessage());
-			if (e.getCause() != null) {
-				log.error("[FORGOT-PASSWORD] Causa original: {}", e.getCause().getMessage());
-			}
-			throw new RuntimeException("Error interno en el servicio de correo: " + e.getMessage(), e);
+			log.error("[FORGOT-PASSWORD-API] ❌ Error crítico al conectar con la API de Brevo: {}", e.getMessage());
+			throw new RuntimeException("Error al enviar el mensaje de correo vía API", e);
 		}
 	}
-
+	
 	public List<Usuario> listarTodos() {
 		return usuarioRepository.findAll();
 	}
 
 	@Transactional
 	public void changeRole(String username, Role role) {
-		Usuario user = usuarioRepository.findByUsername(username).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+		Usuario user = usuarioRepository.findByUsername(username)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
 		user.setRole(role);
 		usuarioRepository.save(user);
 	}
@@ -165,7 +155,8 @@ public class UsuarioService {
 		}
 
 		if (newTheme != null && !newTheme.isBlank()) {
-			user.setTheme(newTheme.trim().toUpperCase());
+			user.setTheme(newTheme.trim()
+					              .toUpperCase());
 		}
 
 		return usuarioRepository.save(user);
