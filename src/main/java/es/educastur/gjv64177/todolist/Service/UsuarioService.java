@@ -23,8 +23,6 @@ import java.util.UUID;
 
 @Service
 public class UsuarioService {
-	@Value("${app.mail.from}")
-	private String remitentePersonalizado;
 	@Autowired
 	private UsuarioRepository usuarioRepository;
 	@Autowired
@@ -33,6 +31,9 @@ public class UsuarioService {
 	private JavaMailSender mailSender;
 	@Autowired
 	private TaskService taskService;
+
+	@Value("${app.mail.from}")
+	private String remitentePersonalizado;
 
 	private static final Logger log = LoggerFactory.getLogger(UsuarioService.class);
 
@@ -66,8 +67,7 @@ public class UsuarioService {
 
 	public void enviarNuevaPassword(String email) {
 		log.info("[FORGOT-PASSWORD] Iniciando proceso de recuperación para el email: {}", email);
-
-		// 1. Buscar usuario
+		
 		Usuario usuario = usuarioRepository.findByEmail(email)
 				.orElseThrow(() -> {
 					log.error("[FORGOT-PASSWORD] Error: El email {} no existe en la base de datos.", email);
@@ -75,7 +75,9 @@ public class UsuarioService {
 				});
 
 		log.info("[FORGOT-PASSWORD] Usuario encontrado: {}. Generando clave temporal...", usuario.getUsername());
-		String tempPassword = UUID.randomUUID().toString().substring(0, 8);
+		String tempPassword = UUID.randomUUID()
+				.toString()
+				.substring(0, 8);
 
 		try {
 			log.info("[FORGOT-PASSWORD] Creando MimeMessage y configurando helper...");
@@ -88,7 +90,7 @@ public class UsuarioService {
 			helper.setSubject("Nueva Contraseña Temporal");
 			helper.setText("Tu nueva contraseña es: " + tempPassword);
 
-			log.info("[FORGOT-PASSWORD] Intentando enviar correo a través de SMTP de Gmail...");
+			log.info("[FORGOT-PASSWORD] Intentando enviar correo a través de SMTP de Brevo (Puerto 2525)...");
 			mailSender.send(message);
 			log.info("[FORGOT-PASSWORD] ¡Correo enviado con éxito! Procediendo a encriptar y guardar la nueva clave...");
 
@@ -97,30 +99,20 @@ public class UsuarioService {
 			log.info("[FORGOT-PASSWORD] Proceso completado con éxito. Contraseña actualizada en BBDD para: {}", usuario.getUsername());
 
 		} catch (org.springframework.mail.MailAuthenticationException e) {
-			log.error("[FORGOT-PASSWORD] ❌ ERROR DE AUTENTICACIÓN: La contraseña de aplicación de Google o el usuario de correo son incorrectos en Render.");
+			log.error("[FORGOT-PASSWORD] ❌ ERROR DE AUTENTICACIÓN: Las credenciales SMTP leídas desde Render son incorrectas.");
 			log.error("[FORGOT-PASSWORD] Detalle del fallo: {}", e.getMessage());
 			throw new RuntimeException("Fallo de autenticación SMTP: Revisa MAIL_USERNAME y MAIL_PASSWORD en Render.", e);
 
 		} catch (org.springframework.mail.MailSendException e) {
-			log.error("[FORGOT-PASSWORD] ❌ ERROR DE CONEXIÓN/RED: No se pudo establecer conexión con smtp.gmail.com.");
-
-			// Evaluamos la causa de forma segura sin imports raros
-			if (e.getMessage() != null && (e.getMessage().contains("Connection timed out") || e.getMessage().contains("refused"))) {
-				log.error("[FORGOT-PASSWORD] Diagnóstico: El Firewall de Render o las restricciones de red están bloqueando el puerto.");
-			} else if (e.getCause() != null) {
-				log.error("[FORGOT-PASSWORD] Causa subyacente: {}", e.getCause().getMessage());
-			}
-
+			log.error("[FORGOT-PASSWORD] ❌ ERROR DE CONEXIÓN O RECHAZO: El servidor SMTP ha denegado el envío.");
 			log.error("[FORGOT-PASSWORD] Detalle completo del fallo: {}", e.getMessage());
-			throw new RuntimeException("Fallo de red al conectar al servidor de correo SMTP.", e);
+			throw new RuntimeException("Fallo al procesar el envío en el servidor de correo SMTP.", e);
 
 		} catch (Exception e) {
 			log.error("[FORGOT-PASSWORD] ❌ ERROR INESPERADO al procesar el envío de correo.");
-			log.error("[FORGOT-PASSWORD] Clase de la excepción: {}", e.getClass().getName());
+			log.error("[FORGOT-PASSWORD] Clase de la excepción: {}", e.getClass()
+					.getName());
 			log.error("[FORGOT-PASSWORD] Mensaje de error: {}", e.getMessage());
-			if (e.getCause() != null) {
-				log.error("[FORGOT-PASSWORD] Causa original: {}", e.getCause().getMessage());
-			}
 			throw new RuntimeException("Error interno en el servicio de correo: " + e.getMessage(), e);
 		}
 	}
