@@ -238,7 +238,7 @@ export class TaskItem extends HTMLElement {
             
             editBtn.disabled = true;
             editBtn.classList.add('opacity-50', 'cursor-not-allowed');
-            editBtn.classList.remove('hover:bg-blue-200', 'dark:hover:bg-blue-900/30');
+            editBtn.classList.remove('cursor-pointer', 'hover:bg-blue-200', 'dark:hover:bg-blue-900/30');
             editBtn.classList.remove('text-blue-600', 'dark:text-indigo-400');
             editBtn.classList.add('text-gray-300', 'dark:text-gray-600');
             dateEl?.setAttribute('color', 'green');
@@ -249,7 +249,7 @@ export class TaskItem extends HTMLElement {
             
             editBtn.disabled = false;
             editBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'text-gray-300', 'dark:text-gray-600');
-            editBtn.classList.add('hover:bg-blue-200', 'dark:hover:bg-blue-900/30', 'text-blue-600', 'dark:text-indigo-400');
+            editBtn.classList.add('cursor-pointer', 'hover:bg-blue-200', 'dark:hover:bg-blue-900/30', 'text-blue-600', 'dark:text-indigo-400');
         }
 
         infoBtn?.classList.remove('invisible');
