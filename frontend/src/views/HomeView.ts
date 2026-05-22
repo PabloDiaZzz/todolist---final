@@ -402,8 +402,8 @@ export class HomeView extends HTMLElement {
     if (prefetchCache.has('/api/cats')) {
       this.cats = prefetchCache.get('/api/cats');
       this.loadCatsDropdown('category-dropdown-container');
-      
-      this.updateCategoryFilter(); 
+
+      this.updateCategoryFilter();
     }
 
     try {
@@ -862,7 +862,7 @@ export class HomeView extends HTMLElement {
 
   private updateCategoryFilter() {
     const root = this.shadowRoot!;
-    
+
     const optionsContainer = root.getElementById('category-options-container') as HTMLDivElement;
     if (!optionsContainer) return;
 
@@ -879,7 +879,7 @@ export class HomeView extends HTMLElement {
       option.value = String(cat.id);
       option.textContent = cat.title ?? '';
       option.className = "bg-white text-gray-900 dark:bg-slate-800 dark:text-white";
-      
+
       optionsContainer.appendChild(option);
     });
   }
@@ -913,18 +913,6 @@ export class HomeView extends HTMLElement {
 
     processed.sort((a, b) => {
 
-      if (a.completed !== b.completed) {
-        return a.completed ? 1 : -1;
-      }
-
-
-      const aImp = a.important ? 1 : 0;
-      const bImp = b.important ? 1 : 0;
-      if (aImp !== bImp) {
-        return bImp - aImp;
-      }
-
-
       if (sortFilter === 'title') {
         return (a.title || '').localeCompare(b.title || '');
       }
@@ -939,6 +927,11 @@ export class HomeView extends HTMLElement {
       if (sortFilter === 'complete') {
         return (a.completed === b.completed) ? 0 : (a.completed ? 1 : -1);
       }
+      if (sortFilter === 'priority') {
+        const aImp = a.important ? 1 : 0;
+        const bImp = b.important ? 1 : 0;
+        return bImp - aImp;
+      }
       if (sortFilter === 'deadline') {
         const timeA = a.deadline ? new Date(a.deadline).getTime() : 0;
         const timeB = b.deadline ? new Date(b.deadline).getTime() : 0;
@@ -950,7 +943,7 @@ export class HomeView extends HTMLElement {
       if (sortFilter === 'created') {
         const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
         const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-        return timeB - timeA;
+        return timeB - timeA; // Las más nuevas primero
       }
       if (sortFilter === 'lastEdit') {
         const timeA = a.lastEdit ? new Date(a.lastEdit).getTime() : 0;
@@ -958,6 +951,15 @@ export class HomeView extends HTMLElement {
         return timeB - timeA;
       }
 
+      if (a.completed !== b.completed) {
+        return a.completed ? 1 : -1;
+      }
+
+      const aImp = a.important ? 1 : 0;
+      const bImp = b.important ? 1 : 0;
+      if (aImp !== bImp) {
+        return bImp - aImp;
+      }
 
       return (b.id ?? 0) - (a.id ?? 0);
     });
