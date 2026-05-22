@@ -98,62 +98,6 @@ export class TaskItem extends HTMLElement {
             this.dispatchEvent(new CustomEvent('task-info', { bubbles: true, composed: true, detail: this._task }));
         });
 
-        const starBtn = this.querySelector('.star-btn') as HTMLButtonElement;
-        starBtn?.addEventListener('click', async (e) => {
-            e.stopPropagation();
-            if (this._isSyncing) return;
-            const task = this._task;
-            const originalState = !!task.important;
-            const nextState = !originalState;
-            task.important = nextState;
-
-            
-            const starIcon = starBtn.querySelector('.star-icon');
-            if (starIcon) {
-                starIcon.classList.remove('animate-star-pop', 'animate-star-shrink');
-                void (starIcon as HTMLElement).offsetWidth; 
-                if (nextState) {
-                    starIcon.classList.add('animate-star-pop');
-                } else {
-                    starIcon.classList.add('animate-star-shrink');
-                }
-            }
-
-            
-            const apiPromise = (async () => {
-                try {
-                    const response = await fetch(`/api/tasks/${task.id}/important`, { method: 'PATCH', headers: authService.getAuthHeaders(), });
-                    if (!response.ok) throw new Error('Error al actualizar la prioridad');
-                    const updatedTask: TaskResponseDTO = await response.json();
-                    return updatedTask.important;
-                } catch (error) {
-                    console.error("Failed to toggle priority", error);
-                    return null;
-                }
-            })();
-
-            
-            setTimeout(async () => {
-                const apiResult = await apiPromise;
-                if (apiResult !== null) {
-                    task.important = apiResult;
-                } else {
-                    task.important = originalState; 
-                }
-
-                this.render();
-
-                updateCachedData<TaskResponseDTO>('/api/tasks', oldTasks =>
-                    oldTasks.map(t => t.id === task.id ? { ...t, important: task.important } : t)
-                );
-
-                this.dispatchEvent(new CustomEvent('task-priority-changed', {
-                    bubbles: true,
-                    composed: true,
-                    detail: { task: this._task }
-                }));
-            }, 350);
-        });
     }
 
     private render() {

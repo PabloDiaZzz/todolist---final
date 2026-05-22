@@ -12,7 +12,7 @@ export function applySelectedTheme(theme: string) {
     } else if (theme === 'DARK') {
         document.documentElement.classList.add('dark');
     } else {
-        
+
         const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
         if (darkQuery.matches) {
             document.documentElement.classList.add('dark');
@@ -42,7 +42,7 @@ export default class SettingsView extends HTMLElement {
         const themeWrapper = this.shadowRoot!.getElementById('theme-wrapper');
         this.themeObserver = syncThemeWithObserver(themeWrapper);
 
-        
+
         const loggedIn = await authService.checkSession();
         if (!loggedIn || !authService.getUser()) {
             (window as any).navigate('/login?required');
@@ -90,7 +90,7 @@ export default class SettingsView extends HTMLElement {
     private setupEvents() {
         const root = this.shadowRoot!;
 
-        
+
         const tabBtns = root.querySelectorAll('.tab-btn');
         tabBtns.forEach(btn => {
             btn.addEventListener('click', () => {
@@ -101,19 +101,19 @@ export default class SettingsView extends HTMLElement {
             });
         });
 
-        
+
         this.setupProfileForm(root);
 
-        
+
         this.setupPasswordForm(root);
 
-        
+
         this.setupThemeCards(root);
 
-        
+
         this.setupDataTools(root);
 
-        
+
         this.setupDangerZone(root);
     }
 
@@ -121,8 +121,8 @@ export default class SettingsView extends HTMLElement {
         const root = this.shadowRoot!;
         const activeClasses = ['bg-blue-600', 'text-white', 'dark:bg-indigo-600', 'dark:text-white'];
         const inactiveClasses = [
-            'text-gray-600', 'dark:text-gray-400', 
-            'hover:bg-gray-100', 'dark:hover:bg-slate-700/50', 
+            'text-gray-600', 'dark:text-gray-400',
+            'hover:bg-gray-100', 'dark:hover:bg-slate-700/50',
             'hover:text-slate-800', 'dark:hover:text-white'
         ];
 
@@ -130,7 +130,7 @@ export default class SettingsView extends HTMLElement {
         tabBtns.forEach(btn => {
             const tab = btn.getAttribute('data-tab');
             const isDanger = tab === 'danger';
-            
+
             if (tab === activeTab) {
                 btn.classList.add('active');
                 if (isDanger) {
@@ -157,7 +157,7 @@ export default class SettingsView extends HTMLElement {
             const id = content.getAttribute('id');
             if (id === `tab-content-${activeTab}`) {
                 content.classList.remove('hidden');
-                
+
                 content.animate([
                     { opacity: 0, transform: 'translateY(6px)' },
                     { opacity: 1, transform: 'translateY(0)' }
@@ -180,7 +180,7 @@ export default class SettingsView extends HTMLElement {
         const usernameFeedback = root.getElementById('username-feedback') as HTMLParagraphElement;
         const emailFeedback = root.getElementById('email-feedback') as HTMLParagraphElement;
 
-        
+
         fullnameInput.value = this.user.fullName ?? '';
         usernameInput.value = this.user.username ?? '';
         emailInput.value = this.user.email ?? '';
@@ -298,13 +298,13 @@ export default class SettingsView extends HTMLElement {
                 if (res.ok) {
                     const updatedUser: UsuarioDTO = await res.json();
                     this.user = updatedUser;
-                    
-                    
+
+
                     await authService.checkSession();
 
                     this.showToast('¡Perfil actualizado correctamente!');
-                    
-                    
+
+
                     usernameInput.classList.remove('border-green-500');
                     emailInput.classList.remove('border-green-500');
                     usernameFeedback.classList.add('hidden');
@@ -382,7 +382,7 @@ export default class SettingsView extends HTMLElement {
     private setupThemeCards(root: ShadowRoot) {
         const cards = root.querySelectorAll('.theme-card');
 
-        
+
         const currentTheme = this.user.theme ?? 'SYSTEM';
         this.updateThemeCardsStyle(currentTheme);
 
@@ -394,7 +394,7 @@ export default class SettingsView extends HTMLElement {
                     applySelectedTheme(selectedTheme);
                     this.setupSystemThemeListener(selectedTheme);
 
-                    
+
                     try {
                         const res = await fetch('/api/user/profile', {
                             method: 'PATCH',
@@ -444,9 +444,6 @@ export default class SettingsView extends HTMLElement {
         const exportJsonBtn = root.getElementById('export-json-btn') as HTMLButtonElement;
 
         clearCompletedBtn.addEventListener('click', async () => {
-            const confirmVal = confirm('¿Estás seguro de que deseas eliminar de forma permanente todas tus tareas completadas? Esta acción es irreversible.');
-            if (!confirmVal) return;
-
             try {
                 const res = await fetch('/api/tasks/completed', {
                     method: 'DELETE',
@@ -465,7 +462,7 @@ export default class SettingsView extends HTMLElement {
 
         exportJsonBtn.addEventListener('click', async () => {
             try {
-                const res = await fetch('/api/tasks', {headers: authService.getAuthHeaders()});
+                const res = await fetch('/api/tasks', { headers: authService.getAuthHeaders() });
                 if (!res.ok) {
                     this.showToast('No se pudieron obtener tus tareas.', true);
                     return;
@@ -476,7 +473,7 @@ export default class SettingsView extends HTMLElement {
                 const dlAnchorElem = document.createElement('a');
                 dlAnchorElem.setAttribute("href", dataStr);
                 dlAnchorElem.setAttribute("download", "mis-tareas.json");
-                
+
                 document.body.appendChild(dlAnchorElem);
                 dlAnchorElem.click();
                 dlAnchorElem.remove();
@@ -511,12 +508,12 @@ export default class SettingsView extends HTMLElement {
             const doubleConfirm = confirm('⚠️ ADVERTENCIA CRÍTICA ⚠️\n¿Estás completamente seguro de que deseas eliminar permanentemente tu cuenta de usuario y todas tus tareas?\nEsta acción es irreversible y no se podrá restaurar ningún dato.');
             if (!doubleConfirm) return;
 
-            
+
             deleteBtn.setAttribute('disabled', 'true');
             deleteBtn.classList.add('cursor-not-allowed', 'opacity-70');
             const originalHTML = deleteBtn.innerHTML;
-            
-            
+
+
             deleteBtn.innerHTML = `
                 <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" style="width: 1rem; height: 1rem; vertical-align: middle;">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -525,7 +522,7 @@ export default class SettingsView extends HTMLElement {
                 <span style="vertical-align: middle;">Eliminando cuenta...</span>
             `;
 
-            
+
             const sidebar = root.querySelector('aside') as HTMLElement;
             if (sidebar) {
                 sidebar.classList.add('pointer-events-none', 'opacity-50');
@@ -542,15 +539,15 @@ export default class SettingsView extends HTMLElement {
                 if (res.ok) {
                     this.showToast('Cuenta eliminada con éxito. Redirigiendo...');
                     await authService.logout();
-                    
+
                     setTimeout(() => {
                         (window as any).navigate('/login?deleted=true');
                     }, 1000);
                 } else {
                     const errText = await res.text();
                     this.showToast(errText || 'Error al eliminar cuenta.', true);
-                    
-                    
+
+
                     deleteBtn.removeAttribute('disabled');
                     deleteBtn.classList.remove('cursor-not-allowed', 'opacity-70');
                     deleteBtn.innerHTML = originalHTML;
@@ -562,8 +559,8 @@ export default class SettingsView extends HTMLElement {
                 }
             } catch (err) {
                 this.showToast('Error de red al eliminar la cuenta.', true);
-                
-                
+
+
                 deleteBtn.removeAttribute('disabled');
                 deleteBtn.classList.remove('cursor-not-allowed', 'opacity-70');
                 deleteBtn.innerHTML = originalHTML;
@@ -591,7 +588,7 @@ export default class SettingsView extends HTMLElement {
             toast.className = "fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-white/90 dark:bg-slate-800/90 border border-gray-200/80 dark:border-slate-700/60 text-slate-800 dark:text-white shadow-2xl px-5 py-4 rounded-2xl backdrop-blur-md transition-all duration-300 translate-y-0 opacity-100";
         }
 
-        
+
         setTimeout(() => {
             if (isError) {
                 toast.className = "fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-red-600 text-white border border-red-500 shadow-2xl px-5 py-4 rounded-2xl transition-all duration-300 translate-y-2 opacity-0 pointer-events-none";
@@ -602,7 +599,7 @@ export default class SettingsView extends HTMLElement {
     }
 
     private render() {
-        
+
     }
 }
 
