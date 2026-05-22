@@ -26,7 +26,7 @@ public class AuthController {
 
 	@Autowired
 	private JwtService jwtService;
-	
+
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@RequestBody Map<String, String> loginRequest) {
 		try {
