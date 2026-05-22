@@ -54,7 +54,15 @@ export class ForgotPasswordView extends HTMLElement {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(form);
-            const res = await fetch('/api/auth/forgot-password', { method: 'POST', headers: authService.getAuthHeaders(),body: formData });
+            const params = new URLSearchParams();
+            params.append('email', formData.get('email') as string);
+            const res = await fetch('/api/auth/forgot-password', { 
+                method: 'POST', 
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: params.toString() 
+            });
 
             if (res.ok) {
                 alertError.classList.remove('hidden');
