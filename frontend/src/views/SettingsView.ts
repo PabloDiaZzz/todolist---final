@@ -505,10 +505,6 @@ export default class SettingsView extends HTMLElement {
         deleteBtn.addEventListener('click', async () => {
             if (deleteBtn.hasAttribute('disabled')) return;
 
-            const doubleConfirm = confirm('⚠️ ADVERTENCIA CRÍTICA ⚠️\n¿Estás completamente seguro de que deseas eliminar permanentemente tu cuenta de usuario y todas tus tareas?\nEsta acción es irreversible y no se podrá restaurar ningún dato.');
-            if (!doubleConfirm) return;
-
-
             deleteBtn.setAttribute('disabled', 'true');
             deleteBtn.classList.add('cursor-not-allowed', 'opacity-70');
             const originalHTML = deleteBtn.innerHTML;
