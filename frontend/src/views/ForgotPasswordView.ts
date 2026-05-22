@@ -1,7 +1,6 @@
 import html from './html/ForgotPasswordView.html?raw';
 import styles from '../style.css?inline';
 import { syncThemeWithObserver } from '../utils/theme';
-import { authService } from '../services/AuthService';
 
 export class ForgotPasswordView extends HTMLElement {
     private themeObserver: MutationObserver | null = null;
