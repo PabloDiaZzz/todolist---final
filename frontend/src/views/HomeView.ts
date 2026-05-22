@@ -169,7 +169,7 @@ export class HomeView extends HTMLElement {
     const dateInput = root.getElementById('date-input') as HTMLInputElement
     const timeInput = root.getElementById('time-input') as HTMLInputElement
 
-    
+
     const createImportantBtn = root.getElementById('create-important-btn') as HTMLButtonElement
     const createImportantHidden = root.getElementById('create-important-hidden') as HTMLInputElement
     createImportantBtn?.addEventListener('click', () => {
@@ -179,8 +179,8 @@ export class HomeView extends HTMLElement {
       const starIcon = createImportantBtn.querySelector('.star-icon')
       if (starIcon) {
         starIcon.classList.remove('animate-star-pop', 'animate-star-shrink')
-        void (starIcon as HTMLElement).offsetWidth 
-        
+        void (starIcon as HTMLElement).offsetWidth
+
         if (nextImportant) {
           starIcon.classList.add('animate-star-pop', 'text-amber-500', 'fill-amber-500', 'drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]')
           starIcon.classList.remove('text-gray-400', 'dark:text-slate-500', 'fill-none')
@@ -192,7 +192,7 @@ export class HomeView extends HTMLElement {
       }
     })
 
-    
+
     root.addEventListener('task-priority-changed', () => {
       if ((document as any).startViewTransition) {
         (document as any).startViewTransition(() => this.renderTasks());
@@ -241,9 +241,9 @@ export class HomeView extends HTMLElement {
       const isActive = importantFilterBtn.getAttribute('data-active') === 'true';
       const nextActive = !isActive;
       importantFilterBtn.setAttribute('data-active', String(nextActive));
-      
+
       const starIcon = importantFilterBtn.querySelector('.filter-star-icon');
-      
+
       if (nextActive) {
         if (starIcon) {
           starIcon.classList.add('text-amber-500', 'fill-amber-500', 'drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]');
@@ -255,7 +255,7 @@ export class HomeView extends HTMLElement {
           starIcon.classList.add('fill-none');
         }
       }
-      
+
       if ((document as any).startViewTransition) {
         (document as any).startViewTransition(() => this.renderTasks());
       } else {
@@ -399,17 +399,11 @@ export class HomeView extends HTMLElement {
   }
 
   private async loadCats() {
-    const catsOptions = this.shadowRoot!.getElementById('category-options-filter')?.querySelector('div') as HTMLDivElement;
     if (prefetchCache.has('/api/cats')) {
       this.cats = prefetchCache.get('/api/cats');
       this.loadCatsDropdown('category-dropdown-container');
-      this.updateCategoryFilter();
-      this.cats.forEach(cat => {
-        const option = document.createElement('option');
-        option.value = cat.id?.toString() ?? '';
-        option.textContent = cat.title ?? '';
-        if (catsOptions) catsOptions.appendChild(option);
-      });
+      
+      this.updateCategoryFilter(); 
     }
 
     try {
@@ -422,12 +416,7 @@ export class HomeView extends HTMLElement {
         this.cats = freshCats;
         prefetchCache.set('/api/cats', freshCats);
         this.loadCatsDropdown('category-dropdown-container');
-        this.cats.forEach(cat => {
-          const option = document.createElement('option');
-          option.value = cat.id?.toString() ?? '';
-          option.textContent = cat.title ?? '';
-          catsOptions.appendChild(option);
-        });
+        this.updateCategoryFilter();
       }
     } catch (err) {
       console.error('Error cargando categorías:', err);
@@ -441,7 +430,7 @@ export class HomeView extends HTMLElement {
     }
 
     try {
-      const response = await fetch('/api/tasks', {headers: authService.getAuthHeaders()});
+      const response = await fetch('/api/tasks', { headers: authService.getAuthHeaders() });
       if (!response.ok) throw new Error('Error al obtener tareas');
 
       const freshTasks: TaskResponseDTO[] = await response.json();
@@ -671,8 +660,8 @@ export class HomeView extends HTMLElement {
       editImportantHidden.value = String(nextImportant);
       if (editStarIcon) {
         editStarIcon.classList.remove('animate-star-pop', 'animate-star-shrink');
-        void (editStarIcon as HTMLElement).offsetWidth; 
-        
+        void (editStarIcon as HTMLElement).offsetWidth;
+
         if (nextImportant) {
           editStarIcon.classList.add('animate-star-pop', 'text-amber-500', 'fill-amber-500', 'drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]');
           editStarIcon.classList.remove('text-gray-400', 'dark:text-slate-500', 'fill-none');
@@ -687,6 +676,7 @@ export class HomeView extends HTMLElement {
     cancel.onclick = () => {
       dp.destroy()
       dialog.close()
+      document.body.classList.remove('overflow-hidden');
     }
     modalBox.onclick = (e) => {
       if (dateDeadline.contains(e.target as Node)) return;
@@ -787,6 +777,7 @@ export class HomeView extends HTMLElement {
       }
     }
     dialog.show();
+    document.body.classList.add('overflow-hidden');
   }
 
   private loadCatsDropdown(id: string, selectedCategories: Category[] = []) {
@@ -871,15 +862,25 @@ export class HomeView extends HTMLElement {
 
   private updateCategoryFilter() {
     const root = this.shadowRoot!;
-    const filterSelect = root.getElementById('category-options-filter') as HTMLSelectElement;
-    if (!filterSelect) return;
+    
+    const optionsContainer = root.getElementById('category-options-container') as HTMLDivElement;
+    if (!optionsContainer) return;
 
-    filterSelect.innerHTML = '<option value="">- Categoria -</option>';
+    optionsContainer.innerHTML = '';
+
+    const defaultOption = document.createElement('option');
+    defaultOption.value = "";
+    defaultOption.textContent = "- Categoria -";
+    defaultOption.className = "bg-white text-gray-900 dark:bg-slate-800 dark:text-white";
+    optionsContainer.appendChild(defaultOption);
+
     this.cats.forEach(cat => {
       const option = document.createElement('option');
       option.value = String(cat.id);
       option.textContent = cat.title ?? '';
-      filterSelect.appendChild(option);
+      option.className = "bg-white text-gray-900 dark:bg-slate-800 dark:text-white";
+      
+      optionsContainer.appendChild(option);
     });
   }
 
@@ -911,19 +912,19 @@ export class HomeView extends HTMLElement {
     }
 
     processed.sort((a, b) => {
-      
+
       if (a.completed !== b.completed) {
         return a.completed ? 1 : -1;
       }
 
-      
+
       const aImp = a.important ? 1 : 0;
       const bImp = b.important ? 1 : 0;
       if (aImp !== bImp) {
         return bImp - aImp;
       }
 
-      
+
       if (sortFilter === 'title') {
         return (a.title || '').localeCompare(b.title || '');
       }
@@ -957,7 +958,7 @@ export class HomeView extends HTMLElement {
         return timeB - timeA;
       }
 
-      
+
       return (b.id ?? 0) - (a.id ?? 0);
     });
 
