@@ -1,0 +1,15 @@
+name: Keep Backend Alive
+
+on:
+  schedule:
+    # Se ejecuta cada 10 minutos
+    - cron: '*/10 * * * *'
+  workflow_dispatch: # Permite lanzarlo manualmente para probarlo
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping backend
+        run: |
+          curl -s -f -m 30 https://todolist-final-4kxj.onrender.com/actuator/health || curl -s -m 30 https://todolist-final-4kxj.onrender.com/
