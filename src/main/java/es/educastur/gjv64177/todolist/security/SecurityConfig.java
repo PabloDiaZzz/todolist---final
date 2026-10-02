@@ -41,7 +41,7 @@ public class SecurityConfig {
 		http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
 		http.authorizeHttpRequests(auth -> auth
-				.requestMatchers("/", "/login", "/register", "/css/**", "/js/**", "/assets/**", "/favicon-login.svg", "/api/auth/**", "/error", "/forgot-password", "/v3/api-docs", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
+				.requestMatchers("/", "/login", "/register", "/css/**", "/js/**", "/assets/**", "/favicon-login.svg", "/api/auth/**", "/error", "/forgot-password", "/v3/api-docs", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/actuator/health")
 				.permitAll()
 				.requestMatchers("/api/admin/users/**", "/api/admin/users").hasRole("ADMIN")
 				.requestMatchers("/api/admin/categories/**", "/api/admin/categories", "/api/admin/tasks/**", "/api/admin/tasks").hasAnyRole("ADMIN", "MANAGER")
